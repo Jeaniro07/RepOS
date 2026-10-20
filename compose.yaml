@@ -1,0 +1,91 @@
+# RepOS Fase 0: satu Murmur + satu Hermes (profil per bot) + satu "komputer" per bot.
+# Jalankan: scripts/fetch-openbot.sh && cp .env.example .env && docker compose up -d --build
+name: repos
+
+x-bot-net: &bot-net
+  networks: [bots]
+
+services:
+  murmur:
+    image: ${MURMUR_IMAGE:-ghcr.io/getumbrel/murmur:0.6}
+    init: true
+    restart: on-failure
+    ports: ["127.0.0.1:3000:3000"]   # buka lewat Tailscale/reverse proxy, bukan langsung
+    volumes: [murmur-data:/data]
+    environment:
+      MURMUR_BUILTIN_HERMES_URL: http://hermes:9119
+      MURMUR_BUILTIN_HERMES_USERNAME: murmur
+      MURMUR_BUILTIN_HERMES_PASSWORD: ${MURMUR_HERMES_PASSWORD:?isi MURMUR_HERMES_PASSWORD di .env}
+      MURMUR_PASSWORD: ${MURMUR_PASSWORD:-}
+    networks: [default]
+
+  hermes:
+    image: ${HERMES_IMAGE}
+    restart: on-failure
+    stop_grace_period: 1m
+    command: ["gateway", "run"]
+    volumes:
+      - hermes-data:/opt/data
+      - ./plugins/auto-review:/opt/data/plugins/auto-review:ro   # plugin Auto Review
+    environment:
+      HERMES_UID: "1000"
+      HERMES_GID: "1000"
+      HERMES_DASHBOARD: "1"
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: murmur
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: ${MURMUR_HERMES_PASSWORD:?isi MURMUR_HERMES_PASSWORD di .env}
+      HERMES_DASHBOARD_BASIC_AUTH_SECRET: ${MURMUR_HERMES_SECRET:-}
+      HERMES_GATEWAY_BOOTSTRAP_STATE: running
+      HERMES_UMBREL_CONTEXT: "0"
+      OPS_TOKEN: ${OPS_TOKEN:?isi OPS_TOKEN di .env}
+    networks: [default, bots]
+
+  # --- Bot: Ops Holding (pilot) -------------------------------------------
+  ops-computer:
+    build:
+      context: vendor/openbot            # hasil scripts/fetch-openbot.sh
+      dockerfile: agent-computer/Dockerfile
+    restart: on-failure
+    init: true
+    shm_size: 1gb
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 512
+    mem_limit: 3g
+    cpus: 2
+    environment:
+      COMPUTER_TOKEN: ${OPS_TOKEN:?isi OPS_TOKEN di .env}
+      COMPUTER_BOT_ID: ops-holding
+    volumes:
+      - ops-profiles:/profiles
+      - ops-workspace:/workspace
+    <<: *bot-net
+
+  ops-mcp:
+    image: ${BUN_IMAGE}
+    restart: on-failure
+    working_dir: /app
+    command: ["bun", "server.ts"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    volumes: ["./computer-mcp/server.ts:/app/server.ts:ro"]
+    environment:
+      COMPUTER_URL: http://ops-computer:4100
+      COMPUTER_TOKEN: ${OPS_TOKEN:?isi OPS_TOKEN di .env}
+      BOT_ID: ops-holding
+      ALLOWED_DOMAINS: ${OPS_ALLOWED_DOMAINS:-}
+      PORT: "8700"
+    depends_on: [ops-computer]
+    <<: *bot-net
+
+  # Penyidikan: sengaja tanpa komputer, tanpa sidecar. Lihat bots/penyidikan/README.md.
+
+networks:
+  default: {}
+  bots: {}
+
+volumes:
+  murmur-data:
+  hermes-data:
+  ops-profiles:
+  ops-workspace:

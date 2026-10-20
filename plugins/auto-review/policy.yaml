@@ -1,0 +1,27 @@
+# Kebijakan Auto Review. Aturan pertama yang cocok menang. tool: glob; args: regex per argumen.
+# MCP tool berbentuk mcp__<server>__<tool>.
+mode: dry-run        # mulai dari dry-run; ganti ke enforce setelah audit log bersih (AUTOREVIEW_MODE menimpa)
+
+profiles:
+  ops-holding:
+    default: approve   # apa pun yang tidak dikenal -> tanya manusia (di cron: otomatis ditolak)
+    rules:
+      - {id: no-exec,      tool: "terminal*",              action: deny, reason: "shell tidak diizinkan untuk bot ini"}
+      - {id: no-code,      tool: "execute_code",           action: deny, reason: "eksekusi kode tidak diizinkan"}
+      - {id: money-words,  tool: "mcp__ops__browser_type", args: {text: "(?i)transfer|bayar|payment|checkout"}, action: approve, reason: "teks menyangkut pembayaran"}
+      - {id: files-write,  tool: "mcp__ops__files_write",  action: approve, reason: "menulis berkas di workspace"}
+      - {id: computer,     tool: "mcp__ops__*",             action: allow}   # browser_*, request_help, files_list/read
+      - {id: memory,       tool: "memory*",                action: allow}
+      - {id: skills,       tool: "skill*",                 action: allow}
+
+  penyidikan:
+    default: deny      # perkara sensitif: apa pun di luar daftar ditolak
+    rules:
+      - {id: memory,   tool: "memory*",      action: allow}
+      - {id: skills,   tool: "skill*",       action: allow}
+      - {id: files,    tool: "read_file",    action: allow}
+      - {id: files-w,  tool: "write_file",   action: approve, reason: "menulis berkas perkara"}
+
+fallback:             # profil lain (mis. Xaqu) sebelum ada kebijakan khusus
+  default: allow
+  rules: []

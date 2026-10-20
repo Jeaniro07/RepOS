@@ -1,0 +1,12 @@
+# Fragmen config profil Ops Holding. Di-merge ke <HERMES_HOME>/profiles/ops-holding/config.yaml oleh hermes/seed.py.
+agent:
+  disabled_toolsets: [browser, computer_use, terminal, code_execution]   # browser/terminal hanya lewat komputer bot
+plugins:
+  enabled: [auto-review]
+approvals:
+  cron_mode: deny          # rutinitas tidak pernah menyetujui sendiri
+mcp_servers:
+  ops:
+    url: http://ops-mcp:8700/mcp
+    headers:
+      Authorization: "Bearer ${OPS_TOKEN}"

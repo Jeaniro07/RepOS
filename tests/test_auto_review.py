@@ -191,3 +191,21 @@ class LlmStage(unittest.TestCase):
                 self.assertEqual(ar.review("mcp__ops__browser_type", {"text": "bayar"})["action"], "approve")
             finally:
                 ar.llm_verdict = ar_llm
+
+
+class LlmSeesContent(unittest.TestCase):
+    def test_verifier_sees_contents_but_not_credentials(self):
+        sent = {}
+        def opener(req, timeout):
+            import io
+            sent["body"] = req.data.decode()
+            return io.BytesIO(json.dumps({"choices": [{"message": {"content": '{"verdict":"deny","confidence":1}'}}]}).encode())
+        ar.llm_verdict("mcp__ops__files_write", {"path": "a", "contents": "ISI-" + "x" * 500, "token": "RAHASIA"}, "r",
+                       {"REVIEW_LLM_URL": "http://x", "REVIEW_LLM_MODEL": "m"}, opener)
+        self.assertIn("ISI-" + "x" * 500, sent["body"])
+        self.assertNotIn("RAHASIA", sent["body"])
+
+    def test_llm_flag_works_on_rule_without_id(self):
+        policy = {"profiles": {"p": {"rules": [{"tool": "t", "action": "approve", "llm": True}]}}}
+        _, rule, _ = ar.decide(policy, "p", "t", {})
+        self.assertTrue(ar.rule_llm(policy, "p", rule))

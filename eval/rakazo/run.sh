@@ -21,6 +21,8 @@ case "${1:-}" in
   egress) sudo bash restrict-computer-egress.sh ;;
   up)
     grep -q '^SANDBOX_COMPUTER_EGRESS=restricted' .env || { echo "egress belum restricted" >&2; exit 1; }
+    # Tanpa aturan iptables, komputer bot bisa menjangkau LAN (mis. UI Proxmox :8006).
+    sudo iptables -S DOCKER-USER 2>/dev/null | grep -q rakazo-c || { echo "aturan egress belum terpasang: jalankan run.sh egress" >&2; exit 1; }
     dc pull && dc up -d --wait --wait-timeout 300
     { date -u +%FT%TZ; dc config --images | sort -u | xargs -I{} docker image inspect {} --format '{{index .RepoDigests 0}}'; } > DIGESTS.txt
     echo "UI: http://127.0.0.1:5173 — digest tercatat di $PWD/DIGESTS.txt (pin ke sini untuk uji ulang)" ;;

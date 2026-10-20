@@ -1,0 +1,6 @@
+vendor/
+.env
+data/
+node_modules/
+__pycache__/
+eval/rakazo/work/

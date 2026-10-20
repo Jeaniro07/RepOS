@@ -1,0 +1,109 @@
+# RepOS Fase 0: satu Murmur + satu Hermes (profil per bot) + satu "komputer" per bot.
+# Jalankan: scripts/fetch-openbot.sh && cp .env.example .env && docker compose up -d --build
+name: repos
+
+services:
+  murmur:
+    image: ${MURMUR_IMAGE:-ghcr.io/getumbrel/murmur:0.6}
+    init: true
+    restart: unless-stopped   # hidup lagi setelah reboot VM
+    mem_limit: 512m
+    ports: ["127.0.0.1:3000:3000"]   # buka lewat Tailscale/reverse proxy, bukan langsung
+    volumes: [murmur-data:/data]
+    environment:
+      MURMUR_BUILTIN_HERMES_URL: http://hermes:9119
+      MURMUR_BUILTIN_HERMES_USERNAME: murmur
+      MURMUR_BUILTIN_HERMES_PASSWORD: ${MURMUR_HERMES_PASSWORD:?isi MURMUR_HERMES_PASSWORD di .env}
+      MURMUR_PASSWORD: ${MURMUR_PASSWORD:?isi MURMUR_PASSWORD di .env (kosong = Murmur tanpa login)}
+    networks: [default]
+
+  hermes:
+    image: ${HERMES_IMAGE}
+    restart: unless-stopped   # hidup lagi setelah reboot VM
+    stop_grace_period: 1m
+    mem_limit: 1536m
+    command: ["gateway", "run"]
+    volumes:
+      - hermes-data:/opt/data
+      # Hermes mencari plugin di <HERMES_HOME>/plugins, dan HERMES_HOME tiap profil = profiles/<bot>.
+      # Jadi plugin di-mount ke SETIAP profil bot (dan ke akar untuk profil default).
+      - ./plugins/auto-review:/opt/data/plugins/auto-review:ro
+      - ./plugins/auto-review:/opt/data/profiles/ops-holding/plugins/auto-review:ro
+      - ./plugins/auto-review:/opt/data/profiles/penyidikan/plugins/auto-review:ro
+    environment:
+      HERMES_UID: "1000"
+      HERMES_GID: "1000"
+      HERMES_DASHBOARD: "1"
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: murmur
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: ${MURMUR_HERMES_PASSWORD:?isi MURMUR_HERMES_PASSWORD di .env}
+      HERMES_DASHBOARD_BASIC_AUTH_SECRET: ${MURMUR_HERMES_SECRET:-}
+      HERMES_GATEWAY_BOOTSTRAP_STATE: running
+      HERMES_UMBREL_CONTEXT: "0"
+      OPS_MCP_TOKEN: ${OPS_MCP_TOKEN:?isi OPS_MCP_TOKEN di .env}   # hanya token MCP, bukan token komputer
+      REVIEW_LLM_URL: ${REVIEW_LLM_URL:-}      # verifier Auto Review (opsional; kosong = semua ke manusia)
+      REVIEW_LLM_MODEL: ${REVIEW_LLM_MODEL:-}
+      REVIEW_LLM_KEY: ${REVIEW_LLM_KEY:-}
+    depends_on:
+      ops-mcp: {condition: service_healthy}
+    networks: [default, bots]
+
+  # --- Bot: Ops Holding (pilot) -------------------------------------------
+  ops-computer:
+    build:
+      context: vendor/openbot            # hasil scripts/fetch-openbot.sh
+      dockerfile: agent-computer/Dockerfile
+    restart: unless-stopped   # hidup lagi setelah reboot VM
+    init: true
+    shm_size: 1gb
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 512
+    mem_limit: 2g      # VM 6 GB di host 8 GB: total semua layanan ±4,1 GB
+    cpus: 1.5
+    environment:
+      COMPUTER_TOKEN: ${OPS_COMPUTER_TOKEN:?isi OPS_COMPUTER_TOKEN di .env}
+      COMPUTER_BOT_ID: ops-holding
+    volumes:
+      - ops-profiles:/profiles
+      - ops-workspace:/workspace
+    networks: [ops-net]   # hanya sidecar yang bisa menjangkau komputer (API-nya punya /exec)
+
+  ops-mcp:
+    image: ${BUN_IMAGE}
+    restart: unless-stopped   # hidup lagi setelah reboot VM
+    working_dir: /app
+    command: ["bun", "server.ts"]
+    mem_limit: 128m
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    volumes: ["./computer-mcp/server.ts:/app/server.ts:ro"]
+    environment:
+      COMPUTER_URL: http://ops-computer:4100
+      COMPUTER_TOKEN: ${OPS_COMPUTER_TOKEN:?isi OPS_COMPUTER_TOKEN di .env}
+      MCP_TOKEN: ${OPS_MCP_TOKEN:?isi OPS_MCP_TOKEN di .env}
+      BOT_ID: ops-holding
+      ALLOWED_DOMAINS: ${OPS_ALLOWED_DOMAINS:-}
+      PORT: "8700"
+    depends_on: [ops-computer]
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://127.0.0.1:8700/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks: [bots, ops-net]
+
+  # Penyidikan: sengaja tanpa komputer, tanpa sidecar. Lihat bots/penyidikan/README.md.
+
+networks:
+  default: {}
+  bots: {}      # Hermes <-> sidecar MCP
+  ops-net: {}   # sidecar <-> komputer Ops Holding (butuh internet untuk browser; dibatasi egress policy)
+
+volumes:
+  murmur-data:
+  hermes-data:
+  ops-profiles:
+  ops-workspace:

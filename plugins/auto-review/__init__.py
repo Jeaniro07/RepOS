@@ -48,7 +48,12 @@ def decide(policy, profile, tool, args):
 
 
 def redact(args):
-    return {k: ("<disembunyikan>" if k.lower() in SECRET_KEYS else str(v)[:80]) for k, v in (args or {}).items()}
+    """Argumen untuk audit: kunci rahasia disembunyikan, juga di dalam dict bersarang (mis. headers)."""
+    def one(k, v):
+        if str(k).lower() in SECRET_KEYS:
+            return "<disembunyikan>"
+        return redact(v) if isinstance(v, dict) else str(v)[:80]
+    return {k: one(k, v) for k, v in (args or {}).items()}
 
 
 def audit(entry):

@@ -14,7 +14,10 @@ export function toSkill(d: Draft, server: string): { slug: string; markdown: str
   if (!/^[a-z0-9][a-z0-9-]*$/.test(d.slug)) throw new Error(`slug tidak valid: ${d.slug}`);
   const wire = (t: string) => `mcp__${server}__${MAP[t] ?? t}`;
   const tools = ["browser_snapshot", ...d.requiredTools.map((t) => MAP[t] ?? t)].filter((t, i, a) => a.indexOf(t) === i).map((t) => `mcp__${server}__${t}`);
-  const body = d.requiredTools.reduce((s, t) => s.replaceAll(t, wire(t)), d.instructions).replaceAll("browser snapshot", `snapshot (${wire("browser_snapshot")})`);
+  // Satu kali lewat (bukan replace berantai) agar nama yang sudah diganti tidak diganti lagi.
+  const names = [...new Set(d.requiredTools)].sort((x, y) => y.length - x.length).map((t) => t.replace(/\W/g, "\\$&"));
+  const swapped = names.length ? d.instructions.replace(new RegExp(`(?<!\\w)(${names.join("|")})(?!\\w)`, "g"), wire) : d.instructions;
+  const body = swapped.replaceAll("browser snapshot", `snapshot (${wire("browser_snapshot")})`);
   const markdown = `---
 name: ${d.slug}
 description: ${JSON.stringify(d.summary || d.title)}

@@ -21,7 +21,8 @@ cat > "$T/e.env" <<E
 MURMUR_HERMES_PASSWORD=x
 MURMUR_HERMES_SECRET=x
 MURMUR_PASSWORD=x
-OPS_TOKEN=x
+OPS_COMPUTER_TOKEN=x
+OPS_MCP_TOKEN=y
 OPS_ALLOWED_DOMAINS=example.com
 E
 run "docker compose config" env ENV_FILE="$T/e.env" scripts/dc config -q
@@ -86,13 +87,15 @@ if bun teach/draft-to-skill.ts tests/fixtures/draft.json --server ops --out "$T/
 
 step "7. Sidecar MCP sebagai proses terpisah (smoke)"
 PORT=$((20000 + RANDOM % 5000))
-COMPUTER_URL=http://127.0.0.1:1 COMPUTER_TOKEN=t BOT_ID=ops-holding ALLOWED_DOMAINS=example.com PORT=$PORT bun computer-mcp/server.ts >"$T/mcp.log" 2>&1 &
+COMPUTER_URL=http://127.0.0.1:1 COMPUTER_TOKEN=t MCP_TOKEN=m BOT_ID=ops-holding ALLOWED_DOMAINS=example.com PORT=$PORT bun computer-mcp/server.ts >"$T/mcp.log" 2>&1 &
 PID=$!; for _ in $(seq 50); do curl -fs "localhost:$PORT/health" >/dev/null 2>&1 && break; sleep 0.1; done
 code_noauth=$(curl -s -o /dev/null -w '%{http_code}' -X POST "localhost:$PORT/mcp" -d '{}')
-tools=$(curl -s -X POST "localhost:$PORT/mcp" -H 'authorization: Bearer t' -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | python3 -c 'import json,sys;print(len(json.load(sys.stdin)["result"]["tools"]))')
-blocked=$(curl -s -X POST "localhost:$PORT/mcp" -H 'authorization: Bearer t' -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"browser_navigate","arguments":{"url":"https://evil.io"}}}')
+code_comptok=$(curl -s -o /dev/null -w '%{http_code}' -X POST "localhost:$PORT/mcp" -H 'authorization: Bearer t' -d '{}')
+tools=$(curl -s -X POST "localhost:$PORT/mcp" -H 'authorization: Bearer m' -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | python3 -c 'import json,sys;print(len(json.load(sys.stdin)["result"]["tools"]))')
+blocked=$(curl -s -X POST "localhost:$PORT/mcp" -H 'authorization: Bearer m' -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"browser_navigate","arguments":{"url":"https://evil.io"}}}')
 kill $PID 2>/dev/null
 [ "$code_noauth" = 401 ] && ok "tanpa token -> 401" || bad "tanpa token -> $code_noauth"
+[ "$code_comptok" = 401 ] && ok "token komputer ditolak di MCP -> 401" || bad "token komputer di MCP -> $code_comptok"
 [ "${tools:-0}" -ge 10 ] && ok "tools/list memuat $tools tool" || bad "tools/list"
 grep -q 'tidak diizinkan' <<<"$blocked" && ok "navigate ke evil.io diblok" || bad "navigate diblok"
 

@@ -4,9 +4,11 @@
 
 const env = (k: string, d = "") => process.env[k]?.trim() || d;
 const COMPUTER = env("COMPUTER_URL", "http://localhost:4100");
-const TOKEN = env("COMPUTER_TOKEN");
+const TOKEN = env("COMPUTER_TOKEN"); // sidecar -> komputer; hanya sidecar yang memegangnya
+const MCP_TOKEN = env("MCP_TOKEN"); // Hermes -> sidecar; tidak berlaku di komputer (yang punya /exec)
 const BOT = env("BOT_ID", "bot");
 const PORT = Number(env("PORT", "8700"));
+const EGRESS_REFRESH_MS = Number(env("EGRESS_REFRESH_MS", "30000"));
 const ALLOWED = env("ALLOWED_DOMAINS").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
 
 type Json = Record<string, unknown>;
@@ -101,7 +103,10 @@ export const tools: Record<string, Tool> = {
   },
   files_write: {
     description: "Tulis berkas workspace.", props: { path: s("path"), contents: s("isi"), append: { type: "boolean" } }, required: ["path", "contents"],
-    run: async (a) => text(await call("/files/write", "POST", { path: str(a, "path"), contents: String(a.contents), append: a.append === true })),
+    run: async (a) => {
+      if (typeof a.contents !== "string") throw new Error("argumen 'contents' wajib (string)");
+      return text(await call("/files/write", "POST", { path: str(a, "path"), contents: a.contents, append: a.append === true }));
+    },
   },
 };
 
@@ -139,31 +144,38 @@ export async function rpc(msg: Json): Promise<Json | null> {
 }
 
 // Egress policy: Chromium hanya boleh ke domain yang diizinkan (pagar sebenarnya, bukan cuma navigate).
-async function pushEgress(tries = 60) {
-  const policy = ALLOWED.includes("*") ? { mode: "allow_all", rules: [] }
-    : { mode: "allowlist_only", rules: ALLOWED.map((value) => ({ type: "domain", value })) };
-  for (let i = 0; i < tries; i++) {
-    try {
-      await call("/egress-policy", "PUT", { policy });
-      console.log(`egress policy terpasang: ${policy.mode} (${ALLOWED.length} domain)`);
-      return;
-    } catch {
-      await Bun.sleep(2000);
-    }
+// Daftar kosong = tidak ada jaringan sama sekali.
+export const egressPolicy = (allowed = ALLOWED) =>
+  allowed.includes("*") ? { mode: "allow_all", rules: [] }
+    : allowed.length === 0 ? { mode: "deny_all", rules: [] }
+    : { mode: "allowlist_only", rules: allowed.map((value) => ({ type: "domain", value })) };
+
+// OpenBot menyimpan policy hanya di memori: komputer yang restart menolak semua koneksi sampai
+// policy dikirim lagi. Maka dikirim ulang berkala (PUT idempoten), bukan sekali saat start.
+let egressOk: boolean | undefined;
+async function pushEgress() {
+  const policy = egressPolicy();
+  try {
+    await call("/egress-policy", "PUT", { policy });
+    if (egressOk !== true) console.log(`egress policy terpasang: ${policy.mode} (${ALLOWED.length} domain)`);
+    egressOk = true;
+  } catch (e) {
+    if (egressOk !== false) console.error(`egress policy belum terpasang (komputer menolak semua koneksi sampai berhasil): ${e}`);
+    egressOk = false;
   }
-  console.error("GAGAL memasang egress policy; browser tetap diblok oleh allowlist navigate");
 }
 
 if (import.meta.main) {
-  if (!TOKEN) throw new Error("COMPUTER_TOKEN wajib");
+  if (!TOKEN || !MCP_TOKEN) throw new Error("COMPUTER_TOKEN dan MCP_TOKEN wajib");
+  if (TOKEN === MCP_TOKEN) throw new Error("MCP_TOKEN harus berbeda dari COMPUTER_TOKEN");
   void pushEgress();
+  setInterval(pushEgress, EGRESS_REFRESH_MS);
   Bun.serve({
     port: PORT,
     async fetch(req) {
       const url = new URL(req.url);
       if (url.pathname === "/health") return new Response("ok");
-      // Hermes membawa token yang sama lewat header Authorization.
-      if (req.headers.get("authorization") !== `Bearer ${TOKEN}`) return new Response("unauthorized", { status: 401 });
+      if (req.headers.get("authorization") !== `Bearer ${MCP_TOKEN}`) return new Response("unauthorized", { status: 401 });
       if (url.pathname !== "/mcp" || req.method !== "POST") return new Response("method not allowed", { status: 405 });
       const body = await req.json().catch(() => null);
       if (!body || typeof body !== "object") return Response.json({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } }, { status: 400 });

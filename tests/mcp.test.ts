@@ -16,6 +16,8 @@ const fake = Bun.serve({
 
 process.env.COMPUTER_URL = `http://localhost:${fake.port}`;
 process.env.COMPUTER_TOKEN = "tok";
+process.env.MCP_TOKEN = "mcp-tok";
+process.env.EGRESS_REFRESH_MS = "150";
 process.env.BOT_ID = "ops-holding";
 process.env.ALLOWED_DOMAINS = "example.com,*.bank.co.id";
 
@@ -117,6 +119,15 @@ describe("tools/call", () => {
     expect(r.result.content[0]).toEqual({ type: "image", data: "aGk=", mimeType: "image/png" });
   });
 
+  test("files_write tanpa contents ditolak (bukan menulis 'undefined')", async () => {
+    seen.length = 0;
+    const r = await call("files_write", { path: "a.txt" });
+    expect(r.result.isError).toBe(true);
+    expect(seen.length).toBe(0);
+    await call("files_write", { path: "kosong.txt", contents: "" });
+    expect(seen[0].body).toEqual({ path: "kosong.txt", contents: "", append: false });
+  });
+
   test("request_help -> /control/request", async () => {
     seen.length = 0;
     await call("request_help", { reason: "perlu login" });
@@ -143,16 +154,17 @@ describe("server HTTP (subprocess)", () => {
   });
   afterAll(() => proc.kill());
 
-  const post = (body: unknown, token = "tok") =>
+  const post = (body: unknown, token = "mcp-tok") =>
     fetch(`${base}/mcp`, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(body) });
 
-  test("tanpa/dengan token salah -> 401", async () => {
+  test("tanpa/dengan token salah -> 401; token komputer TIDAK berlaku untuk MCP", async () => {
     expect((await post({}, "salah")).status).toBe(401);
+    expect((await post({}, "tok")).status).toBe(401);
     expect((await fetch(`${base}/mcp`, { method: "POST" })).status).toBe(401);
   });
   test("GET -> 405, JSON rusak -> 400", async () => {
-    expect((await fetch(`${base}/mcp`, { headers: { authorization: "Bearer tok" } })).status).toBe(405);
-    const bad = await fetch(`${base}/mcp`, { method: "POST", headers: { authorization: "Bearer tok" }, body: "{bukan json" });
+    expect((await fetch(`${base}/mcp`, { headers: { authorization: "Bearer mcp-tok" } })).status).toBe(405);
+    const bad = await fetch(`${base}/mcp`, { method: "POST", headers: { authorization: "Bearer mcp-tok" }, body: "{bukan json" });
     expect(bad.status).toBe(400);
   });
   test("tools/list lewat HTTP", async () => {
@@ -169,8 +181,38 @@ describe("server HTTP (subprocess)", () => {
       if (!put) await Bun.sleep(100);
     }
     expect(put.method).toBe("PUT");
+    expect(put.headers.get("x-openbot-computer-token")).toBe("tok");
     expect(put.body).toEqual({
       policy: { mode: "allowlist_only", rules: [{ type: "domain", value: "example.com" }, { type: "domain", value: "*.bank.co.id" }] },
     });
   });
+  test("egress policy dipasang ulang berkala (komputer restart = policy di memori hilang)", async () => {
+    const count = () => seen.filter((x) => x.path === "/egress-policy").length;
+    const before = count();
+    await Bun.sleep(500);
+    expect(count()).toBeGreaterThan(before);
+  });
+});
+
+describe("start-up guard", () => {
+  const start = (env: Record<string, string>) =>
+    Bun.spawnSync(["bun", `${import.meta.dir}/../computer-mcp/server.ts`], {
+      env: { ...process.env, PORT: "0", ...env }, stdout: "pipe", stderr: "pipe", timeout: 5000,
+    });
+  test("menolak start bila token MCP sama dengan token komputer", () => {
+    const r = start({ MCP_TOKEN: "tok", COMPUTER_TOKEN: "tok" });
+    expect(r.exitCode).not.toBe(0);
+    expect(r.stderr.toString()).toContain("MCP_TOKEN");
+  });
+  test("menolak start tanpa MCP_TOKEN", () => {
+    const r = start({ MCP_TOKEN: "" });
+    expect(r.exitCode).not.toBe(0);
+  });
+});
+
+test("ALLOWED_DOMAINS kosong -> egress deny_all", async () => {
+  const { egressPolicy } = await import("../computer-mcp/server.ts");
+  expect(egressPolicy([])).toEqual({ mode: "deny_all", rules: [] });
+  expect(egressPolicy(["*"])).toEqual({ mode: "allow_all", rules: [] });
+  expect(egressPolicy(["a.com"])).toEqual({ mode: "allowlist_only", rules: [{ type: "domain", value: "a.com" }] });
 });

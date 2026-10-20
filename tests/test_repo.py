@@ -36,7 +36,8 @@ class Compose(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmp = tempfile.NamedTemporaryFile("w", suffix=".env", delete=False)
-        cls.tmp.write(re.sub(r"=$", "=x", (ROOT / ".env.example").read_text(), flags=re.M))
+        # nilai unik per variabel, supaya test bisa membedakan token yang tertukar
+        cls.tmp.write(re.sub(r"^(\w+)=$", r"\1=v-\1", (ROOT / ".env.example").read_text(), flags=re.M))
         cls.tmp.close()
         env = {**os.environ, "ENV_FILE": cls.tmp.name}
         out = subprocess.run([str(ROOT / "scripts/dc"), "config", "--format", "json"], capture_output=True, text=True, env=env)
@@ -52,11 +53,19 @@ class Compose(unittest.TestCase):
         self.assertEqual(list(pub), ["murmur"])
         self.assertEqual(pub["murmur"][0]["host_ip"], "127.0.0.1")
 
-    def test_computer_is_reachable_only_via_bots_network(self):
+    def test_computer_is_reachable_only_via_its_sidecar(self):
+        # Hermes (dan profil lain yang punya terminal) tidak boleh bisa memanggil /exec komputer langsung.
         s = self.cfg["services"]
-        self.assertEqual(list(s["ops-computer"]["networks"]), ["bots"])
-        self.assertEqual(list(s["ops-mcp"]["networks"]), ["bots"])
+        self.assertEqual(list(s["ops-computer"]["networks"]), ["ops-net"])
+        self.assertEqual(set(s["ops-mcp"]["networks"]), {"bots", "ops-net"})
+        self.assertNotIn("ops-net", s["hermes"]["networks"])
         self.assertNotIn("bots", s["murmur"]["networks"])
+
+    def test_auto_review_is_mounted_into_every_bot_profile(self):
+        # Hermes mencari plugin di <HERMES_HOME>/plugins; untuk profil = /opt/data/profiles/<bot>/plugins.
+        targets = {v["target"] for v in self.cfg["services"]["hermes"]["volumes"] if v["type"] == "bind"}
+        for bot in sorted(p.name for p in (ROOT / "bots").iterdir() if (p / "config.yaml").exists()):
+            self.assertIn(f"/opt/data/profiles/{bot}/plugins/auto-review", targets, bot)
 
     def test_computer_is_hardened(self):
         c = self.cfg["services"]["ops-computer"]
@@ -70,10 +79,15 @@ class Compose(unittest.TestCase):
                 if v["type"] == "bind":
                     self.assertTrue(Path(v["source"]).exists(), v["source"])
 
-    def test_tokens_match_across_services(self):
+    def test_tokens_are_split_and_hermes_never_holds_the_computer_token(self):
         s = self.cfg["services"]
-        self.assertEqual(s["hermes"]["environment"]["OPS_TOKEN"], s["ops-computer"]["environment"]["COMPUTER_TOKEN"])
         self.assertEqual(s["ops-mcp"]["environment"]["COMPUTER_TOKEN"], s["ops-computer"]["environment"]["COMPUTER_TOKEN"])
+        self.assertEqual(s["hermes"]["environment"]["OPS_MCP_TOKEN"], s["ops-mcp"]["environment"]["MCP_TOKEN"])
+        self.assertNotIn("COMPUTER_TOKEN", " ".join(s["hermes"]["environment"]))
+        self.assertNotIn(s["ops-computer"]["environment"]["COMPUTER_TOKEN"], s["hermes"]["environment"].values())
+
+    def test_hermes_starts_after_its_mcp_sidecar(self):
+        self.assertIn("ops-mcp", self.cfg["services"]["hermes"].get("depends_on", {}))
 
     def test_secrets_are_required(self):
         env = {**os.environ, "ENV_FILE": "/dev/null"}
@@ -89,6 +103,7 @@ class Bots(unittest.TestCase):
         c = self.cfg("ops-holding")
         self.assertTrue({"browser", "terminal", "computer_use", "code_execution"} <= set(c["agent"]["disabled_toolsets"]))
         self.assertEqual(c["mcp_servers"]["ops"]["url"], "http://ops-mcp:8700/mcp")
+        self.assertEqual(c["mcp_servers"]["ops"]["headers"]["Authorization"], "Bearer ${OPS_MCP_TOKEN}")
         self.assertEqual(c["approvals"]["cron_mode"], "deny")
         self.assertIn("auto-review", c["plugins"]["enabled"])
 

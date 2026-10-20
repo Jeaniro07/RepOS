@@ -8,6 +8,7 @@ Murmur ──► Hermes (profil: ops-holding, penyidikan, …)
               │  plugin auto-review (pre_tool_call: deny / allow / approve, audit JSONL)
               ▼
          ops-mcp (sidecar MCP, 1 file Bun) ──► ops-computer (OpenBot agent-computer: Chromium + CDP screencast, egress allowlist)
+        jaringan "bots", token MCP            jaringan "ops-net", token komputer (Hermes tidak memegangnya)
 ```
 
 | Bagian | Berkas | Bahasa |

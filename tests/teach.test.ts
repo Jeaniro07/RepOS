@@ -15,3 +15,10 @@ test("slug berbahaya ditolak", () => {
   expect(() => toSkill({ ...draft, slug: "../../etc" }, "ops")).toThrow();
   expect(() => toSkill({ ...draft, slug: "Besar Spasi" }, "ops")).toThrow();
 });
+
+test("tool yang sudah bernama browser_* tidak diberi prefiks dua kali", () => {
+  const d = { ...draft, requiredTools: ["computer_type", "browser_type"], instructions: "Pakai computer_type lalu browser_type." };
+  const { markdown } = toSkill(d, "ops");
+  expect(markdown).not.toContain("mcp__ops__mcp__ops__");
+  expect(markdown).toContain("Pakai mcp__ops__browser_type lalu mcp__ops__browser_type.");
+});

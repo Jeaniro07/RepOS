@@ -3,7 +3,7 @@
 Prasyarat: Docker + Compose v2, git, ±6 GB RAM kosong untuk pilot (Murmur+Hermes ±1–2 GB, komputer Chromium ≤3 GB), akses internet keluar.
 
 1. `git clone` repo, `git checkout phase0/foundation`.
-2. `cp .env.example .env` lalu isi semua nilai (`openssl rand -hex 24`) dan `OPS_ALLOWED_DOMAINS` (pisah koma, mis. `example.com,*.bankanda.co.id`). Isi API key LLM sesuai Hermes.
+2. `cp .env.example .env` lalu isi semua nilai (`openssl rand -hex 24`; `OPS_COMPUTER_TOKEN` dan `OPS_MCP_TOKEN` harus berbeda — sidecar menolak start bila sama) dan `OPS_ALLOWED_DOMAINS` (pisah koma, mis. `example.com,*.bankanda.co.id`). Isi API key LLM sesuai Hermes.
 3. `scripts/fetch-openbot.sh` → `scripts/dc up -d --build` → `scripts/seed.sh`.
 4. Buka Murmur di `http://127.0.0.1:3000` (akses jarak jauh: Tailscale/reverse proxy HTTPS; jangan buka port ke internet).
 5. Biarkan `mode: dry-run` di `plugins/auto-review/policy.yaml` beberapa hari; baca `profiles/ops-holding/auto-review.jsonl`, rapikan aturan, lalu ubah `mode: enforce` (policy dibaca ulang otomatis; ganti dengan env `AUTOREVIEW_MODE` bila perlu) .

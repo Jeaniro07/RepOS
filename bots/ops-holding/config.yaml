@@ -9,4 +9,4 @@ mcp_servers:
   ops:
     url: http://ops-mcp:8700/mcp
     headers:
-      Authorization: "Bearer ${OPS_TOKEN}"
+      Authorization: "Bearer ${OPS_MCP_TOKEN}"

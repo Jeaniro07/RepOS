@@ -128,5 +128,12 @@ class Hook(unittest.TestCase):
         self.assertEqual(calls, [("pre_tool_call", ar.review)])
 
 
+class RedactNested(unittest.TestCase):
+    def test_nested_secret_is_hidden(self):
+        r = ar.redact({"headers": {"Authorization": "Bearer RAHASIA"}, "url": "https://x"})
+        self.assertNotIn("RAHASIA", json.dumps(r))
+        self.assertEqual(r["url"], "https://x")
+
+
 if __name__ == "__main__":
     unittest.main()

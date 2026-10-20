@@ -2,9 +2,6 @@
 # Jalankan: scripts/fetch-openbot.sh && cp .env.example .env && docker compose up -d --build
 name: repos
 
-x-bot-net: &bot-net
-  networks: [bots]
-
 services:
   murmur:
     image: ${MURMUR_IMAGE:-ghcr.io/getumbrel/murmur:0.6}
@@ -26,7 +23,11 @@ services:
     command: ["gateway", "run"]
     volumes:
       - hermes-data:/opt/data
-      - ./plugins/auto-review:/opt/data/plugins/auto-review:ro   # plugin Auto Review
+      # Hermes mencari plugin di <HERMES_HOME>/plugins, dan HERMES_HOME tiap profil = profiles/<bot>.
+      # Jadi plugin di-mount ke SETIAP profil bot (dan ke akar untuk profil default).
+      - ./plugins/auto-review:/opt/data/plugins/auto-review:ro
+      - ./plugins/auto-review:/opt/data/profiles/ops-holding/plugins/auto-review:ro
+      - ./plugins/auto-review:/opt/data/profiles/penyidikan/plugins/auto-review:ro
     environment:
       HERMES_UID: "1000"
       HERMES_GID: "1000"
@@ -36,7 +37,8 @@ services:
       HERMES_DASHBOARD_BASIC_AUTH_SECRET: ${MURMUR_HERMES_SECRET:-}
       HERMES_GATEWAY_BOOTSTRAP_STATE: running
       HERMES_UMBREL_CONTEXT: "0"
-      OPS_TOKEN: ${OPS_TOKEN:?isi OPS_TOKEN di .env}
+      OPS_MCP_TOKEN: ${OPS_MCP_TOKEN:?isi OPS_MCP_TOKEN di .env}   # hanya token MCP, bukan token komputer
+    depends_on: [ops-mcp]
     networks: [default, bots]
 
   # --- Bot: Ops Holding (pilot) -------------------------------------------
@@ -53,12 +55,12 @@ services:
     mem_limit: 3g
     cpus: 2
     environment:
-      COMPUTER_TOKEN: ${OPS_TOKEN:?isi OPS_TOKEN di .env}
+      COMPUTER_TOKEN: ${OPS_COMPUTER_TOKEN:?isi OPS_COMPUTER_TOKEN di .env}
       COMPUTER_BOT_ID: ops-holding
     volumes:
       - ops-profiles:/profiles
       - ops-workspace:/workspace
-    <<: *bot-net
+    networks: [ops-net]   # hanya sidecar yang bisa menjangkau komputer (API-nya punya /exec)
 
   ops-mcp:
     image: ${BUN_IMAGE}
@@ -66,23 +68,26 @@ services:
     working_dir: /app
     command: ["bun", "server.ts"]
     read_only: true
+    tmpfs: [/tmp]
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
     volumes: ["./computer-mcp/server.ts:/app/server.ts:ro"]
     environment:
       COMPUTER_URL: http://ops-computer:4100
-      COMPUTER_TOKEN: ${OPS_TOKEN:?isi OPS_TOKEN di .env}
+      COMPUTER_TOKEN: ${OPS_COMPUTER_TOKEN:?isi OPS_COMPUTER_TOKEN di .env}
+      MCP_TOKEN: ${OPS_MCP_TOKEN:?isi OPS_MCP_TOKEN di .env}
       BOT_ID: ops-holding
       ALLOWED_DOMAINS: ${OPS_ALLOWED_DOMAINS:-}
       PORT: "8700"
     depends_on: [ops-computer]
-    <<: *bot-net
+    networks: [bots, ops-net]
 
   # Penyidikan: sengaja tanpa komputer, tanpa sidecar. Lihat bots/penyidikan/README.md.
 
 networks:
   default: {}
-  bots: {}
+  bots: {}      # Hermes <-> sidecar MCP
+  ops-net: {}   # sidecar <-> komputer Ops Holding (butuh internet untuk browser; dibatasi egress policy)
 
 volumes:
   murmur-data:

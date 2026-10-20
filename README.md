@@ -33,3 +33,6 @@ Langkah lengkap + cek di home-lab: [`docs/HOMELAB.md`](docs/HOMELAB.md).
 scripts/dryrun.sh
 ```
 Apa yang sudah dan belum terbukti: [`docs/VERIFICATION.md`](docs/VERIFICATION.md). Rencana & fase: [`docs/PLAN.md`](docs/PLAN.md).
+
+## Uji Rakazo (opsional)
+Lihat `eval/rakazo/` — konfigurasi aman + checklist perbandingan; jalankan `eval/rakazo/run.sh prepare`.

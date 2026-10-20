@@ -148,3 +148,14 @@ class Hygiene(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RakazoEval(unittest.TestCase):
+    def test_overrides_force_restricted_egress_and_no_secrets(self):
+        t = (ROOT / "eval/rakazo/overrides.env").read_text()
+        self.assertRegex(t, r"(?m)^SANDBOX_COMPUTER_EGRESS=restricted$")
+        self.assertNotRegex(t, r"(?m)^[A-Z_]*(KEY|TOKEN|SECRET|PASSWORD)=\S")
+
+    def test_run_script_parses(self):
+        r = subprocess.run(["bash", "-n", str(ROOT / "eval/rakazo/run.sh")], capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stderr)

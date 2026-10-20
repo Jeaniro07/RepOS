@@ -7,6 +7,7 @@ services:
     image: ${MURMUR_IMAGE:-ghcr.io/getumbrel/murmur:0.6}
     init: true
     restart: on-failure
+    mem_limit: 512m
     ports: ["127.0.0.1:3000:3000"]   # buka lewat Tailscale/reverse proxy, bukan langsung
     volumes: [murmur-data:/data]
     environment:
@@ -20,6 +21,7 @@ services:
     image: ${HERMES_IMAGE}
     restart: on-failure
     stop_grace_period: 1m
+    mem_limit: 1536m
     command: ["gateway", "run"]
     volumes:
       - hermes-data:/opt/data
@@ -38,6 +40,9 @@ services:
       HERMES_GATEWAY_BOOTSTRAP_STATE: running
       HERMES_UMBREL_CONTEXT: "0"
       OPS_MCP_TOKEN: ${OPS_MCP_TOKEN:?isi OPS_MCP_TOKEN di .env}   # hanya token MCP, bukan token komputer
+      REVIEW_LLM_URL: ${REVIEW_LLM_URL:-}      # verifier Auto Review (opsional; kosong = semua ke manusia)
+      REVIEW_LLM_MODEL: ${REVIEW_LLM_MODEL:-}
+      REVIEW_LLM_KEY: ${REVIEW_LLM_KEY:-}
     depends_on: [ops-mcp]
     networks: [default, bots]
 
@@ -52,8 +57,8 @@ services:
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
     pids_limit: 512
-    mem_limit: 3g
-    cpus: 2
+    mem_limit: 2g      # host 8 GB (i3 gen 4): total semua layanan harus < ~6 GB
+    cpus: 1.5
     environment:
       COMPUTER_TOKEN: ${OPS_COMPUTER_TOKEN:?isi OPS_COMPUTER_TOKEN di .env}
       COMPUTER_BOT_ID: ops-holding
@@ -67,6 +72,7 @@ services:
     restart: on-failure
     working_dir: /app
     command: ["bun", "server.ts"]
+    mem_limit: 128m
     read_only: true
     tmpfs: [/tmp]
     cap_drop: [ALL]

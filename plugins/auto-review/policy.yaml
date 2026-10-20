@@ -9,7 +9,7 @@ profiles:
       - {id: no-exec,      tool: "terminal*",              action: deny, reason: "shell tidak diizinkan untuk bot ini"}
       - {id: no-code,      tool: "execute_code",           action: deny, reason: "eksekusi kode tidak diizinkan"}
       - {id: money-words,  tool: "mcp__ops__browser_type", args: {text: "(?i)transfer|bayar|payment|checkout"}, action: approve, reason: "teks menyangkut pembayaran"}
-      - {id: files-write,  tool: "mcp__ops__files_write",  action: approve, reason: "menulis berkas di workspace"}
+      - {id: files-write,  tool: "mcp__ops__files_write",  action: approve, llm: true, reason: "menulis berkas di workspace"}   # llm: true = verifier boleh meloloskan jika yakin; uang/pembayaran tetap manusia
       - {id: computer,     tool: "mcp__ops__*",             action: allow}   # browser_*, request_help, files_list/read
       - {id: memory,       tool: "memory*",                action: allow}
       - {id: skills,       tool: "skill*",                 action: allow}

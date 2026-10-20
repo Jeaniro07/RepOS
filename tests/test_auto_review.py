@@ -137,3 +137,57 @@ class RedactNested(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LlmStage(unittest.TestCase):
+    ENV = {"REVIEW_LLM_URL": "http://x/v1", "REVIEW_LLM_MODEL": "m"}
+
+    @staticmethod
+    def opener(content):
+        import io
+        return lambda req, timeout: io.BytesIO(json.dumps({"choices": [{"message": {"content": content}}]}).encode())
+
+    def v(self, content, env=None):
+        return ar.llm_verdict("t", {"text": "x", "password": "p"}, "r", env or self.ENV, self.opener(content))
+
+    def test_parses_verdict(self):
+        self.assertEqual(self.v('ok {"verdict":"allow","confidence":0.9,"why":"aman"} ')[:2], ("allow", 0.9))
+
+    def test_bad_output_or_missing_config_is_unsure(self):
+        self.assertEqual(self.v("bukan json")[0], "unsure")
+        self.assertEqual(self.v('{"verdict":"maybe","confidence":1}')[0], "unsure")
+        self.assertEqual(self.v('{"verdict":"allow","confidence":7}')[0], "unsure")
+        self.assertEqual(self.v("{}", {})[0], "unsure")
+
+    def test_network_error_is_unsure(self):
+        def boom(req, timeout): raise OSError("down")
+        self.assertEqual(ar.llm_verdict("t", {}, "r", self.ENV, boom)[0], "unsure")
+
+    def run_review(self, verdict, conf, tool="mcp__ops__files_write"):
+        orig = ar.llm_verdict
+        ar.llm_verdict = lambda *a, **k: (verdict, conf, "w")
+        try:
+            with Env(mode="enforce"):
+                return ar.review(tool, {"path": "a"})
+        finally:
+            ar.llm_verdict = orig
+
+    def test_confident_allow_lets_llm_rule_through(self):
+        self.assertIsNone(self.run_review("allow", 0.95))
+
+    def test_low_confidence_or_unsure_goes_to_human(self):
+        self.assertEqual(self.run_review("allow", 0.5)["action"], "approve")
+        self.assertEqual(self.run_review("unsure", 0)["action"], "approve")
+
+    def test_confident_deny_blocks(self):
+        self.assertEqual(self.run_review("deny", 0.9)["action"], "block")
+
+    def test_llm_never_overrides_deny_or_non_llm_rule(self):
+        with Env(mode="enforce"):
+            ar_llm = ar.llm_verdict
+            ar.llm_verdict = lambda *a, **k: ("allow", 1.0, "x")
+            try:
+                self.assertEqual(ar.review("terminal", {})["action"], "block")
+                self.assertEqual(ar.review("mcp__ops__browser_type", {"text": "bayar"})["action"], "approve")
+            finally:
+                ar.llm_verdict = ar_llm

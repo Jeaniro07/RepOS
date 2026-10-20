@@ -8,6 +8,7 @@ import json
 import os
 import re
 import time
+import urllib.request
 from pathlib import Path
 
 import yaml
@@ -47,6 +48,11 @@ def decide(policy, profile, tool, args):
     return prof.get("default", "approve"), "default", "tidak ada aturan yang cocok"
 
 
+def rule_llm(policy, profile, rule_id):
+    prof = (policy.get("profiles") or {}).get(profile) or policy.get("fallback") or {}
+    return any(r.get("id") == rule_id and r.get("llm") for r in prof.get("rules") or [])
+
+
 def redact(args):
     """Argumen untuk audit: kunci rahasia disembunyikan, juga di dalam dict bersarang (mis. headers)."""
     def one(k, v):
@@ -54,6 +60,31 @@ def redact(args):
             return "<disembunyikan>"
         return redact(v) if isinstance(v, dict) else str(v)[:80]
     return {k: one(k, v) for k, v in (args or {}).items()}
+
+
+def llm_verdict(tool, args, reason, env=os.environ, opener=urllib.request.urlopen):
+    """Verifier LLM (ide Rakazo Auto Review). Endpoint OpenAI-compatible, stdlib saja.
+    -> (verdict, confidence, why). Gagal/timeout/format salah -> ("unsure", 0, ...): jatuh ke persetujuan manusia."""
+    url, model = env.get("REVIEW_LLM_URL"), env.get("REVIEW_LLM_MODEL")
+    if not url or not model:
+        return "unsure", 0.0, "verifier tidak dikonfigurasi"
+    prompt = ("Kamu penjaga keamanan agen. Nilai satu pemanggilan tool. Balas HANYA JSON "
+              '{"verdict":"allow|deny","confidence":0..1,"why":"..."}. Tolak jika menyangkut uang, '
+              "kredensial, penghapusan, atau tujuan yang tidak jelas.\n"
+              + json.dumps({"tool": tool, "args": redact(args), "alasan_aturan": reason}, ensure_ascii=False))
+    body = json.dumps({"model": model, "temperature": 0, "messages": [{"role": "user", "content": prompt}]}).encode()
+    req = urllib.request.Request(url.rstrip("/") + "/chat/completions", body, {
+        "Content-Type": "application/json", "Authorization": "Bearer " + env.get("REVIEW_LLM_KEY", "")})
+    try:
+        with opener(req, timeout=float(env.get("REVIEW_LLM_TIMEOUT", "8"))) as r:
+            text = json.load(r)["choices"][0]["message"]["content"]
+        d = json.loads(text[text.index("{"):text.rindex("}") + 1])
+        v, c = d["verdict"], float(d["confidence"])
+        if v not in ("allow", "deny") or not 0 <= c <= 1:
+            raise ValueError("format")
+        return v, c, str(d.get("why", ""))[:200]
+    except Exception as e:
+        return "unsure", 0.0, f"verifier gagal: {type(e).__name__}"
 
 
 def audit(entry):
@@ -71,16 +102,25 @@ def audit(entry):
 
 def review(tool_name, args=None, **_):
     args = args if isinstance(args, dict) else {}
-    policy, profile = {}, "?"
+    policy, profile, extra = {}, "?", {}
     mode = os.environ.get("AUTOREVIEW_MODE", "enforce")
     try:
         policy = load_policy()
         mode = os.environ.get("AUTOREVIEW_MODE") or policy.get("mode", "enforce")
         profile = profile_name()
         action, rule, reason = decide(policy, profile, tool_name, args)
+        if action == "approve" and rule_llm(policy, profile, rule):
+            v, c, why = llm_verdict(tool_name, args, reason)
+            floor = float(os.environ.get("REVIEW_LLM_MIN_CONFIDENCE", "0.8"))
+            extra = {"llm": v, "confidence": c, "why": why}
+            if v == "deny" and c >= floor:
+                action, reason = "deny", f"ditolak verifier: {why}"
+            elif v == "allow" and c >= floor:
+                action = "allow"  # LLM tidak pernah meloloskan aturan deny, dan hanya aturan ber-`llm: true`
+            # selain itu tetap "approve" (manusia)
     except Exception as e:  # fail-closed
         action, rule, reason = "deny", "error", f"auto-review error: {type(e).__name__}"
-    audit({"profile": profile, "tool": tool_name, "action": action, "rule": rule, "mode": mode, "args": redact(args)})
+    audit({"profile": profile, "tool": tool_name, "action": action, "rule": rule, "mode": mode, "args": redact(args), **extra})
     if mode != "enforce" or action == "allow":
         return None
     msg = f"[auto-review:{rule}] {reason or action}"

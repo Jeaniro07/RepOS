@@ -27,6 +27,8 @@ Batas uji ini: Playwright 1.56 (image memakai 1.62.1) dengan shim satu baris unt
 tidak terbuka karena proxy sandbox, Hermes gateway/Telegram/LLM tidak dijalankan.
 
 ## Belum terbukti — perlu home-lab
+Status 2026-10-20: uji di VM Proxmox + Tailscale **dilewati atas keputusan pemilik**. Fase 0 ditutup tanpa bukti home-lab;
+jalankan `scripts/homelab-check.sh` sebelum bot dipakai sungguhan.
 Item 2, 3a, 6, 7 (Tailscale), 10 dicek otomatis oleh `scripts/homelab-check.sh` (logikanya diuji di sandbox terhadap OpenBot,
 sidecar, dan plugin asli; Tailscale/Docker belum).
 1. `scripts/dc build` komputer OpenBot & Chromium jalan; screencast/takeover/request_help nyata.

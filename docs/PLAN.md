@@ -17,9 +17,9 @@
 ## Fase
 - **Fase 0 (repo ini)**: fondasi, pilot Ops Holding, dry-run offline.
 - **Fase 1 (di home-lab)**: jalankan, lengkapi checklist `docs/VERIFICATION.md` bagian "perlu home-lab", aktifkan `enforce` setelah audit dry-run bersih, ajari 1–2 skill lewat teach.
-- **Fase 2**: Hermes terpisah di jaringan `internal: true` + LLM lokal untuk Penyidikan (isolasi nyata); LLM-reviewer di Auto Review; bot lain.
+- **Fase 2**: Hermes terpisah di jaringan `internal: true` + LLM lokal untuk Penyidikan (isolasi nyata); bot lain.
 
 ## Tidak ada di Fase 0 (jujur)
-- Auto Review **belum** punya LLM-reviewer — hanya aturan + persetujuan manusia.
+- Auto Review: aturan + verifier LLM opsional (hanya aturan `llm: true`, lihat `docs/MERGED.md`); sisanya persetujuan manusia.
 - Isolasi Penyidikan masih tingkat konfigurasi; LLM tetap cloud.
 - Image Murmur hanya dikunci tag (bukan digest).

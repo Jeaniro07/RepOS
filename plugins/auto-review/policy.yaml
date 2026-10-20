@@ -23,5 +23,5 @@ profiles:
       - {id: files-w,  tool: "write_file",   action: approve, reason: "menulis berkas perkara"}
 
 fallback:             # profil lain (mis. Xaqu) sebelum ada kebijakan khusus
-  default: allow
+  default: approve   # profil tak dikenal / gagal dibaca -> tanya manusia (di cron: ditolak), bukan bebas
   rules: []

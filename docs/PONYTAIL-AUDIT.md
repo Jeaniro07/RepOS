@@ -1,35 +1,39 @@
-# Uji coba ponytail-audit (2026-10-20)
+# Uji coba ponytail (2026-10-20)
 
-Skill: `ponytail-audit` dari DietrichGebert/ponytail @ 09c434a (plugin tidak terpasang di sesi; aturannya diterapkan manual).
-Beban yang diasumsikan: satu pemilik, 1–2 bot aktif, satu VM Proxmox 6 GB.
+Plugin `ponytail@ponytail` 5.3.2 (DietrichGebert/ponytail) dipasang lewat `claude plugin install`, lalu dijalankan headless
+dengan izin baca saja: `/ponytail:ponytail-audit` (seluruh repo) → perbaikan → `/ponytail:ponytail-review` (diff perbaikan).
+Beban yang diasumsikan: satu pemilik, 1–2 bot, satu VM Proxmox 6 GB.
 
-**Apa repo ini:** satu Murmur + satu Hermes (profil per bot) + satu komputer OpenBot per bot, dengan sidecar MCP
-yang membatasi domain dan plugin Auto Review yang memutuskan allow/approve/deny per tool.
+## Putaran 0: aturan ponytail diterapkan manual (sebelum plugin terpasang)
+| # | Temuan | Status |
+|---|---|---|
+| a | Verifier LLM menilai `files_write` tanpa melihat isi | diperbaiki + tes |
+| b | `eval/rakazo/run.sh up` jalan tanpa aturan iptables (LAN/Proxmox :8006 terjangkau) | diperbaiki |
+| c | `llm: true` diabaikan pada aturan tanpa `id` | diperbaiki + tes |
 
-## Must fix
-1. **Verifier LLM menilai tanpa melihat isi** (`plugins/auto-review/__init__.py`, `llm_verdict`) — *diperbaiki*
-   - Apa: aturan `files-write` bertanya ke LLM sebelum bot menulis berkas.
-   - Masalah: argumen dikirim lewat `redact()`, yang menyembunyikan `contents`. LLM hanya melihat path, lalu bisa
-     menjawab "allow 0.9" untuk isi apa pun — sebelumnya itu selalu dilihat manusia.
-   - Perbaikan: verifier menerima `text`/`contents` (maks 2000 karakter); kunci kredensial tetap disembunyikan. Ada tes.
-   - Jika dibiarkan: berkas berbahaya bisa lolos tanpa dilihat siapa pun.
+## Putaran 1: `/ponytail:ponytail-audit`
+| # | Tingkat | Temuan | Status |
+|---|---|---|---|
+| 1 | Must | Skrip root Rakazo diunduh dari `main` | dipin ke commit 08ee8cf |
+| 2 | Must | Profil tak dikenal → `fallback: allow` | `fallback: approve` + tes |
+| 3 | Should | Murmur boleh tanpa password (dokumen Murmur: kosong = tanpa login) | wajib di compose + tes |
+| 4 | Should | Panggilan ke komputer tanpa timeout | `CALL_TIMEOUT_MS` 60 dtk |
+| 5 | Should | `restart: on-failure`, tanpa healthcheck → mati setelah reboot VM | `unless-stopped` + healthcheck `ops-mcp`, Hermes menunggu sehat |
+| 6 | Should | Gagal tulis audit log diam saja (log kosong terbaca "bersih") | ditulis ke stderr |
+| 7 | Should | Seed ulang menimpa list → toolset yang dimatikan manual hidup lagi | list digabung + tes |
+| 8 | Should | `dryrun.sh` mengulang tes | **ditolak**: dry-run adalah laporan skenario untuk pemilik, sengaja dipertahankan |
+| 9 | Nice | `unittest.main()` di tengah berkas | dipindah ke akhir |
+| 10 | Nice | Dokumen tidak sesuai kode (LLM reviewer, limit RAM, 8 vs 6 GB) | diperbarui |
+| 11 | Nice | Teach: `sourceRecordingId`/tools bisa menyisipkan kunci front matter | di-quote + tes |
 
-2. **Uji Rakazo bisa jalan tanpa firewall** (`eval/rakazo/run.sh up`) — *diperbaiki*
-   - Apa: `up` hanya mengecek tulisan `SANDBOX_COMPUTER_EGRESS=restricted` di `.env`.
-   - Masalah: tanpa `run.sh egress`, aturan iptables tidak ada; komputer bot bisa membuka LAN, termasuk UI Proxmox `:8006`.
-   - Perbaikan: `up` menolak jalan bila rantai `DOCKER-USER` tidak memuat aturan `rakazo-c`.
-   - Jika dibiarkan: bot uji bisa menjangkau hypervisor Anda.
+## Putaran 2: `/ponytail:ponytail-review` atas perbaikan
+Must fix: tidak ada. Diperbaiki: healthcheck pakai `127.0.0.1` + `start_period` (risiko IPv6 `::1`); error timeout
+menyebut path dan memperingatkan agar tidak mengulang aksi membabi buta; catatan bahwa list seed hanya bertambah;
+catatan wajib `MURMUR_PASSWORD`.
 
-## Nice to have
-3. **Flag `llm: true` diabaikan pada aturan tanpa `id`** (`rule_llm`) — *diperbaiki*
-   - Masalah: `decide` memberi nama `rule<i>` untuk aturan tanpa id, `rule_llm` hanya mencari `id`. Verifier diam-diam tidak dipakai.
-   - Perbaikan: satu baris, nama cadangan yang sama. Ada tes.
+Bug yang tertangkap saat memverifikasi putaran 2: komentar sebaris `MURMUR_PASSWORD=  # ...` dibaca Compose sebagai
+**isi password**. Komentar dipindah ke baris sendiri, dan ada tes yang melarang komentar sebaris di `.env.example`.
 
-Diperiksa dan **bukan** temuan: pola `*.domain` di sidecar sama dengan pencocokan OpenBot (`egress.ts domainMatches`);
-`file:`/`javascript:` saat `OPS_ALLOWED_DOMAINS=*` tetap ditolak OpenBot (`request-validation.ts`);
-nilai `REVIEW_LLM_MIN_CONFIDENCE` rusak → fail-closed (deny).
-
-Verdict: setelah 1–3, siap diuji di home lab.
-Lean: tidak ada kode mati yang ditemukan; repo ±540 baris kode.
-Not checked: perilaku runtime (Docker, Chromium, Hermes, panggilan LLM nyata) — tidak bisa dijalankan di sandbox ini.
-Batas yang diterima (komentar `shortcut:`): isi berkas bisa memuat prompt injection ke verifier; aman selama aturan `llm` hanya untuk aksi berisiko rendah.
+## Belum diuji
+Runtime (Docker image, Chromium, Hermes, panggilan LLM nyata). Docker daemon jalan di sandbox, tetapi kebijakan jaringan
+menolak `registry-1.docker.io` dan `ghcr.io` (403), jadi image tidak bisa ditarik. Uji runtime di VM Proxmox: `docs/HOMELAB.md`.

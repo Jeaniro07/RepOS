@@ -6,7 +6,7 @@
 #   eval/rakazo/run.sh down      hentikan (data tetap); `down -v` hapus data
 set -Eeuo pipefail
 cd "$(dirname "$0")"
-W=work; BASE="${RAKAZO_DOWNLOAD_BASE:-https://raw.githubusercontent.com/elie222/rakazo/main/infra/compose}"
+W=work; BASE="${RAKAZO_DOWNLOAD_BASE:-https://raw.githubusercontent.com/elie222/rakazo/08ee8cfb1552833de6ffca85b2e3e95bdbbf88dc/infra/compose}"
 export COMPOSE_PROJECT_NAME=rakazo-eval
 mkdir -p "$W"; cd "$W"
 dc() { docker compose --env-file .env -f docker-compose.images.yml "$@"; }

@@ -22,3 +22,8 @@ test("tool yang sudah bernama browser_* tidak diberi prefiks dua kali", () => {
   expect(markdown).not.toContain("mcp__ops__mcp__ops__");
   expect(markdown).toContain("Pakai mcp__ops__browser_type lalu mcp__ops__browser_type.");
 });
+
+test("field draft tidak bisa menyisipkan kunci front matter", () => {
+  const { markdown } = toSkill({ ...draft, sourceRecordingId: "a\nevil: true" }, "ops");
+  expect(markdown).not.toMatch(/^evil:/m);
+});

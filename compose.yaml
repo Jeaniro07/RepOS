@@ -6,7 +6,7 @@ services:
   murmur:
     image: ${MURMUR_IMAGE:-ghcr.io/getumbrel/murmur:0.6}
     init: true
-    restart: on-failure
+    restart: unless-stopped   # hidup lagi setelah reboot VM
     mem_limit: 512m
     ports: ["127.0.0.1:3000:3000"]   # buka lewat Tailscale/reverse proxy, bukan langsung
     volumes: [murmur-data:/data]
@@ -14,12 +14,12 @@ services:
       MURMUR_BUILTIN_HERMES_URL: http://hermes:9119
       MURMUR_BUILTIN_HERMES_USERNAME: murmur
       MURMUR_BUILTIN_HERMES_PASSWORD: ${MURMUR_HERMES_PASSWORD:?isi MURMUR_HERMES_PASSWORD di .env}
-      MURMUR_PASSWORD: ${MURMUR_PASSWORD:-}
+      MURMUR_PASSWORD: ${MURMUR_PASSWORD:?isi MURMUR_PASSWORD di .env (kosong = Murmur tanpa login)}
     networks: [default]
 
   hermes:
     image: ${HERMES_IMAGE}
-    restart: on-failure
+    restart: unless-stopped   # hidup lagi setelah reboot VM
     stop_grace_period: 1m
     mem_limit: 1536m
     command: ["gateway", "run"]
@@ -43,7 +43,8 @@ services:
       REVIEW_LLM_URL: ${REVIEW_LLM_URL:-}      # verifier Auto Review (opsional; kosong = semua ke manusia)
       REVIEW_LLM_MODEL: ${REVIEW_LLM_MODEL:-}
       REVIEW_LLM_KEY: ${REVIEW_LLM_KEY:-}
-    depends_on: [ops-mcp]
+    depends_on:
+      ops-mcp: {condition: service_healthy}
     networks: [default, bots]
 
   # --- Bot: Ops Holding (pilot) -------------------------------------------
@@ -51,13 +52,13 @@ services:
     build:
       context: vendor/openbot            # hasil scripts/fetch-openbot.sh
       dockerfile: agent-computer/Dockerfile
-    restart: on-failure
+    restart: unless-stopped   # hidup lagi setelah reboot VM
     init: true
     shm_size: 1gb
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
     pids_limit: 512
-    mem_limit: 2g      # host 8 GB (i3 gen 4): total semua layanan harus < ~6 GB
+    mem_limit: 2g      # VM 6 GB di host 8 GB: total semua layanan ±4,1 GB
     cpus: 1.5
     environment:
       COMPUTER_TOKEN: ${OPS_COMPUTER_TOKEN:?isi OPS_COMPUTER_TOKEN di .env}
@@ -69,7 +70,7 @@ services:
 
   ops-mcp:
     image: ${BUN_IMAGE}
-    restart: on-failure
+    restart: unless-stopped   # hidup lagi setelah reboot VM
     working_dir: /app
     command: ["bun", "server.ts"]
     mem_limit: 128m
@@ -86,6 +87,12 @@ services:
       ALLOWED_DOMAINS: ${OPS_ALLOWED_DOMAINS:-}
       PORT: "8700"
     depends_on: [ops-computer]
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://127.0.0.1:8700/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     networks: [bots, ops-net]
 
   # Penyidikan: sengaja tanpa komputer, tanpa sidecar. Lihat bots/penyidikan/README.md.

@@ -8,6 +8,7 @@ const TOKEN = env("COMPUTER_TOKEN"); // sidecar -> komputer; hanya sidecar yang 
 const MCP_TOKEN = env("MCP_TOKEN"); // Hermes -> sidecar; tidak berlaku di komputer (yang punya /exec)
 const BOT = env("BOT_ID", "bot");
 const PORT = Number(env("PORT", "8700"));
+const CALL_TIMEOUT_MS = Number(env("CALL_TIMEOUT_MS", "60000"));
 const EGRESS_REFRESH_MS = Number(env("EGRESS_REFRESH_MS", "30000"));
 const ALLOWED = env("ALLOWED_DOMAINS").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
 
@@ -32,6 +33,10 @@ async function call(path: string, method = "GET", body?: Json): Promise<Json> {
     method,
     headers: { "x-openbot-computer-token": TOKEN, "x-openbot-bot-id": BOT, "content-type": "application/json" },
     body: body && JSON.stringify(body),
+    signal: AbortSignal.timeout(CALL_TIMEOUT_MS), // Chromium macet tidak boleh menggantung giliran agent
+  }).catch((e) => {
+    // timeout hanya berhenti menunggu; aksi di browser mungkin tetap selesai, jadi jangan diulang membabi buta
+    throw new Error(`${path}: ${e instanceof Error ? e.message : e} (cek browser_snapshot sebelum mengulang; CALL_TIMEOUT_MS bisa dinaikkan)`);
   });
   const data = (await res.json().catch(() => ({}))) as Json;
   if (!res.ok) throw new Error(String(data.error ?? `${path} -> HTTP ${res.status}`));

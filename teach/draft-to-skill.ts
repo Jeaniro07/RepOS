@@ -24,8 +24,8 @@ description: ${JSON.stringify(d.summary || d.title)}
 version: 1.0.0
 metadata:
   repos:
-    source: openbot-teach:${d.sourceRecordingId}
-    requires_tools: [${tools.join(", ")}]
+    source: ${JSON.stringify(`openbot-teach:${d.sourceRecordingId}`)}
+    requires_tools: [${tools.map((t) => JSON.stringify(t)).join(", ")}]
 ---
 
 # ${d.title}

@@ -7,6 +7,7 @@ import fnmatch
 import json
 import os
 import re
+import sys
 import time
 import urllib.request
 from pathlib import Path
@@ -98,8 +99,8 @@ def audit(entry):
             home = Path(os.environ.get("HERMES_HOME", "."))
         with (home / "auto-review.jsonl").open("a") as f:
             f.write(json.dumps({"ts": int(time.time()), **entry}, ensure_ascii=False) + "\n")
-    except Exception:
-        pass  # audit tidak boleh menjatuhkan agent
+    except Exception as e:  # audit tidak boleh menjatuhkan agent, tapi log kosong tidak boleh terbaca "bersih"
+        print(f"auto-review: audit gagal ditulis: {e}", file=sys.stderr)
 
 
 def review(tool_name, args=None, **_):

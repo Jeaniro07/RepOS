@@ -17,7 +17,7 @@ Jalankan `scripts/dryrun.sh`. Hasil terakhir di sandbox pengembangan (tanpa Dock
 3. Hermes (a) memuat plugin & profil via `seed.sh` (python di image bernama `python3`?), (b) mengenali `mcp_servers` di config profil dan klien MCP-nya cocok dengan sidecar stateless, (c) nama tool tepat `mcp__ops__*`.
 4. Tombol persetujuan Telegram untuk aksi `approve`; perilaku saat tak ada manusia (harus blok).
 5. `request_help` sampai ke Buddy/Telegram.
-6. Konsumsi RAM/CPU (limit: 3 GB, 2 CPU untuk komputer).
+6. Konsumsi RAM/CPU (limit komputer: 2 GB, 1,5 CPU; total ±4,1 GB di VM 6 GB).
 7. HTTPS/OAuth Apps, Tailscale/CGNAT.
 8. Digest Murmur: `docker buildx imagetools inspect ghcr.io/getumbrel/murmur:0.6` lalu kunci di `versions.env`.
 9. `scripts/fetch-openbot.sh` (butuh internet ke GitHub).
@@ -41,4 +41,4 @@ Jalankan `scripts/dryrun.sh`. Hasil terakhir di sandbox pengembangan (tanpa Dock
 - Semua profil berbagi satu container Hermes: `OPS_MCP_TOKEN` terbaca oleh profil yang punya terminal. Dampaknya terbatas pada 12 tool sidecar (dengan allowlist), bukan `/exec`. Isolasi penuh = Hermes terpisah (Fase 2).
 
 ## Batasan yang disengaja
-Tidak ada LLM-reviewer; Penyidikan hanya terkunci lewat config; sidecar tidak punya tool exec/terminal.
+Verifier LLM opsional dan terbatas (lihat `MERGED.md`); Penyidikan hanya terkunci lewat config; sidecar tidak punya tool exec/terminal.

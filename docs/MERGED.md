@@ -1,6 +1,6 @@
 # Gabungan terbaik: RepOS + Rakazo + OpenBot + Hermes
 
-Target hardware: Core i3 gen 4, 8 GB RAM → **satu stack ringan**, bukan dua. Rakazo tidak dijalankan
+Target hardware: Core i3 gen 4, 8 GB RAM (VM Proxmox 6 GB) → **satu stack ringan**, bukan dua. Rakazo tidak dijalankan
 permanen; hanya diambil ide-idenya. Sumber: kode Rakazo commit 08ee8cf, OpenBot e8bb273.
 
 | Kemampuan | Dipakai dari | Status di repo |

@@ -45,6 +45,12 @@ class Compose(unittest.TestCase):
         import json
         cls.cfg = json.loads(out.stdout)
 
+    def test_murmur_password_is_required(self):
+        env = {**os.environ, "ENV_FILE": self.tmp.name, "MURMUR_PASSWORD": ""}
+        out = subprocess.run([str(ROOT / "scripts/dc"), "config", "-q"], capture_output=True, text=True, env=env)
+        self.assertNotEqual(out.returncode, 0)
+        self.assertIn("MURMUR_PASSWORD", out.stderr)
+
     def test_services(self):
         self.assertEqual(set(self.cfg["services"]), {"murmur", "hermes", "ops-computer", "ops-mcp"})
 
@@ -126,6 +132,9 @@ class Seed(unittest.TestCase):
             self.assertEqual(first, p.read_text())
             self.assertTrue((Path(home) / "profiles/ops-holding/SOUL.md").exists())
 
+    def test_reseed_keeps_manually_disabled_toolsets(self):
+        self.assertEqual(seed.merge({"a": ["x", "manual"]}, {"a": ["x", "y"]}), {"a": ["x", "manual", "y"]})
+
     def test_seed_preserves_existing_keys(self):
         with tempfile.TemporaryDirectory() as home:
             d = Path(home) / "profiles/ops-holding"
@@ -144,10 +153,9 @@ class Hygiene(unittest.TestCase):
         self.assertIn(".env", gi.split())
         self.assertIn("vendor/", gi.split())
         self.assertNotRegex((ROOT / ".env.example").read_text(), r"=[A-Za-z0-9]{12,}")
+        # compose membaca "KEY=  # x" sebagai nilai "# x": komentar harus di baris sendiri
+        self.assertNotRegex((ROOT / ".env.example").read_text(), r"(?m)^\w+=.*#")
 
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class RakazoEval(unittest.TestCase):
@@ -159,3 +167,7 @@ class RakazoEval(unittest.TestCase):
     def test_run_script_parses(self):
         r = subprocess.run(["bash", "-n", str(ROOT / "eval/rakazo/run.sh")], capture_output=True, text=True)
         self.assertEqual(r.returncode, 0, r.stderr)
+
+
+if __name__ == "__main__":
+    unittest.main()

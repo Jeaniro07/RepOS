@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Merge bots/<nama>/{config.yaml,SOUL.md} ke <HERMES_HOME>/profiles/<nama>/. Idempoten; nilai dict digabung, lainnya ditimpa.
+"""Merge bots/<nama>/{config.yaml,SOUL.md} ke <HERMES_HOME>/profiles/<nama>/. Idempoten; dict & list digabung, lainnya ditimpa.
+List hanya bertambah: untuk menghapus item (mis. menyalakan lagi toolset), edit profil di /opt/data secara manual.
 
 Pakai: seed.py <bots_dir> [<hermes_home>]   (hermes_home default: $HERMES_HOME atau /opt/data)
 """
@@ -13,7 +14,13 @@ import yaml
 
 def merge(base, new):
     for k, v in new.items():
-        base[k] = merge(base[k], v) if isinstance(v, dict) and isinstance(base.get(k), dict) else v
+        old = base.get(k)
+        if isinstance(v, dict) and isinstance(old, dict):
+            base[k] = merge(old, v)
+        elif isinstance(v, list) and isinstance(old, list):  # gabung: toolset yang dimatikan manual tetap mati
+            base[k] = old + [x for x in v if x not in old]
+        else:
+            base[k] = v
     return base
 
 

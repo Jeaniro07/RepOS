@@ -63,7 +63,7 @@ class Decide(unittest.TestCase):
         self.assertEqual(self.d("penyidikan", "memory"), "allow")
 
     def test_other_profiles_use_fallback(self):
-        self.assertEqual(self.d("xaqu", "terminal"), "allow")
+        self.assertEqual(self.d("xaqu", "terminal"), "approve")
 
     def test_server_name_in_policy_matches_bot_config(self):
         cfg = ar.yaml.safe_load((ROOT / "bots/ops-holding/config.yaml").read_text())
@@ -134,9 +134,6 @@ class RedactNested(unittest.TestCase):
         self.assertNotIn("RAHASIA", json.dumps(r))
         self.assertEqual(r["url"], "https://x")
 
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class LlmStage(unittest.TestCase):
@@ -209,3 +206,7 @@ class LlmSeesContent(unittest.TestCase):
         policy = {"profiles": {"p": {"rules": [{"tool": "t", "action": "approve", "llm": True}]}}}
         _, rule, _ = ar.decide(policy, "p", "t", {})
         self.assertTrue(ar.rule_llm(policy, "p", rule))
+
+
+if __name__ == "__main__":
+    unittest.main()

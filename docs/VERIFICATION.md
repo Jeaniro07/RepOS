@@ -27,6 +27,8 @@ Batas uji ini: Playwright 1.56 (image memakai 1.62.1) dengan shim satu baris unt
 tidak terbuka karena proxy sandbox, Hermes gateway/Telegram/LLM tidak dijalankan.
 
 ## Belum terbukti — perlu home-lab
+Item 2, 3a, 6, 7 (Tailscale), 10 dicek otomatis oleh `scripts/homelab-check.sh` (logikanya diuji di sandbox terhadap OpenBot,
+sidecar, dan plugin asli; Tailscale/Docker belum).
 1. `scripts/dc build` komputer OpenBot & Chromium jalan; screencast/takeover/request_help nyata.
 2. Egress policy benar-benar memblok domain di luar allowlist (uji `navigate` ke domain lain lewat link/redirect).
 3. Hermes (a) memuat plugin & profil via `seed.sh` (python di image bernama `python3`?), (b) mengenali `mcp_servers` di config profil dan klien MCP-nya cocok dengan sidecar stateless, (c) nama tool tepat `mcp__ops__*`.

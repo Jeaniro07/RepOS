@@ -43,4 +43,6 @@ Hermes, komputer bot, dan sidecar tidak punya port di host; hanya Murmur di 127.
 ## 4. Sebelum enforce
 Biarkan `mode: dry-run` di `plugins/auto-review/policy.yaml` beberapa hari; baca `profiles/ops-holding/auto-review.jsonl`,
 rapikan aturan, lalu ubah ke `mode: enforce` (dibaca ulang otomatis; `AUTOREVIEW_MODE` menimpa).
-Lalu jalankan checklist "perlu home-lab" di `VERIFICATION.md` dan catat hasilnya, termasuk `docker stats`.
+Lalu jalankan `scripts/homelab-check.sh 2>&1 | tee homelab-check.txt` (VM, Tailscale serve/funnel, kontainer, plugin memblok
+`terminal`, sidecar, egress walau sidecar dilewati, `docker stats`) dan tempel hasilnya ke PR. Sisa checklist "perlu home-lab"
+di `VERIFICATION.md` (Telegram, takeover, `request_help`) tetap manual.

@@ -1,4 +1,4 @@
-"""Auto Review: hook pre_tool_call per profil. Hanya stdlib + PyYAML (sudah ada di Hermes).
+"""Auto Review: hook pre_tool_call per profil. Hanya stdlib + parser YAML milik Hermes.
 
 Urutan: aturan pertama yang cocok menang (deny | allow | approve), lalu `default`.
 Gagal evaluasi di mode enforce -> blok (fail-closed). dry-run tidak pernah memblok, hanya mencatat.
@@ -12,7 +12,10 @@ import time
 import urllib.request
 from pathlib import Path
 
-import yaml
+try:  # Hermes baru memakai ruamel lewat hermes_yaml dan tidak lagi membawa PyYAML (diuji di source 0b10b9f)
+    from hermes_yaml import safe_load as load_yaml
+except ImportError:
+    from yaml import safe_load as load_yaml
 
 HERE = Path(__file__).parent
 SECRET_KEYS = {"text", "contents", "password", "token", "secret", "authorization", "api_key"}
@@ -33,7 +36,7 @@ def load_policy():
     path = Path(os.environ.get("AUTOREVIEW_POLICY") or HERE / "policy.yaml")
     mtime = path.stat().st_mtime
     if (_cache["path"], _cache["mtime"]) != (path, mtime):  # hot-reload saat berkas berubah
-        _cache.update(path=path, mtime=mtime, data=yaml.safe_load(path.read_text()) or {})
+        _cache.update(path=path, mtime=mtime, data=load_yaml(path.read_text()) or {})
     return _cache["data"]
 
 

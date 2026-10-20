@@ -9,7 +9,10 @@ import shutil
 import sys
 from pathlib import Path
 
-import yaml
+try:  # sama dengan plugin: Hermes baru membawa ruamel (hermes_yaml), bukan PyYAML
+    from hermes_yaml import safe_dump, safe_load
+except ImportError:
+    from yaml import safe_dump, safe_load
 
 
 def merge(base, new):
@@ -30,8 +33,8 @@ def seed(bots_dir, home):
         dest = Path(home) / "profiles" / bot.name
         dest.mkdir(parents=True, exist_ok=True)
         cfg_path = dest / "config.yaml"
-        cfg = yaml.safe_load(cfg_path.read_text()) if cfg_path.exists() else {}
-        cfg_path.write_text(yaml.safe_dump(merge(cfg or {}, yaml.safe_load((bot / "config.yaml").read_text())), sort_keys=False, allow_unicode=True))
+        cfg = safe_load(cfg_path.read_text()) if cfg_path.exists() else {}
+        cfg_path.write_text(safe_dump(merge(cfg or {}, safe_load((bot / "config.yaml").read_text())), sort_keys=False, allow_unicode=True))
         if (bot / "SOUL.md").exists():
             shutil.copyfile(bot / "SOUL.md", dest / "SOUL.md")
         done.append(bot.name)

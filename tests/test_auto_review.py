@@ -39,7 +39,7 @@ class Env:
 
 class Decide(unittest.TestCase):
     def setUp(self):
-        self.policy = ar.yaml.safe_load((ROOT / "plugins/auto-review/policy.yaml").read_text())
+        self.policy = ar.load_yaml((ROOT / "plugins/auto-review/policy.yaml").read_text())
 
     def d(self, profile, tool, **args):
         return ar.decide(self.policy, profile, tool, args)[0]
@@ -66,7 +66,7 @@ class Decide(unittest.TestCase):
         self.assertEqual(self.d("xaqu", "terminal"), "approve")
 
     def test_server_name_in_policy_matches_bot_config(self):
-        cfg = ar.yaml.safe_load((ROOT / "bots/ops-holding/config.yaml").read_text())
+        cfg = ar.load_yaml((ROOT / "bots/ops-holding/config.yaml").read_text())
         self.assertIn("ops", cfg["mcp_servers"])
 
 
@@ -207,6 +207,22 @@ class LlmSeesContent(unittest.TestCase):
         _, rule, _ = ar.decide(policy, "p", "t", {})
         self.assertTrue(ar.rule_llm(policy, "p", rule))
 
+
+class LoadsWithoutPyYaml(unittest.TestCase):
+    def test_plugin_and_seed_use_hermes_yaml_when_pyyaml_is_missing(self):
+        # Hermes baru tidak membawa PyYAML; plugin yang gagal import = Hermes jalan tanpa penjaga.
+        import sys, types
+        from unittest import mock
+        fake = types.ModuleType("hermes_yaml")
+        fake.safe_load = lambda text: {"dari": "hermes_yaml"}
+        fake.safe_dump = lambda data, **kw: "dari: hermes_yaml\n"
+        with mock.patch.dict(sys.modules, {"yaml": None, "hermes_yaml": fake}):  # None = ImportError
+            for name, path in (("ar2", "plugins/auto-review/__init__.py"), ("seed2", "hermes/seed.py")):
+                spec = importlib.util.spec_from_file_location(name, ROOT / path)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                load = getattr(mod, "load_yaml", None) or mod.safe_load
+                self.assertEqual(load("x"), {"dari": "hermes_yaml"}, path)
 
 if __name__ == "__main__":
     unittest.main()

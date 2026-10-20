@@ -34,6 +34,17 @@ catatan wajib `MURMUR_PASSWORD`.
 Bug yang tertangkap saat memverifikasi putaran 2: komentar sebaris `MURMUR_PASSWORD=  # ...` dibaca Compose sebagai
 **isi password**. Komentar dipindah ke baris sendiri, dan ada tes yang melarang komentar sebaris di `.env.example`.
 
+## Putaran 3: uji runtime komponen asli + `/ponytail:ponytail-review` kedua
+Image tidak bisa ditarik (registry diblokir di sandbox), jadi OpenBot agent-computer, sidecar, dan pemuat plugin Hermes
+dijalankan dari source yang dipin (hasil: `VERIFICATION.md`). Bug yang hanya muncul di runtime:
+| # | Tingkat | Temuan | Status |
+|---|---|---|---|
+| 1 | Must | Hermes baru tidak membawa PyYAML → plugin Auto Review gagal import, Hermes melewatinya, **bot jalan tanpa penjaga** | `hermes_yaml` dengan fallback PyYAML + tes |
+| 2 | Must | `seed.py` punya bug yang sama | idem, dijalankan dengan Python milik Hermes + tes |
+| 3 | Should | Tidak ada bukti plugin termuat setelah seed | `seed.sh` memuat plugin dan gagal keras bila tidak bisa; uji `ls` → `BLOCKED` di HOMELAB langkah 5 |
+| 4 | Should | `bun test` ikut menjalankan ribuan tes vendor OpenBot | `bunfig.toml` (`root = "./tests"`) |
+| 5 | Nice | Tes mengubah `sys.modules` manual | `mock.patch.dict` |
+
 ## Belum diuji
-Runtime (Docker image, Chromium, Hermes, panggilan LLM nyata). Docker daemon jalan di sandbox, tetapi kebijakan jaringan
-menolak `registry-1.docker.io` dan `ghcr.io` (403), jadi image tidak bisa ditarik. Uji runtime di VM Proxmox: `docs/HOMELAB.md`.
+Stack penuh dari image, Chromium versi image, Hermes gateway + Telegram + LLM nyata, Proxmox/Tailscale.
+Uji ini di VM Proxmox: `docs/HOMELAB.md` langkah 1–5, lalu `VERIFICATION.md` "perlu home-lab".

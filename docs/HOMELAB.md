@@ -27,6 +27,7 @@ Hanya **satu** komputer bot aktif di mesin ini. Uji Rakazo (`eval/rakazo/`) jala
 2. `cp .env.example .env`, isi semua nilai (`openssl rand -hex 24`; `OPS_COMPUTER_TOKEN` ≠ `OPS_MCP_TOKEN`, sidecar menolak start bila sama), `OPS_ALLOWED_DOMAINS` (mis. `example.com,*.bankanda.co.id`), dan API key LLM untuk Hermes. Verifier `REVIEW_LLM_*` opsional.
 3. `scripts/fetch-openbot.sh` → `scripts/dc up -d --build` → `scripts/seed.sh`.
 4. `scripts/dryrun.sh` harus 10 lolos.
+5. Bukti Auto Review termuat: di Murmur minta Ops Holding menjalankan `ls` di terminal → harus `BLOCKED [auto-review:no-exec]`. Jika perintah jalan, plugin tidak termuat; hentikan bot dan cek log Hermes.
 
 ## 3. Akses lewat Tailscale
 Tailscale dipasang **di dalam VM** (bukan di host Proxmox), supaya hanya Murmur yang terlihat di tailnet:

@@ -18,6 +18,7 @@ slopguard doctor
 | `slopguard sheet video.mp4 --cuts` | Contact sheet dan strip sebelum/sesudah potongan |
 | `slopguard captions transcript.json --out master.srt [--edl edl.json]` | SRT yang terbaca dari timestamp per kata (Scribe/Whisper/fal), dipotong per makna, angka tidak dipisah dari satuannya |
 | `slopguard master in.mp4 --out out.mp4` | Loudness dua pass ke -14 LUFS / -1.5 dBTP, video disalin tanpa re-encode |
+| `slopguard provenance <file|folder>` | Membaca C2PA Content Credentials (klaim AI, generator, action) dan tag encoder; tanda tangan tidak diverifikasi |
 | `slopguard fal plan gen/plan.json --out GENERATION_PLAN.md` | Tabel biaya rencana generasi untuk persetujuan pengguna (tanpa panggilan) |
 | `slopguard fal run <endpoint> --input in.json --confirm` | Generasi fal.ai dengan batas jumlah panggilan per proyek dan log |
 

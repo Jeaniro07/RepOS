@@ -36,6 +36,7 @@ Three tiers (the structure is borrowed from Nutlope/hallmark's Floor / Reflex / 
 | ledger.no-license | FLOOR | stock/archival/music/sfx row without a licence |
 | ledger.synthetic-real-person | FLOOR | generated row with `real_person=yes` and no `consent:` in notes |
 | ledger.source-type / timing / columns / empty | FLOOR | Malformed ledger |
+| ledger.provenance-mismatch | FLOOR | A source listed as footage/capture/archival/stock whose own Content Credentials declare AI generation |
 | ledger.no-idea | REFLEX | A shot with no idea is decoration |
 | ledger.generated-share | REFLEX | More than 60% of runtime is generated imagery |
 | ledger.repeat-visual | REFLEX | Same visual 3+ times |
@@ -72,6 +73,7 @@ Three tiers (the structure is borrowed from Nutlope/hallmark's Floor / Reflex / 
 | picture.flicker | REFLEX | Mean brightness flips up/down on most frames for 0.5 s+: temporal flicker, the artifact VBench measures on generated video |
 | edit.metronomic | REFLEX | 6+ cuts at near-identical intervals |
 | picture.first-frame | REFLEX | Frame 0 black or flat (it is the thumbnail) |
+| provenance.lost | REFLEX | Files in `assets/` or `gen/` declare AI generation (C2PA) but the render carries no credentials: ffmpeg drops them, so disclose on upload |
 | video.low-res / video.fps / video.duration | REFLEX | Under 720 px short side, under 24 fps, ±10% off target |
 | encode.bitrate | FINISH | Thin bitrate; platform re-encode will band |
 

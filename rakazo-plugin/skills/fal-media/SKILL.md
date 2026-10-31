@@ -61,6 +61,9 @@ together with the full result JSON (seed, model, input) so a good result can be 
 ## After each call
 
 Look at it before using it: make a contact sheet for clips (`slopguard sheet clip.mp4 --out gen/x/sheet`).
+Run `slopguard provenance gen/<shot>/` to see whether the output carries C2PA Content Credentials and an AI
+declaration; note it in the ledger. Editing with ffmpeg drops those credentials, so the final video will not
+carry them: disclosure stays your job (see `video-qa`).
 Reject: extra or fused fingers, melting faces, warped text, objects morphing, wrong physics, flicker, the
 wrong object. Note rejected calls in `project.md` so the same prompt is not paid for twice. Record kept
 outputs in `ledger.csv` with `source_type=generated`, the endpoint and the request id in `source`.

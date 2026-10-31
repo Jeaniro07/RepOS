@@ -15,9 +15,11 @@ from __future__ import annotations
 
 import csv
 import io
+import os
 from collections import Counter
 from typing import List
 
+from slopguard import provenance
 from slopguard.report import FINISH, FLOOR, REFLEX, Finding, Report
 
 SOURCE_TYPES = {"footage", "capture", "code", "illustration", "generated", "stock", "archival", "music", "sfx"}
@@ -26,7 +28,10 @@ NEEDS_LICENSE = {"stock", "archival", "music", "sfx"}
 REQUIRED = ["shot", "start", "end", "idea", "visual", "source_type"]
 
 
-def check_ledger(text: str, subject: str = "ledger.csv", max_generated_share: float = 0.6) -> Report:
+REAL_TYPES = {"footage", "capture", "archival", "stock"}
+
+
+def check_ledger(text: str, subject: str = "ledger.csv", max_generated_share: float = 0.6, base_dir: str = None) -> Report:
     report = Report(subject=subject, kind="ledger")
     rows = list(csv.DictReader(io.StringIO(text.lstrip("﻿"))))
     if not rows:
@@ -40,6 +45,7 @@ def check_ledger(text: str, subject: str = "ledger.csv", max_generated_share: fl
 
     norm: List[dict] = [{(k or "").strip().lower(): (v or "").strip() for k, v in r.items()} for r in rows]
     total = 0.0
+    ai_credentialed = [0]
     by_type: Counter = Counter()
     visuals: Counter = Counter()
     prev_end = None
@@ -101,11 +107,32 @@ def check_ledger(text: str, subject: str = "ledger.csv", max_generated_share: fl
                         fix="Use real footage with permission, a non-identifiable illustration, or record 'consent: <who, when>' in notes.",
                     )
                 )
+        src = r.get("source", "")
+        if base_dir and src:
+            path = src if os.path.isabs(src) else os.path.join(base_dir, src)
+            if os.path.isfile(path):
+                info = provenance.inspect(path)
+                if info.get("c2pa") and (info.get("ai_generated") or info.get("ai_in_history")):
+                    gens = "; ".join(info.get("generators") or []) or "unknown generator"
+                    if st in REAL_TYPES:
+                        report.add(
+                            Finding(
+                                "ledger.provenance-mismatch",
+                                FLOOR,
+                                f"Listed as {st}, but the file's Content Credentials declare AI-generated content ({gens}).",
+                                at=at,
+                                fix="Mark it source_type=generated and disclose it, or replace it with real material.",
+                            )
+                        )
+                    else:
+                        ai_credentialed[0] += 1
         v = r.get("visual", "").lower()
         if v:
             visuals[v] += 1
 
     report.metrics["shots"] = len(norm)
+    if base_dir:
+        report.metrics["sources with AI Content Credentials"] = ai_credentialed[0]
     report.metrics["runtime in ledger (s)"] = round(total, 2)
     if total > 0:
         shares = {k: v / total for k, v in by_type.items()}

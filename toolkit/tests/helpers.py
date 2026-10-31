@@ -87,3 +87,76 @@ def make_flicker(path: str, size: str = "540x960", seconds: float = 4.0) -> str:
 
 def have_ffmpeg() -> bool:
     return FFMPEG is not None and os.access(FFMPEG, os.X_OK)
+
+
+# ---------------------------------------------------------------- synthetic C2PA (mirrors real Google/Truepic layouts)
+
+JUMBF_SUFFIX = bytes.fromhex("00110010800000aa00389b71")
+C2PA_UUID = bytes.fromhex("d8fec3d61b0e483c92975828877ec481")
+
+
+def cbor_encode(v) -> bytes:
+    import struct as _s
+
+    def head(mt, n):
+        if n < 24:
+            return bytes([mt << 5 | n])
+        for ai, w in ((24, 1), (25, 2), (26, 4), (27, 8)):
+            if n < 1 << (8 * w):
+                return bytes([mt << 5 | ai]) + n.to_bytes(w, "big")
+        raise ValueError(n)
+    if v is True:
+        return b"\xf5"
+    if v is False:
+        return b"\xf4"
+    if v is None:
+        return b"\xf6"
+    if isinstance(v, int):
+        return head(0, v) if v >= 0 else head(1, -1 - v)
+    if isinstance(v, float):
+        return b"\xfb" + _s.pack(">d", v)
+    if isinstance(v, bytes):
+        return head(2, len(v)) + v
+    if isinstance(v, str):
+        b = v.encode()
+        return head(3, len(b)) + b
+    if isinstance(v, (list, tuple)):
+        return head(4, len(v)) + b"".join(cbor_encode(x) for x in v)
+    if isinstance(v, dict):
+        return head(5, len(v)) + b"".join(cbor_encode(k) + cbor_encode(x) for k, x in v.items())
+    raise TypeError(type(v))
+
+
+def _box(typ: bytes, payload: bytes) -> bytes:
+    return (8 + len(payload)).to_bytes(4, "big") + typ + payload
+
+
+def jumbf(kind: str, label: str, content: bytes = b"", children=()) -> bytes:
+    jumd = _box(b"jumd", kind.encode() + JUMBF_SUFFIX + b"\x03" + label.encode() + b"\x00")
+    return _box(b"jumb", jumd + content + b"".join(children))
+
+
+def c2pa_store(actions, generator="Test Generator", label="urn:c2pa:test-0001") -> bytes:
+    assertion = jumbf("cbor", "c2pa.actions.v2", _box(b"cbor", cbor_encode({"actions": actions})))
+    claim = jumbf("c2cl", "c2pa.claim.v2", _box(b"cbor", cbor_encode({
+        "instanceID": "xmp:iid:test", "claim_generator_info": {"name": generator, "version": "1"},
+        "created_assertions": [{"url": "self#jumbf=c2pa.assertions/c2pa.actions.v2", "hash": b"\x00" * 32}],
+        "signature": "self#jumbf=c2pa.signature", "alg": "sha256",
+    })))
+    signature = jumbf("c2cs", "c2pa.signature", _box(b"cbor", b"\xd2\x84\x40\xa0\xf6\x40"))
+    manifest = jumbf("c2ma", label, children=[signature, claim, jumbf("c2as", "c2pa.assertions", children=[assertion])])
+    return jumbf("c2pa", "c2pa", children=[manifest])
+
+
+def add_c2pa(src: str, dst: str, store: bytes) -> str:
+    """Append a top-level C2PA uuid box (appending keeps every chunk offset valid)."""
+    payload = C2PA_UUID + b"\x00\x00\x00\x00" + b"manifest\x00" + b"\x00" * 8 + store
+    with open(src, "rb") as fh:
+        data = fh.read()
+    with open(dst, "wb") as fh:
+        fh.write(data + _box(b"uuid", payload))
+    return dst
+
+
+AI = "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"
+CAMERA = "http://cv.iptc.org/newscodes/digitalsourcetype/digitalCapture"

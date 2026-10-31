@@ -17,6 +17,9 @@ checked too, `waivers.json` is applied, and the report plus contact sheets land 
 vertical video, `safezones.jpg` (frames with the platform-UI bands shaded red and the safe box in green).
 The measured gates include temporal flicker (a generated-video tell), caption reading speed for the project's
 language, 2-frame caption gaps and captions that land just beside a shot change.
+Provenance is checked too: a ledger row marked footage whose file declares AI generation is a FLOOR failure,
+and `provenance.lost` reminds you that AI inputs lost their Content Credentials in the edit, so the AI disclosure
+must be made by hand at upload. `slopguard provenance <file>` shows what any file declares.
 
 Exit code 1 means a FLOOR failure: fix it, there is no waiver. Exit code 2 means open REFLEX findings: fix
 each one, or waive it with a real reason in `waivers.json` (example: a deliberate 3 s hold on the end card).

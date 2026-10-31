@@ -134,3 +134,9 @@ skill menyuruh bot memeriksa halaman resmi sebelum mengutipnya ke pengguna.
 | YouTube: [Last Week Tonight, "AI Slop" (HBO)](https://www.youtube.com/watch?v=TWpg1RmzAbc); Kurzgesagt, "AI Slop Is Killing Our Channel" (2025, [TheTVDB](https://thetvdb.com/series/kurzgesagt-in-a-nutshell/episodes/11383775)) | Cara penonton dan kreator melihat slop: spam yang meniru konten, informasi tanpa sumber | Penekanan pada sumber, ide per shot, dan larangan konten massal |
 | Halaman model fal: [Seedance 2.0 i2v](https://fal.ai/models/bytedance/seedance-2.0/image-to-video/api), [Nano Banana Pro](https://fal.ai/learn/tools/how-to-use-nano-banana-pro), [ElevenLabs di fal](https://fal.ai/elevenlabs) | ID endpoint dan harga indikatif | `fal-models.md`, `slopguard fal plan` |
 | Artikel Indonesia tentang ciri tulisan AI: [detik](https://www.detik.com/bali/berita/d-7905724/6-cara-mendeteksi-tulisan-buatan-ai), [eraspace](https://eraspace.com/artikel/post/ciri-ciri-tulisan-ai-yang-mudah-dikenali-tanpa-perlu-tools) | Frasa pembuka klise ("patut dicatat", "sebagaimana diketahui"), nada kaku, pengulangan | Lexicon Indonesia tambahan (frasa ini wajar dipakai manusia; yang dihitung adalah kepadatannya) |
+
+## Reverse engineering: asal-usul file video AI
+
+Peta format C2PA/JUMBF di MP4, sampel nyata dari Google Generative AI, Truepic dan Adobe Firefly, serta bukti bahwa
+ffmpeg membuang kredensial: [`RE-video-provenance.md`](RE-video-provenance.md). Dipakai oleh `slopguard provenance`,
+`ledger.provenance-mismatch` dan `provenance.lost`.

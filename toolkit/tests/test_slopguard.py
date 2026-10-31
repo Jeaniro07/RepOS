@@ -1,5 +1,8 @@
+import contextlib
+import io
 import json
 import os
+import shutil
 import sys
 import tempfile
 import threading
@@ -413,7 +416,8 @@ class Build(unittest.TestCase):
             with open(words, "w") as fh:
                 json.dump(long, fh)
             out = os.path.join(d, "edit", "master.srt")
-            cli.main(["captions", words, "--out", out])
+            with contextlib.redirect_stdout(io.StringIO()):
+                cli.main(["captions", words, "--out", out])
             with open(out, encoding="utf-8") as fh:
                 lines = [l for l in fh.read().splitlines() if l and "-->" not in l and not l.isdigit()]
             self.assertTrue(lines and max(len(l) for l in lines) <= 28, lines)
@@ -458,6 +462,99 @@ class Build(unittest.TestCase):
             res = build.master_loudness(src, os.path.join(d, "out.mp4"))
             self.assertAlmostEqual(res["after_lufs"], -14.0, delta=1.0)
             self.assertLessEqual(res["after_true_peak"], -1.0)
+
+
+@unittest.skipUnless(helpers.have_ffmpeg(), "ffmpeg not installed")
+class Provenance(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.mkdtemp(prefix="slopguard-prov-")
+        base = helpers.make_clean(os.path.join(cls.tmp, "base.mp4"))
+        cls.ai = helpers.add_c2pa(base, os.path.join(cls.tmp, "ai.mp4"), helpers.c2pa_store(
+            [{"action": "c2pa.created", "description": "Created by a test generator.", "digitalSourceType": helpers.AI}],
+            generator="Test GenAI Library"))
+        cls.camera = helpers.add_c2pa(base, os.path.join(cls.tmp, "camera.mp4"), helpers.c2pa_store(
+            [{"action": "c2pa.created", "digitalSourceType": helpers.CAMERA, "softwareAgent": "Test Camera"}]))
+        cls.base = base
+
+    def test_reads_ai_declaration(self):
+        from slopguard import provenance
+        info = provenance.inspect(self.ai)
+        self.assertTrue(info["c2pa"])
+        self.assertTrue(info["ai_generated"])
+        self.assertIn("Test GenAI Library 1", info["generators"])
+        self.assertEqual(info["active_manifest"], "urn:c2pa:test-0001")
+        acts = info["manifests"][0]["actions"]
+        self.assertEqual(acts[0]["action"], "c2pa.created")
+        self.assertEqual(acts[0]["source_kind"], "ai")
+        self.assertTrue(info["manifests"][0]["signed"])
+        self.assertIn("declares AI-generated content", provenance.summarize(info))
+
+    def test_camera_capture_is_not_ai(self):
+        from slopguard import provenance
+        info = provenance.inspect(self.camera)
+        self.assertTrue(info["c2pa"])
+        self.assertFalse(info["ai_generated"])
+
+    def test_ffmpeg_remux_drops_credentials(self):
+        from slopguard import provenance
+        out = os.path.join(self.tmp, "remux.mp4")
+        helpers._run(["-i", self.ai, "-c", "copy", out])
+        info = provenance.inspect(out)
+        self.assertFalse(info["c2pa"])
+        self.assertTrue(any(h.startswith("Lavf") for h in info["hints"]), info["hints"])
+
+    def test_hostile_input_never_raises(self):
+        from slopguard import provenance
+        cases = {
+            "random.mp4": os.urandom(4096),
+            "huge-box.mp4": b"\x00\x00\x00\x18ftypisom" + b"\x00" * 12 + b"\xff\xff\xff\xffuuid" + helpers.C2PA_UUID + b"x" * 64,
+            "bad-jumbf.mp4": b"\x00\x00\x00\x10ftypisom\x00\x00\x00\x00" + (40).to_bytes(4, "big") + b"uuid" + helpers.C2PA_UUID + b"\x00" * 12,
+            "deep.bin": b"jumb" * 1000,
+            "empty.mp4": b"",
+        }
+        for name, data in cases.items():
+            path = os.path.join(self.tmp, name)
+            with open(path, "wb") as fh:
+                fh.write(data)
+            info = provenance.inspect(path)
+            self.assertFalse(info["ai_generated"], name)
+        from slopguard.provenance import cbor_decode, CBORError
+        with self.assertRaises(CBORError):
+            cbor_decode(b"\x9b\xff\xff\xff\xff\xff\xff\xff\xff")  # array claiming 2^64 items
+
+    def test_cbor_roundtrip(self):
+        from slopguard.provenance import cbor_decode
+        value = {"a": [1, -5, 3.5, True, None, b"\x01\x02", "teks"], "n": 70000, "nested": {"x": [{"y": "z"}]}}
+        self.assertEqual(cbor_decode(helpers.cbor_encode(value))[0], value)
+
+    def test_ledger_flags_ai_file_listed_as_footage(self):
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, "assets"))
+            shutil.copy(self.ai, os.path.join(d, "assets", "pour.mp4"))
+            rows = "shot,start,end,narration,idea,visual,source_type,source,license,real_person,notes\n"
+            bad = rows + "1,0,3,x,ide,tuang,footage,assets/pour.mp4,own,no,\n"
+            good = rows + "1,0,3,x,ide,tuang,generated,assets/pour.mp4,,no,\n"
+            r_bad = ledger.check_ledger(bad, base_dir=d)
+            self.assertIn("ledger.provenance-mismatch", gates(r_bad))
+            self.assertEqual(r_bad.exit_code(), EXIT_FLOOR)
+            r_good = ledger.check_ledger(good, base_dir=d)
+            self.assertNotIn("ledger.provenance-mismatch", gates(r_good))
+            self.assertEqual(r_good.metrics["sources with AI Content Credentials"], 1)
+
+    def test_qa_flags_lost_credentials(self):
+        from slopguard import cli
+        with tempfile.TemporaryDirectory() as d:
+            project.init_project(d, "t", fmt="vertical", duration=16)
+            shutil.copy(self.ai, os.path.join(d, "gen", "clip.mp4"))
+            render = os.path.join(d, "edit", "final.mp4")
+            shutil.copy(self.base, render)
+            with contextlib.redirect_stdout(io.StringIO()):
+                cli.main(["qa", render, "--no-sheets", "--target", "540x960"])
+            with open(os.path.join(d, "edit", "qa", "qa-report.json"), encoding="utf-8") as fh:
+                rep = json.load(fh)
+            self.assertIn("provenance.lost", {f["gate"] for f in rep["findings"]})
+            self.assertEqual(rep["metrics"]["inputs with AI Content Credentials"], 1)
 
 
 if __name__ == "__main__":

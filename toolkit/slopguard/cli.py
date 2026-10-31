@@ -10,8 +10,8 @@ import json
 import os
 import sys
 
-from slopguard import __version__, build, captions, fal, ledger, media, project, sheet, textlint, videoqa
-from slopguard.report import EXIT_USAGE, Report, apply_waivers, load_waivers, write_outputs
+from slopguard import __version__, build, captions, fal, ledger, media, project, provenance, sheet, textlint, videoqa
+from slopguard.report import EXIT_USAGE, REFLEX, Finding, Report, apply_waivers, load_waivers, write_outputs
 
 
 def _print(report: Report, as_json: bool) -> None:
@@ -81,7 +81,10 @@ def cmd_captions(a) -> int:
 
 
 def cmd_ledger(a) -> int:
-    report = ledger.check_ledger(_read(a.file), subject=a.file, max_generated_share=a.max_generated)
+    report = ledger.check_ledger(
+        _read(a.file), subject=a.file, max_generated_share=a.max_generated,
+        base_dir=os.path.dirname(os.path.abspath(a.file)),
+    )
     cfg = project.load_config(a.file)
     apply_waivers(report, load_waivers(a.waivers or (os.path.join(cfg["_root"], "waivers.json") if cfg else None)))
     write_outputs(report, a.out, "ledger")
@@ -125,10 +128,43 @@ def cmd_qa(a) -> int:
         report.manual_checks += cr.manual_checks
     led = a.ledger or (os.path.join(root, "ledger.csv") if root and os.path.exists(os.path.join(root, "ledger.csv")) else None)
     if led:
-        lr = ledger.check_ledger(_read(led), subject=led)
+        lr = ledger.check_ledger(_read(led), subject=led, base_dir=os.path.dirname(os.path.abspath(led)))
         if lr.metrics.get("shots"):
             report.extend(lr.findings)
             report.metrics.update({f"ledger: {k}": v for k, v in lr.metrics.items()})
+    # Provenance: does the render still say what its inputs said? ffmpeg drops C2PA boxes.
+    rinfo = provenance.inspect(a.video)
+    report.metrics["render Content Credentials"] = (
+        "AI declared" if rinfo.get("ai_generated") else ("present" if rinfo.get("c2pa") else "none")
+    )
+    if root:
+        ai_inputs = []
+        for sub in ("assets", "gen"):
+            d = os.path.join(root, sub)
+            if os.path.isdir(d):
+                for path in provenance.media_files(d):
+                    if os.path.abspath(path) == os.path.abspath(a.video):
+                        continue
+                    info = provenance.inspect(path)
+                    if info.get("ai_generated") or info.get("ai_in_history"):
+                        ai_inputs.append((os.path.relpath(path, root), "; ".join(info.get("generators") or [])))
+        report.metrics["inputs with AI Content Credentials"] = len(ai_inputs)
+        if ai_inputs and not rinfo.get("ai_generated"):
+            example = ", ".join(f"{p} ({g})" if g else p for p, g in ai_inputs[:3])
+            report.add(
+                Finding(
+                    "provenance.lost",
+                    REFLEX,
+                    f"{len(ai_inputs)} input file(s) declare AI generation in their Content Credentials ({example}); "
+                    "the render carries none, because editing with ffmpeg drops them.",
+                    fix="Disclose the AI-generated parts when uploading (the platform cannot read it from this file), "
+                    "and list them in REVIEW.md. Waive only if the AI material was cut from the final.",
+                )
+            )
+    if rinfo.get("c2pa"):
+        report.manual_checks.append(
+            "The render carries Content Credentials: platforms read them and may label the upload automatically."
+        )
     waivers_path = a.waivers or (os.path.join(root, "waivers.json") if root else None)
     apply_waivers(report, load_waivers(waivers_path))
     out = a.out or (os.path.join(root, "edit", "qa") if root else os.path.splitext(a.video)[0] + ".qa")
@@ -247,6 +283,19 @@ def cmd_master(a) -> int:
     print(json.dumps(res, indent=2))
     ok = res["after_lufs"] is not None and abs(res["after_lufs"] - float(lufs)) <= 1.0 and (res["after_true_peak"] or 0) <= -1.0
     return 0 if ok else 2
+
+
+def cmd_provenance(a) -> int:
+    paths = []
+    for p in a.paths:
+        paths.extend(provenance.media_files(p) if os.path.isdir(p) else [p])
+    infos = [provenance.inspect(p) for p in paths]
+    if a.json:
+        print(json.dumps(infos, indent=2, ensure_ascii=False, default=str))
+    else:
+        print("\n\n".join(provenance.summarize(i) for i in infos) if infos else "no media files found")
+        print("\nNote: Content Credentials are claims; slopguard reads them but does not verify signatures.")
+    return 0 if all(not i.get("error") for i in infos) else EXIT_USAGE
 
 
 def cmd_doctor(a) -> int:
@@ -377,6 +426,11 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--lufs", type=float)
     s.add_argument("--tp", type=float, default=-1.5)
     s.set_defaults(func=cmd_master)
+
+    s = sub.add_parser("provenance", help="read C2PA Content Credentials and container metadata (AI declarations, generator, encoder)")
+    s.add_argument("paths", nargs="+", help="media files or folders")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_provenance)
 
     s = sub.add_parser("doctor", help="check ffmpeg, filters and FAL_KEY presence")
     s.set_defaults(func=cmd_doctor)

@@ -19,8 +19,20 @@ mkdir -p "${BIN}" "${HOME}/.local/bin"
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
+NEEDED_FILTERS="ebur128 silencedetect blackdetect freezedetect signalstats showinfo tile loudnorm drawbox subtitles"
+
+has_filters() {
+  local list
+  list="$("$1" -nostdin -hide_banner -filters 2>/dev/null)" || return 1
+  for f in ${NEEDED_FILTERS}; do
+    printf '%s\n' "${list}" | grep -q " ${f} " || { echo "ffmpeg at $1 lacks the '${f}' filter" >&2; return 1; }
+  done
+}
+
 ffmpeg_ok() {
-  { have ffmpeg && have ffprobe; } || { [ -x "${BIN}/ffmpeg" ] && [ -x "${BIN}/ffprobe" ]; }
+  # Our own static build, or a system ffmpeg + ffprobe that has every filter slopguard uses.
+  if [ -x "${BIN}/ffmpeg" ] && [ -x "${BIN}/ffprobe" ]; then return 0; fi
+  have ffmpeg && have ffprobe && has_filters "$(command -v ffmpeg)"
 }
 
 install_static() {

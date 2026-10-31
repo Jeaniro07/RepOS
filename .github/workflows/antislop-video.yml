@@ -7,12 +7,16 @@ on:
       - "rakazo-plugin/**"
       - "scripts/validate_plugin.py"
       - "research/build_catalog.py"
+      - "install.sh"
+      - "install.ps1"
       - ".github/workflows/antislop-video.yml"
   push:
     branches: [main]
     paths:
       - "toolkit/**"
       - "rakazo-plugin/**"
+      - "install.sh"
+      - "install.ps1"
 
 permissions:
   contents: read
@@ -47,3 +51,39 @@ jobs:
           set +e
           python -m slopguard lint-script ../examples/kopi-pahit/script-slop.md > /dev/null
           test $? -eq 1
+
+  install-linux:
+    # The one-command installer, as a user would run it: fresh HOME, clone from GitHub, setup, doctor, tests.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install.sh
+        env:
+          REF: ${{ github.head_ref || github.ref_name }}
+        run: |
+          export HOME="$RUNNER_TEMP/home" && mkdir -p "$HOME"
+          bash ./install.sh --ref "$REF"
+          "$HOME/.local/bin/slopguard" doctor
+          "$HOME/.local/bin/slopguard" lint-script "$HOME/antislop/RepOS/examples/kopi-pahit/script.md"
+
+  install-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: install.ps1
+        shell: pwsh
+        env:
+          REF: ${{ github.head_ref || github.ref_name }}
+        run: |
+          ./install.ps1 -Ref $env:REF -NoWinget
+          & "$env:LOCALAPPDATA\slopguard\bin\slopguard.cmd" lint-script "$HOME\antislop\RepOS\examples\kopi-pahit\script.md"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: Windows PowerShell 5.1 can parse install.ps1
+        shell: powershell
+        run: |
+          $errs = $null
+          [System.Management.Automation.Language.Parser]::ParseFile("$PWD\install.ps1", [ref]$null, [ref]$errs) | Out-Null
+          if ($errs.Count) { $errs | ForEach-Object { $_.Message }; exit 1 }

@@ -2,8 +2,9 @@
 
 Discovery order for each binary:
   1. $SLOPGUARD_FFMPEG / $SLOPGUARD_FFPROBE (set to "none" to disable)
-  2. PATH
-  3. ~/.local/share/slopguard/bin (where setup.sh puts static builds)
+  2. the installer's static build: ~/.local/share/slopguard/bin (Linux/macOS),
+     %LOCALAPPDATA%\\slopguard\\bin (Windows)
+  3. PATH
   4. imageio-ffmpeg's bundled ffmpeg (ffmpeg only), if importable
 ffprobe is optional: without it, stream info is parsed from `ffmpeg -i`.
 """
@@ -18,7 +19,12 @@ import subprocess
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
-LOCAL_BIN = os.path.join(os.path.expanduser("~"), ".local", "share", "slopguard", "bin")
+IS_WINDOWS = os.name == "nt"
+# Where the installers put the static ffmpeg build.
+if IS_WINDOWS:
+    LOCAL_BIN = os.path.join(os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"), "slopguard", "bin")
+else:
+    LOCAL_BIN = os.path.join(os.path.expanduser("~"), ".local", "share", "slopguard", "bin")
 
 
 class MediaError(RuntimeError):
@@ -31,12 +37,13 @@ def _find(name: str) -> Optional[str]:
         if env.lower() == "none":
             return None
         return env if os.path.exists(env) else shutil.which(env)
+    # The build the installer chose wins over an older system ffmpeg that may lack filters.
+    for local in (os.path.join(LOCAL_BIN, name + ".exe"), os.path.join(LOCAL_BIN, name)):
+        if os.path.isfile(local):
+            return local
     found = shutil.which(name)
     if found:
         return found
-    local = os.path.join(LOCAL_BIN, name)
-    if os.path.exists(local):
-        return local
     if name == "ffmpeg":
         try:
             import imageio_ffmpeg  # type: ignore

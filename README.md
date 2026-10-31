@@ -63,12 +63,27 @@ tidak mengaku "sudah menonton"; tidak mengubah file sumber Anda.
 | Ledger | shot tanpa sumber/lisensi (FLOOR), orang nyata sintetis tanpa izin (FLOOR), > 60% generatif, visual diulang |
 | Video | aspek salah, tanpa suara, clipping (FLOOR), loudness di luar -14 ± 2 LUFS, jeda mati > 1.5 s, gambar utama beku > 2.5 s, cut metronom, frame pertama hitam |
 
-Uji cepat di komputer mana pun dengan Python 3.10+ dan ffmpeg:
+## Pasang di komputer sendiri (satu perintah)
 
+**Linux / macOS** (memasang git/python/curl yang belum ada lewat package manager, ffmpeg 8.1, perintah `slopguard`, lalu tes otomatis):
 ```bash
-bash toolkit/setup.sh
-cd toolkit && python3 -m unittest discover -s tests
+curl -fsSL https://raw.githubusercontent.com/Jeaniro07/RepOS/main/install.sh | bash
 ```
+
+**Windows 10/11** (PowerShell; memasang Git dan Python lewat winget bila belum ada, ffmpeg 8.1, perintah `slopguard` di PATH, lalu tes):
+```powershell
+irm https://raw.githubusercontent.com/Jeaniro07/RepOS/main/install.ps1 | iex
+```
+
+Sebelum PR di-merge ke `main`, pakai branch-nya:
+```bash
+curl -fsSL https://raw.githubusercontent.com/Jeaniro07/RepOS/claude/keen-einstein-1e7dc9/install.sh | bash -s -- --ref claude/keen-einstein-1e7dc9
+```
+```powershell
+irm https://raw.githubusercontent.com/Jeaniro07/RepOS/claude/keen-einstein-1e7dc9/install.ps1 -OutFile install.ps1; powershell -ExecutionPolicy Bypass -File .\install.ps1 -Ref claude/keen-einstein-1e7dc9
+```
+
+Kedua installer tidak pernah meminta atau menyimpan API key. Kunci fal.ai diberikan ke bot Rakazo lewat kartu terlindung.
 
 ## Batasan yang perlu Anda tahu
 

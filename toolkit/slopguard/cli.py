@@ -266,7 +266,7 @@ def cmd_doctor(a) -> int:
         ok = False
     else:
         code, out, err = media.run([ff, "-hide_banner", "-filters"], timeout=60)
-        need = ["ebur128", "silencedetect", "blackdetect", "freezedetect", "signalstats", "showinfo", "tile", "loudnorm"]
+        need = ["ebur128", "silencedetect", "blackdetect", "freezedetect", "signalstats", "showinfo", "tile", "loudnorm", "drawbox", "subtitles"]
         missing = [n for n in need if f" {n} " not in out]
         print(f"filters: {'all present' if not missing else 'MISSING ' + ', '.join(missing)}")
         ok = ok and not missing
@@ -384,6 +384,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv=None) -> int:
+    # Reports contain characters outside legacy Windows code pages; never crash on printing them.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     args = build_parser().parse_args(argv)
     try:
         return args.func(args)

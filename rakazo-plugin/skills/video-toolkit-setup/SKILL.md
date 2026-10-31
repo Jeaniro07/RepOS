@@ -20,6 +20,18 @@ slopguard doctor
 
 `ANTISLOP_REF` is only for testing an unmerged branch; leave it unset to use `main`.
 
+### On the user's own computer (Rakazo desktop app, "Let bots use this computer")
+
+- **Linux / macOS:** `curl -fsSL https://raw.githubusercontent.com/Jeaniro07/RepOS/main/install.sh | bash`
+  installs missing git/python/curl with the system package manager (it may ask for the sudo password; on macOS
+  it uses Homebrew, including for ffmpeg), then clones, sets up and self-tests.
+- **Windows (PowerShell):** `irm https://raw.githubusercontent.com/Jeaniro07/RepOS/main/install.ps1 | iex`
+  installs Git and Python with winget when missing, downloads ffmpeg 8.1 into `%LOCALAPPDATA%\slopguard\bin`,
+  adds a `slopguard` command to the user PATH and self-tests. Open a new terminal afterwards. On Windows there
+  is no `timeout` command: run renders through PowerShell (`Start-Process -Wait` with a time limit) or keep
+  them short; `slopguard` itself already bounds every ffmpeg call. In ffmpeg filter arguments use relative paths
+  (a `C:` drive colon breaks filter syntax).
+
 `setup.sh` downloads a static ffmpeg + ffprobe build (about 150 MB, BtbN/FFmpeg-Builds) into
 `~/.local/share/slopguard/bin` when none is installed, falls back to the imageio-ffmpeg wheel through `uv`,
 and puts a `slopguard` command in `~/.local/bin`. It never reads or writes secrets. `doctor` must show

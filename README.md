@@ -15,6 +15,8 @@ Generasi gambar/video/suara memakai **fal.ai** dengan kunci Anda sendiri, dan ha
 | [`toolkit/`](toolkit/) | `slopguard`: CLI pengukur (lint naskah, caption, ledger shot, QA video, contact sheet, klien fal.ai dengan batas anggaran) |
 | [`research/`](research/) | [`REPOS.md`](research/REPOS.md): 153 repo GitHub terverifikasi dalam 14 kategori; [`REFERENCES.md`](research/REFERENCES.md): apa yang diambil dari Remotion, video-use, video-shotcraft, stickman-video-director, hallmark, HyperFrames |
 | [`scripts/validate_plugin.py`](scripts/validate_plugin.py) | Validasi plugin terhadap aturan pemasangan Rakazo |
+| [`simulation/`](simulation/) | Simulasi ujung-ke-ujung: parser plugin asli Rakazo + komputer bot tiruan + fal.ai tiruan; laporan di [`simulation/output/SIMULATION.md`](simulation/output/SIMULATION.md) |
+| [`examples/kopi-pahit/`](examples/kopi-pahit/) | Contoh artefak proyek (naskah bersih vs slop, ledger, caption) |
 
 ## Pasang di Rakazo (sekitar 5 menit)
 

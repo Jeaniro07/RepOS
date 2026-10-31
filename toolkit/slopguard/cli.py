@@ -198,7 +198,12 @@ def cmd_doctor(a) -> int:
     ff = media._find("ffmpeg")
     fp = media.ffprobe_path()
     print(f"slopguard {__version__}  python {sys.version.split()[0]}")
-    print(f"ffmpeg : {ff or 'MISSING (run toolkit/setup.sh)'}")
+    ver = ""
+    if ff:
+        _, vout, _ = media.run([ff, "-hide_banner", "-version"], timeout=30)
+        parts = vout.split()
+        ver = f"  (version {parts[2]})" if len(parts) > 2 else ""
+    print(f"ffmpeg : {ff or 'MISSING (run toolkit/setup.sh)'}{ver}")
     print(f"ffprobe: {fp or 'not found (optional; ffmpeg -i parsing is used)'}")
     print(f"FAL_KEY: {'set' if os.environ.get('FAL_KEY') else 'not set (needed only for fal generation)'}")
     if not ff:

@@ -48,7 +48,9 @@ if Node is missing, install it in your home folder (for example a Node 22 tarbal
 8. **Deterministic renders**: no `Date.now()`/unseeded random in HTML/React; same input, same frames.
 9. **Output spec** from `slopguard.json` (default vertical 1080x1920@30). H.264 yuv420p CRF 18-20,
    AAC 48 kHz, `-movflags +faststart`.
-10. **Bounded renders.** Write each render as a script in `edit/` and run every ffmpeg call under
+10. **`ffmpeg -nostdin` always.** You run without a terminal. Without `-nostdin`, ffmpeg reads stdin as keyboard
+    commands; with stdin closed it can read an input file's bytes as commands and hang or corrupt the result.
+11. **Bounded renders.** Write each render as a script in `edit/` and run every ffmpeg call under
     `timeout -s KILL <seconds>` (about 30x the clip length is generous). A call that shows no progress is
     killed and simplified, never left spinning.
 

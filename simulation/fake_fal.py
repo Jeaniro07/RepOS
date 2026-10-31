@@ -39,7 +39,7 @@ STATE = {"requests": {}, "uploads": {}, "word_timings": {}}
 
 
 def ff(*args):
-    subprocess.run([FFMPEG, "-hide_banner", "-loglevel", "error", "-y", *args], check=True)
+    subprocess.run([FFMPEG, "-nostdin", "-hide_banner", "-loglevel", "error", "-y", *args], check=True, stdin=subprocess.DEVNULL)
 
 
 def has_flite() -> bool:

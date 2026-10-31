@@ -41,10 +41,14 @@ install_static() {
   rel="${SLOPGUARD_FFMPEG_RELEASE:-8.1}"
   tmp="$(mktemp -d)"
   ok=0
+  local retry="--retry 4 --retry-delay 3"
+  curl --help all 2>/dev/null | grep -q -- "--retry-all-errors" && retry="${retry} --retry-all-errors"
   for asset in "ffmpeg-n${rel}-latest-${plat}-gpl-${rel}.tar.xz" "ffmpeg-master-latest-${plat}-gpl.tar.xz"; do
     url="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/${asset}"
     echo "downloading ${url} (about 150 MB)..."
-    if curl -fL --retry 3 -o "${tmp}/ff.tar.xz" "${url}"; then ok=1; break; fi
+    # shellcheck disable=SC2086
+    if curl -fsSL ${retry} -o "${tmp}/ff.tar.xz" "${url}"; then ok=1; break; fi
+    echo "download failed: ${asset}" >&2
   done
   [ "${ok}" = 1 ] || { rm -rf "${tmp}"; return 1; }
   # Extract only the two binaries with Python (no xz-utils needed).

@@ -61,7 +61,12 @@ def ffprobe_path() -> Optional[str]:
 
 
 def run(cmd: List[str], timeout: int = 1800) -> Tuple[int, str, str]:
-    proc = subprocess.run(cmd, capture_output=True, text=True, errors="replace", timeout=timeout)
+    """Run a media tool with no stdin. Without -nostdin, ffmpeg treats stdin as a
+    keyboard; under an agent (no terminal, closed or piped stdin) it can read an
+    input file's bytes as commands and hang or corrupt the read."""
+    if cmd and os.path.basename(cmd[0]).startswith("ffmpeg") and "-nostdin" not in cmd:
+        cmd = [cmd[0], "-nostdin"] + list(cmd[1:])
+    proc = subprocess.run(cmd, capture_output=True, text=True, errors="replace", timeout=timeout, stdin=subprocess.DEVNULL)
     return proc.returncode, proc.stdout, proc.stderr
 
 

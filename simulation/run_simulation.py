@@ -109,7 +109,7 @@ class Sim:
         if self.as_user:
             full = ["runuser", "-u", USER, "--", *full]
         t0 = time.time()
-        p = subprocess.run(full, capture_output=True, text=True, errors="replace", timeout=timeout)
+        p = subprocess.run(full, capture_output=True, text=True, errors="replace", timeout=timeout, stdin=subprocess.DEVNULL)
         out = (p.stdout + ("\n" + p.stderr if p.stderr.strip() else "")).replace(FAKE_KEY, "***")
         ok = expect is None or p.returncode == expect
         self.steps.append({"step": step, "skill": skill, "actor": actor, "command": cmd, "exit": p.returncode,
@@ -203,23 +203,23 @@ def shot_script(n, dur, kind, src=None, start=0.0, version=2):
     enc = "-an -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p -r 30"
     out = f"edit/clips/shot{n}.mp4"
     if kind == "footage":
-        return (f"ffmpeg -hide_banner -loglevel error -y -ss {start:.3f} -i {src} -t {dur:.3f} "
+        return (f"ffmpeg -nostdin -hide_banner -loglevel error -y -ss {start:.3f} -i {src} -t {dur:.3f} "
                 f"-vf \"scale=1080:1920,setsar=1,fps=30\" {enc} {out}")
     if kind == "diagram":
         base = (f"color=c=0x1d1a17:s=1080x1920:r=30:d={dur:.3f}[bg];"
                 f"[bg]drawtext=fontfile={FONT}:textfile=edit/text/temp.txt:fontcolor=0xe0703a:fontsize=150:x=(w-tw)/2:y=560")
         if version == 1:  # first draft: a static title card (a default the QA should catch)
             vf = base + f",drawtext=fontfile={FONT}:textfile=edit/text/label.txt:fontcolor=0xf4efe6:fontsize=56:x=(w-tw)/2:y=820[v]"
-            return f"ffmpeg -hide_banner -loglevel error -y -f lavfi -i nullsrc=s=16x16:d=0.1 -filter_complex \"{vf}\" -map \"[v]\" -t {dur:.3f} {enc} {out}"
+            return f"ffmpeg -nostdin -hide_banner -loglevel error -y -f lavfi -i nullsrc=s=16x16:d=0.1 -filter_complex \"{vf}\" -map \"[v]\" -t {dur:.3f} {enc} {out}"
         vf = (base + f",drawtext=fontfile={FONT}:textfile=edit/text/label.txt:fontcolor=0xf4efe6:fontsize=56:x=(w-tw)/2:y=820:enable='gte(t,0.5)'[t];"
               f"color=c=0xe0703a:s=900x70:r=30:d={dur:.3f}[bar];"
               f"[t][bar]overlay=x='90-900+900*min(1,max(0,(t-0.5)/2.6))':y=980:shortest=1,"
               f"drawtext=fontfile={FONT}:textfile=edit/text/bar.txt:fontcolor=0x1d1a17:fontsize=44:x=120:y=992:enable='gte(t,3.1)'[v]")
-        return f"ffmpeg -hide_banner -loglevel error -y -f lavfi -i nullsrc=s=16x16:d=0.1 -filter_complex \"{vf}\" -map \"[v]\" -t {dur:.3f} {enc} {out}"
+        return f"ffmpeg -nostdin -hide_banner -loglevel error -y -f lavfi -i nullsrc=s=16x16:d=0.1 -filter_complex \"{vf}\" -map \"[v]\" -t {dur:.3f} {enc} {out}"
     if kind == "generated":
         vf = (f"scale=1080:1920,setsar=1,fps=30,tpad=stop_mode=clone:stop_duration=2,"
               f"drawtext=fontfile={FONT}:textfile=edit/text/temp92.txt:fontcolor=white:fontsize=150:borderw=6:bordercolor=0x1d1a17:x=(w-tw)/2:y=520:enable='gte(t,0.4)'")
-        return f"ffmpeg -hide_banner -loglevel error -y -i {src} -t {dur:.3f} -vf \"{vf}\" {enc} {out}"
+        return f"ffmpeg -nostdin -hide_banner -loglevel error -y -i {src} -t {dur:.3f} -vf \"{vf}\" {enc} {out}"
     raise ValueError(kind)
 
 
@@ -298,7 +298,7 @@ def run(sim: Sim):
     for name, c0, c1, label in (("pour", "0x5b3a29", "0xc89b6d", "kopi dituang"), ("kettle", "0x2f3b44", "0x9fb4c0", "ketel mendidih"), ("taste", "0x6d4c3d", "0xe8c9a6", "mencicipi")):
         sim.write(f"{proj}/edit/text/{name}.txt", f"FOOTAGE PENGGUNA (simulasi): {label}")
         sim.sh(f"(simulasi) footage pengguna: assets/{name}.mp4", "-", (
-            f"cd ~/{proj} && ffmpeg -hide_banner -loglevel error -y -f lavfi -i gradients=s=1080x1920:c0={c0}:c1={c1}:speed=0.06:d=12:r=30 "
+            f"cd ~/{proj} && ffmpeg -nostdin -hide_banner -loglevel error -y -f lavfi -i gradients=s=1080x1920:c0={c0}:c1={c1}:speed=0.06:d=12:r=30 "
             f"-vf \"drawtext=fontfile={FONT}:textfile=edit/text/{name}.txt:fontcolor=white:fontsize=34:x=40:y=170:box=1:boxcolor=black@0.5:boxborderw=12\" "
             f"-c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p assets/{name}.mp4"), expect=0, actor="sim")
 
@@ -349,12 +349,12 @@ def run(sim: Sim):
         for i, ((kind, src, start), d) in enumerate(zip(plan, durs), start=1):
             lines.append("timeout -s KILL 600 " + shot_script(i, d, kind, src, start, version=version))
         lines.append("printf \"file 'clips/shot%d.mp4'\\n\" 1 2 3 4 5 > edit/clips.txt")
-        lines.append("timeout -s KILL 300 ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i edit/clips.txt -c copy edit/picture.mp4")
+        lines.append("timeout -s KILL 300 ffmpeg -nostdin -hide_banner -loglevel error -y -f concat -safe 0 -i edit/clips.txt -c copy edit/picture.mp4")
         style = "FontName=DejaVu Sans,Bold=1,FontSize=11,PrimaryColour=&H00FFFFFF,OutlineColour=&H00171A1D,BorderStyle=1,Outline=1.2,Shadow=0,Alignment=2,MarginV=58"
-        lines.append(f"timeout -s KILL 600 ffmpeg -hide_banner -loglevel error -y -i edit/picture.mp4 "
+        lines.append(f"timeout -s KILL 600 ffmpeg -nostdin -hide_banner -loglevel error -y -i edit/picture.mp4 "
                      f"-vf \"subtitles={srt}:fontsdir={FONT_DIR}:force_style='{style}'\" -an "
                      f"-c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p edit/picture_subs.mp4")
-        lines.append(f"timeout -s KILL 300 ffmpeg -hide_banner -loglevel error -y -i edit/picture_subs.mp4 -i {voice_rel} "
+        lines.append(f"timeout -s KILL 300 ffmpeg -nostdin -hide_banner -loglevel error -y -i edit/picture_subs.mp4 -i {voice_rel} "
                      f"-map 0:v -map 1:a -c:v copy -af apad -t {total} -c:a aac -b:a 192k edit/preview_raw.mp4")
         lines.append("slopguard master edit/preview_raw.mp4 --out edit/preview.mp4")
         sim.write(f"{proj}/edit/render_v{version}.sh", "\n".join(lines) + "\n")
@@ -421,12 +421,12 @@ def write_report(sim: Sim, result: dict, out_dir: str):
                 shutil.copy(src, os.path.join(out_dir, os.path.basename(rel)))
         final = os.path.join(proj, "deliver", "final.mp4")
         if os.path.exists(final):
-            subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", final, "-vf", "scale=360:-2", "-c:v", "libx264", "-crf", "30",
+            subprocess.run(["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-i", final, "-vf", "scale=360:-2", "-c:v", "libx264", "-crf", "30",
                             "-preset", "veryfast", "-c:a", "aac", "-b:a", "64k", os.path.join(out_dir, "final-360p.mp4")])
         for img in ("overview.jpg", "cuts.jpg"):
             p = os.path.join(out_dir, img)
             if os.path.exists(p):
-                subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", p, "-vf", "scale=1200:-2", "-q:v", "5", p + ".tmp.jpg"])
+                subprocess.run(["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-i", p, "-vf", "scale=1200:-2", "-q:v", "5", p + ".tmp.jpg"])
                 os.replace(p + ".tmp.jpg", p)
     passed = sum(1 for s in sim.steps if s["ok"])
     lines = [

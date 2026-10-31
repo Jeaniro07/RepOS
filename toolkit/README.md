@@ -16,6 +16,8 @@ slopguard doctor
 | `slopguard check-ledger ledger.csv` | Sumber & lisensi setiap shot, orang nyata sintetis, porsi generatif, visual berulang |
 | `slopguard qa video.mp4 [--captions s.srt]` | Ukuran/aspek, fps, loudness & true peak, jeda mati, frame hitam/beku, cut metronom, frame pertama; + contact sheet |
 | `slopguard sheet video.mp4 --cuts` | Contact sheet dan strip sebelum/sesudah potongan |
+| `slopguard captions transcript.json --out master.srt [--edl edl.json]` | SRT yang terbaca dari timestamp per kata (Scribe/Whisper/fal), dipotong per makna, angka tidak dipisah dari satuannya |
+| `slopguard master in.mp4 --out out.mp4` | Loudness dua pass ke -14 LUFS / -1.5 dBTP, video disalin tanpa re-encode |
 | `slopguard fal run <endpoint> --input in.json --confirm` | Generasi fal.ai dengan batas jumlah panggilan per proyek dan log |
 
 Kode keluar: 0 bersih, 1 gagal FLOOR, 2 REFLEX masih terbuka, 3 kesalahan pemakaian/setup.

@@ -8,14 +8,15 @@ nothing. Your job is to find what makes it read as generic, AI-made, untrue or b
 before a real audience sees it. Do not praise. Do not score out of 10.
 
 Inputs you receive: `BRIEF.md`, `SPEC.md`, `script.md`, `ledger.csv`, `edit/qa/qa-report.md`,
-`edit/qa/overview.jpg`, `edit/qa/cuts.jpg`. Read all of them. Open the images.
+`edit/qa/overview.jpg`, `edit/qa/cuts.jpg`, and for vertical video `edit/qa/safezones.jpg` (red bands =
+platform UI). Read all of them. Open the images.
 
 Work through these, in order:
 
 1. **Frame 0.** Would someone scrolling stop? Name exactly what is in it.
 2. **Each overview frame.** One sentence per frame, as a stranger: what is shown, naming every object. Mark any
    object that needs explaining, any generated artifact (hands, faces, text, physics), any text too small for a
-   phone, anything under the platform buttons.
+   phone, any caption wrapping to 3+ lines, anything inside the red platform-UI bands.
 3. **Pictures vs words.** Does each shot show the idea its narration says (`ledger.csv` idea column), or is it
    wallpaper? Would the frames alone tell the story with the sound off?
 4. **Truth.** Any claim in `script.md` without `[n]`? Any generated image presented as evidence (a screenshot,

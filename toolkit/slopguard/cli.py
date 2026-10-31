@@ -71,7 +71,10 @@ def cmd_lint_script(a) -> int:
 def cmd_captions(a) -> int:
     duration = media.probe(a.video).duration if a.video else None
     max_chars = a.max_chars or (VERTICAL_CHECK if _is_vertical(a.video, project.load_config(a.file)) else LANDSCAPE_CHECK)
-    report = captions.check_captions(_read(a.file), subject=a.file, video_duration=duration, max_cps=a.max_cps, max_chars=max_chars)
+    report = captions.check_captions(
+        _read(a.file), subject=a.file, video_duration=duration, max_cps=a.max_cps, max_chars=max_chars,
+        lang=project.load_config(a.file).get("lang"),
+    )
     write_outputs(report, a.out, "captions")
     _print(report, a.json)
     return report.exit_code()
@@ -109,10 +112,14 @@ def cmd_qa(a) -> int:
     caps = a.captions
     if caps:
         vertical = bool(probe and probe.display_size[1] > probe.display_size[0])
+        fps = probe.fps if probe and probe.fps else 30.0
+        cap_text = _read(caps)
         cr = captions.check_captions(
-            _read(caps), subject=caps, video_duration=probe.duration if probe else None,
-            max_chars=VERTICAL_CHECK if vertical else LANDSCAPE_CHECK,
+            cap_text, subject=caps, video_duration=probe.duration if probe else None,
+            max_chars=VERTICAL_CHECK if vertical else LANDSCAPE_CHECK, lang=cfg.get("lang"), fps=fps,
         )
+        if pic is not None:
+            cr.extend(captions.near_cut_findings(captions.parse_captions(cap_text), [c for c in pic.cuts if 0.2 < c < probe.duration - 0.2], fps))
         report.extend(cr.findings)
         report.metrics.update({f"captions: {k}": v for k, v in cr.metrics.items()})
         report.manual_checks += cr.manual_checks
@@ -128,7 +135,13 @@ def cmd_qa(a) -> int:
     if not a.no_sheets and probe and pic is not None:
         ov = sheet.overview(a.video, out, duration=probe.duration)
         cs = sheet.cut_strip(a.video, [c for c in pic.cuts if 0.2 < c < probe.duration - 0.2], out)
-        report.metrics["contact sheets"] = ", ".join(p for p in (ov, cs) if p) or "none"
+        w, h = probe.display_size
+        sz = sheet.safe_zone_sheet(a.video, out, probe.duration) if h > w else None
+        report.metrics["contact sheets"] = ", ".join(p for p in (ov, cs, sz) if p) or "none"
+        if sz:
+            report.manual_checks.append(
+                "safezones.jpg: no caption, face, product or key text inside the red platform-UI bands (approximate; check in each app)."
+            )
     paths = write_outputs(report, out, "qa-report")
     _print(report, a.json)
     if paths and not a.json:
@@ -153,6 +166,14 @@ def cmd_fal(a) -> int:
             used, mx, log = fal.budget(a.project)
             print(json.dumps({"calls_used": used, "max_calls": mx, "log": log}))
             return 0
+        if a.fal_cmd == "plan":
+            md, summary = fal.plan_table(json.loads(_read(a.plan)), a.project)
+            if a.out:
+                with open(a.out, "w", encoding="utf-8") as fh:
+                    fh.write(md)
+            print(md)
+            print(json.dumps(summary))
+            return 2 if summary["over_budget"] or summary["missing_prices"] else 0
         if a.fal_cmd == "upload":
             print(fal.upload_file(a.file))
             return 0
@@ -200,13 +221,15 @@ def cmd_build_captions(a) -> int:
         words = build.map_to_output(words, edl.get("ranges", edl if isinstance(edl, list) else []))
     cfg = project.load_config(a.out)
     lang = a.lang or cfg.get("lang", "id")
-    video_end = media.probe(a.video).duration if a.video else None
+    vprobe = media.probe(a.video) if a.video else None
+    video_end = vprobe.duration if vprobe else None
+    fps = vprobe.fps if vprobe and vprobe.fps else float(cfg.get("fps", 30) or 30)
     max_chars = a.max_chars or (VERTICAL_CHARS if _is_vertical(a.video, cfg) else LANDSCAPE_CHARS)
-    cues = build.captions_from_words(words, lang=lang, max_chars=max_chars, max_cps=a.max_cps, video_end=video_end)
+    cues = build.captions_from_words(words, lang=lang, max_chars=max_chars, max_cps=a.max_cps, fps=fps, video_end=video_end)
     with open(a.out, "w", encoding="utf-8") as fh:
         fh.write(build.to_srt(cues))
     check_chars = VERTICAL_CHECK if max_chars <= VERTICAL_CHARS else LANDSCAPE_CHECK
-    report = captions.check_captions(_read(a.out), subject=a.out, video_duration=video_end, max_chars=check_chars)
+    report = captions.check_captions(_read(a.out), subject=a.out, video_duration=video_end, max_chars=check_chars, lang=lang, fps=fps)
     print(f"wrote {a.out}: {len(cues)} cues from {len(words)} words, <= {max_chars} chars/line; {report.verdict()}")
     return report.exit_code()
 
@@ -270,7 +293,7 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("check-captions", help="check SRT/VTT readability and timing")
     s.add_argument("file")
     s.add_argument("--video", help="rendered video, to check cues against its duration")
-    s.add_argument("--max-cps", type=float, default=20.0)
+    s.add_argument("--max-cps", type=float, help="default by language: 17 (id) / 20 (en), Netflix adult reading speed")
     s.add_argument("--max-chars", type=int, help="default: 28 (build) / 32 (check) for vertical video, 42 otherwise")
     s.add_argument("--out")
     s.add_argument("--json", action="store_true")
@@ -319,6 +342,10 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--label")
     r.add_argument("--max-wait", type=int, default=900)
     r.add_argument("--confirm", action="store_true", help="required: the user approved this paid call")
+    pl = fs.add_parser("plan", help="price a generation plan for the user's approval (no calls made)")
+    pl.add_argument("plan", help="plan.json with items[{endpoint,purpose,count,unit,quantity,unit_price,price_source}]")
+    pl.add_argument("--out", help="write the table here, e.g. GENERATION_PLAN.md")
+    pl.add_argument("--project", default=".")
     u = fs.add_parser("upload", help="upload a local file, print its URL")
     u.add_argument("file")
     rs = fs.add_parser("result", help="fetch a finished result by response URL")
@@ -334,7 +361,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--video", help="rendered video, to clamp cues to its end")
     s.add_argument("--lang", choices=["id", "en"])
     s.add_argument("--max-chars", type=int, help="default: 28 (build) / 32 (check) for vertical video, 42 otherwise")
-    s.add_argument("--max-cps", type=float, default=17.0)
+    s.add_argument("--max-cps", type=float, help="default by language: 17 (id) / 20 (en)")
     s.set_defaults(func=cmd_build_captions)
 
     s = sub.add_parser("master", help="two-pass loudness master (video stream copied)")

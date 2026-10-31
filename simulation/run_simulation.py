@@ -269,7 +269,10 @@ def run(sim: Sim):
            "4,12,16.5,turunkan ke 92 derajat,solusi,uap di atas cangkir + angka 92,generated,fal (rencana),,no,\n"
            "5,16.5,20,Hasilnya lebih manis,hasil,mencicipi,footage,assets/taste.mp4,rekaman sendiri,no,\n")
     sim.write(f"{proj}/ledger.csv", est)
-    sim.write(f"{proj}/GENERATION_PLAN.md", open(os.path.join(SCEN, "GENERATION_PLAN.md")).read())
+    sim.write(f"{proj}/gen/plan.json", open(os.path.join(SCEN, "plan.json")).read())
+    sim.sh("fal plan dengan harga TTS kosong (harus menolak terlihat lengkap)", "fal-media", f"cd ~/{proj} && slopguard fal plan gen/plan.json | tail -3", expect=2)
+    sim.write(f"{proj}/gen/plan.json", open(os.path.join(SCEN, "plan-filled.json")).read())
+    sim.sh("fal plan lengkap → GENERATION_PLAN.md untuk persetujuan", "fal-media", f"cd ~/{proj} && slopguard fal plan gen/plan.json --out GENERATION_PLAN.md | tail -4", expect=0)
     sim.sh("Ledger rencana → check-ledger", "antislop-video-director", f"cd ~/{proj} && slopguard check-ledger ledger.csv | sed -n 3,5p", expect=0)
 
     # 6. Money guard
@@ -368,7 +371,7 @@ def run(sim: Sim):
     code, out = sim.sh("QA pass 2", "video-qa", f"cd ~/{proj} && slopguard qa edit/preview.mp4 --captions {srt}", expect=0)
 
     # 10. Critic inputs, review, delivery
-    critic = ["BRIEF.md", "SPEC.md", "script.md", "ledger.csv", "edit/qa/qa-report.md", "edit/qa/overview.jpg", "edit/qa/cuts.jpg"]
+    critic = ["BRIEF.md", "SPEC.md", "script.md", "ledger.csv", "edit/qa/qa-report.md", "edit/qa/overview.jpg", "edit/qa/cuts.jpg", "edit/qa/safezones.jpg"]
     sim.sh("Bahan untuk helper slop-critic tersedia (run_subagent dijalankan oleh Rakazo)", "video-qa", f"cd ~/{proj} && ls -la " + " ".join(critic), expect=0)
     qa = json.loads(subprocess.run(["cat", os.path.join(sim.home, proj, "edit", "qa", "qa-report.json")], capture_output=True, text=True).stdout)
     m = qa["metrics"]
@@ -416,7 +419,7 @@ def write_report(sim: Sim, result: dict, out_dir: str):
     os.makedirs(out_dir, exist_ok=True)
     proj = os.path.join(sim.home, sim.project) if sim.project else None
     if proj and os.path.isdir(proj):
-        for rel in ("edit/qa/qa-report.md", "edit/qa/overview.jpg", "edit/qa/cuts.jpg", "edit/master.srt", "REVIEW.md", "ledger.csv", "edit/render_v2.sh", "edit/qa1.json"):
+        for rel in ("edit/qa/qa-report.md", "edit/qa/overview.jpg", "edit/qa/cuts.jpg", "edit/qa/safezones.jpg", "edit/master.srt", "REVIEW.md", "ledger.csv", "edit/render_v2.sh", "edit/qa1.json", "GENERATION_PLAN.md"):
             src = os.path.join(proj, rel)
             if os.path.exists(src):
                 shutil.copy(src, os.path.join(out_dir, os.path.basename(rel)))
@@ -424,7 +427,7 @@ def write_report(sim: Sim, result: dict, out_dir: str):
         if os.path.exists(final):
             subprocess.run(["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-i", final, "-vf", "scale=360:-2", "-c:v", "libx264", "-crf", "30",
                             "-preset", "veryfast", "-c:a", "aac", "-b:a", "64k", os.path.join(out_dir, "final-360p.mp4")])
-        for img in ("overview.jpg", "cuts.jpg"):
+        for img in ("overview.jpg", "cuts.jpg", "safezones.jpg"):
             p = os.path.join(out_dir, img)
             if os.path.exists(p):
                 subprocess.run(["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-i", p, "-vf", "scale=1200:-2", "-q:v", "5", p + ".tmp.jpg"])
@@ -457,7 +460,7 @@ def write_report(sim: Sim, result: dict, out_dir: str):
             if "contact" in k or "cut times" in k:
                 continue
             lines.append(f"- {k}: {v}")
-        lines += ["", "Contact sheet: [overview.jpg](overview.jpg) · [cuts.jpg](cuts.jpg) · video hasil (diperkecil): [final-360p.mp4](final-360p.mp4)", ""]
+        lines += ["", "Contact sheet: [overview.jpg](overview.jpg) · [cuts.jpg](cuts.jpg) · [safezones.jpg](safezones.jpg) · rencana biaya: [GENERATION_PLAN.md](GENERATION_PLAN.md) · video hasil (diperkecil): [final-360p.mp4](final-360p.mp4)", ""]
     lines += ["## Log per langkah", ""]
     for i, s in enumerate(sim.steps, 1):
         lines += [f"### {i}. {s['step']}", ""]

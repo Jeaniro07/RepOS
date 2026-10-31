@@ -208,6 +208,18 @@ def qa_video(
                     fix="Replace held stills with motion that explains the narration.",
                 )
             )
+    flicker = [seg for seg in media.flicker_segments(pic.luma) if seg[1] - seg[0] >= 0.5]
+    report.metrics["flicker stretches"] = len(flicker)
+    for fs, fe, rate in flicker:
+        report.add(
+            Finding(
+                "picture.flicker",
+                REFLEX,
+                f"Brightness flips up/down on {rate * 100:.0f}% of frames for {fe - fs:.1f}s: temporal flicker, a generated-video tell.",
+                at=f"{fs:.2f}s",
+                fix="Regenerate or replace the clip. For mild flicker try ffmpeg -vf deflicker=size=5:mode=pm, then look again.",
+            )
+        )
     if pic.first_frame_luma is not None:
         report.metrics["first frame luma / range"] = f"{pic.first_frame_luma:.0f} / {pic.first_frame_range:.0f}"
         if pic.first_frame_luma < 18 or (pic.first_frame_range or 0) < 12:

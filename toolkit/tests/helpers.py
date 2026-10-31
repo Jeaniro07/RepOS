@@ -72,5 +72,18 @@ def make_metronomic(path: str, size: str = "540x960", shots: int = 8, shot_len: 
     return path
 
 
+def make_flicker(path: str, size: str = "540x960", seconds: float = 4.0) -> str:
+    """Moving picture whose brightness flips up/down every frame (generated-video flicker)."""
+    _run(
+        [
+            "-f", "lavfi", "-i", f"testsrc2=s={size}:r=30:d={seconds}",
+            "-f", "lavfi", "-i", f"anoisesrc=color=pink:amplitude=0.25:d={seconds}:r=48000",
+            "-vf", "eq=eval=frame:brightness='0.008*(2*mod(n,2)-1)',format=yuv420p",
+            "-af", "loudnorm=I=-14:TP=-2", "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18", "-c:a", "aac", path,
+        ]
+    )
+    return path
+
+
 def have_ffmpeg() -> bool:
     return FFMPEG is not None and os.access(FFMPEG, os.X_OK)

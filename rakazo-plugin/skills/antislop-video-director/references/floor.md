@@ -26,6 +26,7 @@ Three tiers (the structure is borrowed from Nutlope/hallmark's Floor / Reflex / 
 | script.repetition | REFLEX | Same 4-word phrase 3+ times |
 | script.crammed | REFLEX | Speech longer than the target (140 wpm ID, 155 wpm EN) |
 | script.hook-too-long / sparse | FINISH | First sentence > 22 words; very little speech for the length |
+| script.generic | REFLEX | 50+ words with under 2 specifics (names, numbers, units, places) per 100 words |
 
 ## Ledger (`slopguard check-ledger`)
 
@@ -45,10 +46,13 @@ Three tiers (the structure is borrowed from Nutlope/hallmark's Floor / Reflex / 
 | Gate | Tier | Meaning |
 |---|---|---|
 | captions.overlap / beyond-end / timing / parse | FLOOR | Broken captions |
-| captions.reading-speed | REFLEX | More than 20 characters per second |
+| captions.reading-speed | REFLEX | Faster than the language's adult reading speed: 17 characters/s Indonesian, 20 English (Netflix guides) |
 | captions.flash | REFLEX | Cue on screen under 0.7 s |
 | captions.line-length / lines | REFLEX | More than 32 characters per line on vertical video (42 on landscape), or more than 2 lines |
 | captions.emoji | REFLEX | Emoji inside captions |
+| captions.short | FINISH | Under 5/6 s on screen (streaming minimum; fine for deliberate punch captions) |
+| captions.gap | FINISH | Less than 2 frames between cues (Netflix minimum gap) |
+| captions.near-cut | FINISH | A cue starts/ends 3-11 frames from a shot change: snap to the cut or keep 12+ frames away |
 | captions.dense / long-hold / all-caps | FINISH | Comfort notes |
 
 ## Rendered video (`slopguard qa`)
@@ -65,13 +69,29 @@ Three tiers (the structure is borrowed from Nutlope/hallmark's Floor / Reflex / 
 | audio.dead-air | REFLEX | 1.5 s+ of silence mid-video |
 | picture.frozen | REFLEX | Main picture (caption band and platform UI excluded) unchanged for 2.5 s+ |
 | edit.slideshow | REFLEX | 40%+ of runtime frozen |
+| picture.flicker | REFLEX | Mean brightness flips up/down on most frames for 0.5 s+: temporal flicker, the artifact VBench measures on generated video |
 | edit.metronomic | REFLEX | 6+ cuts at near-identical intervals |
 | picture.first-frame | REFLEX | Frame 0 black or flat (it is the thumbnail) |
 | video.low-res / video.fps / video.duration | REFLEX | Under 720 px short side, under 24 fps, ±10% off target |
 | encode.bitrate | FINISH | Thin bitrate; platform re-encode will band |
 
+## What the gates stand for
+
+Shaib et al., "Measuring AI 'Slop' in Text" (2025, arXiv:2509.19163) found that people's slop judgements
+follow seven dimensions, with relevance, information density and tone the strongest predictors, and that
+human-written text can be slop too. The script gates map onto them:
+
+| Dimension | Gates |
+|---|---|
+| Density | script.generic, script.slop-density, script.repetition, script.crammed |
+| Relevance | script.generic-hook, script.generic, ledger.no-idea |
+| Factuality | script.unsourced-claim, script.dangling-citation (FLOOR) |
+| Tone | hype words, bait, clickbait, exclamation, emoji |
+| Structure | rule-of-three, contrast frames, monotone rhythm, question stacks |
+| Coherence, bias | not measurable: the critic and the user judge them |
+
 ## Not measurable (always listed in the report as manual checks)
 
-Truth of claims against the sources; whether the hook pays off; whether each object reads as what it is;
+Truth of claims against the sources; whether the hook pays off; captions or faces under platform UI (see safezones.jpg); whether each object reads as what it is;
 voice intelligibility over music; pops at cuts; whether anything sits under platform UI; AI disclosure;
 that no real person is shown saying or doing what they did not.

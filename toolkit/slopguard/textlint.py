@@ -28,6 +28,11 @@ WORD_RE = re.compile(r"[A-Za-zÀ-ÿ0-9']+(?:-[A-Za-zÀ-ÿ0-9']+)*")
 EMOJI_RE = re.compile(
     "[\U0001F300-\U0001FAFF\U00002600-\U000027BF\U0001F000-\U0001F2FF\U0001F900-\U0001F9FF]"
 )
+UNITS = {
+    "derajat", "persen", "menit", "detik", "jam", "hari", "minggu", "bulan", "tahun", "gram", "kg", "ml", "liter",
+    "meter", "km", "cm", "rupiah", "rp", "dolar", "kali", "degrees", "percent", "minutes", "seconds", "hours", "days",
+    "weeks", "months", "years", "grams", "kilograms", "liters", "meters", "miles", "dollars", "times",
+}
 TRIPLET_EN = re.compile(r"\b[\w'-]+(?: [\w'-]+){0,2}, [\w'-]+(?: [\w'-]+){0,2},? and [\w'-]+", re.I)
 TRIPLET_ID = re.compile(r"\b[\w'-]+(?: [\w'-]+){0,2}, [\w'-]+(?: [\w'-]+){0,2},? dan [\w'-]+", re.I)
 
@@ -288,7 +293,30 @@ def lint_script(
             )
         )
 
-    # 7. Length against target.
+    # 7. Specificity: names, numbers, units and places per 100 words. Shaib et al. (2025),
+    # "Measuring AI 'Slop' in Text", find low information density and low relevance among the
+    # strongest predictors of text people call slop; generic scripts have almost no specifics.
+    specifics = 0
+    for _, _, sp in sentences:
+        toks = WORD_RE.findall(sp)
+        for k, tok in enumerate(toks):
+            if any(ch.isdigit() for ch in tok) or tok.lower() in UNITS:
+                specifics += 1
+            elif k > 0 and tok[:1].isupper() and not tok.isupper():
+                specifics += 1  # a capitalised word inside a sentence: a name, place or product
+    spec_rate = specifics / max(n_words, 1) * 100
+    report.metrics["specifics per 100 words"] = round(spec_rate, 1)
+    if n_words >= 50 and spec_rate < 2.0:
+        report.add(
+            Finding(
+                "script.generic",
+                REFLEX,
+                f"Only {specifics} specifics (names, numbers, units, places) in {n_words} words: it could be about anything.",
+                fix="Replace adjectives with the actual name, number, place, time or result from the brief and sources.",
+            )
+        )
+
+    # 8. Length against target.
     if target_seconds:
         report.metrics["target duration (s)"] = target_seconds
         if est_seconds > target_seconds * 1.10:

@@ -71,6 +71,23 @@ class ScriptLint(unittest.TestCase):
         self.assertIn("script.unsourced-claim", gates(r))
         self.assertIn("script.contrast-frame", gates(r))
 
+    def test_generic_script_flagged(self):
+        text = " ".join([
+            "Ada banyak hal yang bisa kamu lakukan untuk membuat hidup lebih baik setiap hari.",
+            "Semua orang ingin merasa lebih bahagia dan lebih produktif dalam pekerjaan mereka.",
+            "Kuncinya adalah konsisten dan tidak mudah menyerah ketika menghadapi tantangan.",
+            "Mulailah dari hal kecil dan lakukan dengan sepenuh hati supaya hasilnya terasa.",
+            "Percayalah bahwa usaha tidak akan mengkhianati hasil jika kamu terus berusaha.",
+        ])
+        r = textlint.lint_script(text, lang="id")
+        self.assertIn("script.generic", gates(r))
+        self.assertNotIn("script.generic", gates(textlint.lint_script(CLEAN_ID)))
+
+    def test_new_indonesian_phrases(self):
+        r = textlint.lint_script("Patut dicatat bahwa kopi memainkan peran penting dalam dunia yang terus berkembang.", lang="id")
+        cats = {f.gate for f in r.findings}
+        self.assertTrue({"script.hedge", "script.cliche", "script.filler-opener"} <= cats, cats)
+
     def test_dangling_citation(self):
         r = textlint.lint_script("Air 100 derajat terlalu panas untuk kopi [2].\n\nSumber:\n[1] contoh\n")
         self.assertIn("script.dangling-citation", gates(r))
@@ -113,6 +130,24 @@ padahal bijinya mahal.
 
 
 class Captions(unittest.TestCase):
+    def test_language_reading_speed_gap_and_short(self):
+        srt = "1\n00:00:00,000 --> 00:00:01,000\nIni kalimat yang cukup cepat\n\n2\n00:00:01,020 --> 00:00:01,780\nlagi\n"
+        r_id = captions.check_captions(srt, lang="id")
+        r_en = captions.check_captions(srt, lang="en")
+        self.assertIn("captions.reading-speed", gates(r_id))  # 24 chars/s > 17 (Indonesian)
+        self.assertIn("captions.reading-speed", gates(r_en))  # > 20 (English)
+        self.assertIn("captions.gap", gates(r_id))
+        self.assertIn("captions.short", gates(r_id))
+        srt2 = "1\n00:00:00,000 --> 00:00:02,000\nKopi saya pahit sekali\n"
+        self.assertNotIn("captions.reading-speed", gates(captions.check_captions(srt2, lang="id")))  # ~9.5 cps
+
+    def test_near_cut(self):
+        cues = captions.parse_captions("1\n00:00:01,000 --> 00:00:02,850\nhalo dunia\n")
+        found = captions.near_cut_findings(cues, [3.0], fps=30)
+        self.assertEqual([f.gate for f in found], ["captions.near-cut"])  # ends 150 ms before the cut
+        self.assertEqual(captions.near_cut_findings(cues, [2.9], fps=30), [])  # within 2 frames: snapped
+        self.assertEqual(captions.near_cut_findings(cues, [5.0], fps=30), [])
+
     def test_bad(self):
         r = captions.check_captions(SRT_BAD, video_duration=16.0)
         g = gates(r)
@@ -190,6 +225,19 @@ class VideoQA(unittest.TestCase):
         r, p, pic = videoqa.qa_video(self.clean, target="landscape")
         sizes = [f for f in r.findings if f.gate == "video.size"]
         self.assertEqual(sizes[0].tier, "FLOOR")
+
+    def test_flicker_detected_only_on_flicker(self):
+        flick = helpers.make_flicker(os.path.join(self.tmp, "flicker.mp4"))
+        r, p, pic = videoqa.qa_video(flick, target="540x960")
+        self.assertIn("picture.flicker", gates(r))
+        for clean in (self.clean, self.metro, self.sloppy):
+            r2, _, _ = videoqa.qa_video(clean, target="540x960")
+            self.assertNotIn("picture.flicker", gates(r2), clean)
+
+    def test_safe_zone_sheet_for_vertical(self):
+        from slopguard import sheet
+        out = sheet.safe_zone_sheet(self.clean, os.path.join(self.tmp, "sz"), 16.0)
+        self.assertTrue(out and os.path.getsize(out) > 1000)
 
     def test_ffmpeg_only_probe(self):
         os.environ["SLOPGUARD_FFPROBE"] = "none"
@@ -307,6 +355,21 @@ class Fal(unittest.TestCase):
                 fal.run("fal-ai/x/edit", {"image_url": "assets/missing.png"}, out_dir=d, project_dir=d, confirm=True, base_dir=d)
             self.assertFalse([c for c in _FakeFal.calls if c[1].startswith("/fal-ai/")])
 
+    def test_plan_prices_and_budget(self):
+        with tempfile.TemporaryDirectory() as d:
+            project.init_project(d, "t", max_calls=2)
+            md, summary = fal.plan_table({"items": [
+                {"endpoint": "fal-ai/nano-banana-pro", "purpose": "still", "count": 1, "unit": "image", "unit_price": 0.15},
+                {"endpoint": "bytedance/seedance-2.0/image-to-video", "purpose": "motion", "count": 1, "unit": "second", "quantity": 5, "unit_price": 0.3024},
+            ]}, d)
+            self.assertAlmostEqual(summary["total"], 0.15 + 5 * 0.3024, places=4)
+            self.assertFalse(summary["over_budget"])
+            self.assertIn("1.66", md)
+            _, s2 = fal.plan_table({"items": [{"endpoint": "a/b", "count": 3}]}, d)
+            self.assertTrue(s2["over_budget"])
+            self.assertEqual(s2["missing_prices"], ["a/b"])
+            self.assertEqual(_FakeFal.calls, [])  # planning never calls fal
+
     def test_rejects_bad_endpoint(self):
         with self.assertRaises(fal.FalError):
             fal.submit("https://evil.example/x", {})
@@ -353,6 +416,20 @@ class Build(unittest.TestCase):
             cli.main(["captions", words, "--out", out])
             lines = [l for l in open(out).read().splitlines() if l and "-->" not in l and not l.isdigit()]
             self.assertTrue(lines and max(len(l) for l in lines) <= 28, lines)
+
+    def test_balanced_split_has_no_orphans_and_keeps_numbers(self):
+        from slopguard import build
+        words, t = [], 0.2
+        for w in "Air mendidih seratus derajat mengekstrak terlalu banyak senyawa pahit dari bubuk kopi.".split():
+            words.append((w, t, t + 0.35))
+            t += 0.42
+        cues = build.captions_from_words(words, lang="id", max_chars=28)
+        word_counts = [len(" ".join(c[2]).split()) for c in cues]
+        self.assertGreaterEqual(min(word_counts), 3, cues)
+        lines = [line for c in cues for line in c[2]]
+        self.assertFalse(any(line.endswith("seratus") for line in lines), lines)
+        for (s1, e1, _), (s2, _, _) in zip(cues, cues[1:]):
+            self.assertGreaterEqual(round(s2 - e1, 3), round(2 / 30, 3))
 
     def test_edl_mapping(self):
         from slopguard import build

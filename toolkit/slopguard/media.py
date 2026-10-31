@@ -233,6 +233,48 @@ class PictureStats:
     cuts: List[float] = field(default_factory=list)
     first_frame_luma: Optional[float] = None
     first_frame_range: Optional[float] = None
+    luma: List[Tuple[float, float]] = field(default_factory=list)  # (pts_time, mean luma) per frame
+
+
+def flicker_segments(
+    luma: List[Tuple[float, float]],
+    window: int = 30,
+    min_delta: float = 0.5,
+    rate: float = 0.5,
+    cut_delta: float = 25.0,
+) -> List[Tuple[float, float, float]]:
+    """Find stretches where mean luma alternates up/down frame after frame.
+
+    This is the temporal-flicker artifact that VBench measures on generated video
+    (frame-to-frame brightness fluctuation). Normal motion changes brightness
+    smoothly; flicker flips the sign of the change almost every frame.
+    Returns [(start, end, alternation_rate)]. Jumps larger than cut_delta (cuts,
+    flashes) are ignored.
+    """
+    if len(luma) < window + 2:
+        return []
+    t = [x[0] for x in luma]
+    y = [x[1] for x in luma]
+    d = [b - a for a, b in zip(y, y[1:])]
+    alt = [
+        1 if (a * b < 0 and min_delta <= abs(a) < cut_delta and min_delta <= abs(b) < cut_delta) else 0
+        for a, b in zip(d, d[1:])
+    ]
+    segs: List[Tuple[float, float, float]] = []
+    cur = None
+    for i in range(0, len(alt) - window + 1):
+        r = sum(alt[i : i + window]) / window
+        if r >= rate:
+            s, e = t[i], t[min(i + window + 1, len(t) - 1)]
+            if cur and s <= cur[1]:
+                cur = (cur[0], e, max(cur[2], r))
+            else:
+                if cur:
+                    segs.append(cur)
+                cur = (s, e, r)
+    if cur:
+        segs.append(cur)
+    return segs
 
 
 def picture_stats(
@@ -255,6 +297,8 @@ def picture_stats(
         "scale=320:-2",
         "blackdetect=d=0.4:pix_th=0.10",
         f"freezedetect=n={freeze_noise_db}dB:d={freeze_min}",
+        "signalstats",
+        "metadata=print:key=lavfi.signalstats.YAVG",
         f"select='gt(scene\\,{scene_threshold})'",
         "showinfo",
     ]
@@ -270,6 +314,17 @@ def picture_stats(
         st.freezes.append((s, e))
     for m in re.finditer(r"Parsed_showinfo.*?pts_time:\s*(\d+(?:\.\d+)?)", err):
         st.cuts.append(float(m.group(1)))
+    pts = None
+    for line in err.splitlines():
+        if "Parsed_metadata" not in line:
+            continue
+        mt = re.search(r"pts_time:\s*(-?\d+(?:\.\d+)?)", line)
+        if mt:
+            pts = float(mt.group(1))
+            continue
+        my = re.search(r"lavfi\.signalstats\.YAVG=(\d+(?:\.\d+)?)", line)
+        if my and pts is not None:
+            st.luma.append((pts, float(my.group(1))))
     lum = first_frame_signal(path)
     if lum:
         st.first_frame_luma, st.first_frame_range = lum

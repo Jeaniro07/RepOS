@@ -295,3 +295,51 @@ def run(
             files.append(f"(download failed: {exc})")
     _log(log, {"event": "done", "endpoint": endpoint, "request_id": rid, "files": files})
     return {"request_id": rid, "files": files, "result": result}
+
+
+# ------------------------------------------------------------- plan
+
+
+def plan_table(plan: dict, project_dir: str = ".") -> Tuple[str, dict]:
+    """Render a generation plan for the user's approval.
+
+    plan.json: {"currency": "USD", "items": [{"endpoint": "...", "purpose": "shot 4 still",
+      "count": 1, "unit": "image|second|minute|call", "quantity": 1, "unit_price": 0.15,
+      "price_source": "fal model page, 2026-10-31"}]}
+    Prices are what the agent read on the model page; this never guesses one."""
+    items = plan.get("items") or []
+    cur = plan.get("currency", "USD")
+    used, max_calls, _ = budget(project_dir)
+    rows, total, calls, missing = [], 0.0, 0, []
+    for i, it in enumerate(items, 1):
+        count = int(it.get("count", 1))
+        qty = float(it.get("quantity", 1))
+        price = it.get("unit_price")
+        if price is None:
+            missing.append(it.get("endpoint", f"item {i}"))
+            sub = None
+        else:
+            sub = count * qty * float(price)
+            total += sub
+        calls += count
+        rows.append(
+            f"| {i} | `{it.get('endpoint', '?')}` | {it.get('purpose', '')} | {count} | "
+            f"{qty:g} {it.get('unit', 'call')} | {'' if price is None else f'{float(price):g}'} | "
+            f"{'?' if sub is None else f'{sub:.2f}'} | {it.get('price_source', '')} |"
+        )
+    lines = [
+        "# Rencana generasi fal.ai (menunggu persetujuan)",
+        "",
+        f"| # | Endpoint | Untuk | Panggilan | Jumlah | Harga/unit ({cur}) | Subtotal ({cur}) | Sumber harga |",
+        "|---|---|---|---|---|---|---|---|",
+        *rows,
+        "",
+        f"**Total perkiraan: {total:.2f} {cur}** untuk {calls} panggilan. Anggaran proyek: {used} dari {max_calls} panggilan sudah dipakai.",
+    ]
+    if missing:
+        lines.append(f"Harga belum diisi untuk: {', '.join(missing)}. Buka halaman model fal dan isi sebelum meminta persetujuan.")
+    if used + calls > max_calls:
+        lines.append(f"Rencana ini melebihi batas ({used + calls} > {max_calls}). Kurangi panggilan atau minta izin menaikkan fal.max_calls.")
+    summary = {"total": round(total, 4), "currency": cur, "calls": calls, "calls_used": used, "max_calls": max_calls,
+               "missing_prices": missing, "over_budget": used + calls > max_calls}
+    return "\n".join(lines) + "\n", summary

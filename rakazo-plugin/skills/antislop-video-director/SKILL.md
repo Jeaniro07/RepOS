@@ -80,8 +80,10 @@ the record in `waivers.json` with a real reason. FINISH notes are craft. Full ta
 8. **Check.** Follow `video-qa`: `slopguard qa`, contact sheets, the `slop-critic` helper, fix, at most three
    passes, then `REVIEW.md`. Only then show the preview.
 9. **Deliver.** `final.mp4`, captions (`.srt`), `REVIEW.md`, `ledger.csv`, credits, the AI-disclosure note, and
-   a suggested title/description without bait. Append the session to `project.md`. Ask before any upload;
-   the default answer is that the user uploads it.
+   a suggested title/description without bait. Keep a provenance pack in the project (ledger, sources, list of raw
+   files, `project.md`, QA reports): platforms' slop detectors also flag human-made videos, and this is the evidence
+   for an appeal. Append the session to `project.md`. Ask before any upload; the default answer is that the user
+   uploads it.
 
 ## The real-material ladder (pick the highest rung that can show the idea)
 

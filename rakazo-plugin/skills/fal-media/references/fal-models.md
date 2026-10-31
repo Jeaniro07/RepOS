@@ -1,5 +1,10 @@
 # fal.ai endpoint starting points
 
+Prices seen on fal pages and fal's own guides on 2026-10-31 (indicative; read the model page before every plan):
+`fal-ai/nano-banana-pro` $0.15/image ($0.30 at 4K); `bytedance/seedance-2.0/image-to-video` about $0.30/s at 720p
+(fast variant about $0.24/s), audio included; `fal-ai/elevenlabs/speech-to-text/scribe-v2` $0.008/min. fal's guide
+also lists the newer `google/nano-banana-2.1`.
+
 Snapshot taken 2026-10-31 from fal-ai-community/skills (`model-routing`, last updated 2026-05) and fal
 model pages referenced there. Endpoints get renamed and replaced: **verify each id and its schema before
 use** (fal model page, the fal MCP `search`/schema tools, or `genmedia models --endpoint_id <id> --json`).

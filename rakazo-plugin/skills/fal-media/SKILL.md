@@ -27,8 +27,10 @@ Never ask the user to paste the key in chat and never print it. Two supported ro
 2. Pick the endpoint from [references/fal-models.md](references/fal-models.md). Verify it still exists and read
    its input schema on its fal model page (`https://fal.ai/models/<endpoint>/api`), via the fal MCP, or with
    `genmedia schema <endpoint> --json` if the genmedia CLI is installed. Do not invent endpoint ids or parameters.
-3. Write the generation plan: one row per call with endpoint, purpose (shot id), key inputs, count, unit price,
-   total. Cheap drafts first (fast image model, low resolution, short duration), finals only for chosen shots.
+3. Write the generation plan as `gen/plan.json` (endpoint, purpose, count, unit, quantity, unit price you read on
+   the model page, price source) and render it with `slopguard fal plan gen/plan.json --out GENERATION_PLAN.md`.
+   It totals the cost, checks the project's call budget, and refuses to look complete while a price is missing.
+   Cheap drafts first (fast image model, low resolution, short duration), finals only for chosen shots.
 4. Show the plan and get an explicit yes in chat. The project budget is `slopguard.json` → `fal.max_calls`
    (default 12). Raising it needs the user's yes too.
 

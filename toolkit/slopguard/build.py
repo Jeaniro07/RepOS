@@ -19,6 +19,23 @@ DANGLING = {
     "id": {"di", "ke", "dari", "yang", "dan", "atau", "untuk", "dengan", "pada", "ini", "itu", "si", "sang", "para", "tidak", "bukan", "akan", "sudah", "lebih", "paling", "se", "per"},
     "en": {"a", "an", "the", "of", "to", "in", "on", "at", "for", "and", "or", "but", "with", "from", "by", "is", "are", "not", "my", "your", "our", "their"},
 }
+# Number words stay with what follows ("seratus derajat", "ninety percent").
+NUMBER_WORDS = {
+    "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas",
+    "seratus", "seribu", "sejuta", "puluh", "belas", "ratus", "ribu", "juta", "miliar", "triliun", "setengah",
+    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+    "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety", "hundred", "thousand",
+    "million", "billion", "half",
+}
+
+
+def _keeps_next(word: str, dangling: set) -> bool:
+    bare = word.lower().strip(",.!?")
+    if word.endswith((",", ".", "!", "?", ";", ":")):
+        return False
+    return bare in dangling or bare in NUMBER_WORDS or bool(re.fullmatch(r"[\d.,%]+", bare))
+
+
 SENTENCE_END = re.compile(r"[.!?…]$")
 CLAUSE_END = re.compile(r"[,;:—-]$")
 
@@ -98,10 +115,104 @@ def _split_lines(text: str, max_chars: int) -> List[str]:
         a, b = " ".join(words[:i]), " ".join(words[i:])
         if len(a) > max_chars or len(b) > max_chars:
             continue
-        score = abs(len(a) - len(b)) + (8 if words[i - 1].lower().strip(",.") in DANGLING["id"] | DANGLING["en"] else 0)
+        score = abs(len(a) - len(b)) + (20 if _keeps_next(words[i - 1], DANGLING["id"] | DANGLING["en"]) else 0)
+        if words[i - 1].endswith((",", ";", ":")):
+            score -= 6
         if best_score is None or score < best_score:
             best, best_score = [a, b], score
     return best or [text]
+
+
+READING_CPS = {"id": 17.0, "en": 20.0}  # Netflix adult reading speeds (Indonesian / English guides)
+MIN_CUE = 5 / 6  # Netflix minimum event duration
+MAX_CUE = 7.0
+
+
+def _sentence_groups(words: List[Word], pause_break: float) -> List[List[Word]]:
+    groups, cur = [], []
+    for i, w in enumerate(words):
+        cur.append(w)
+        nxt = words[i + 1] if i + 1 < len(words) else None
+        if nxt is None:
+            break
+        if SENTENCE_END.search(w[0]) or nxt[1] - w[2] >= pause_break * 2:
+            groups.append(cur)
+            cur = []
+    if cur:
+        groups.append(cur)
+    return groups
+
+
+def _balanced_split(group: List[Word], limit: int, max_dur: float, dangling: set, pause_break: float) -> List[List[Word]]:
+    """Split one sentence into the fewest cues whose lengths are as even as possible,
+    preferring breaks at commas and pauses and never ending a cue on a word that
+    belongs to the next one (a preposition, an article, a number before its unit)."""
+    n = len(group)
+    texts = [w[0] for w in group]
+
+    def length(i, j):
+        return len(" ".join(texts[i:j]))
+
+    total = length(0, n)
+    if total <= limit and group[-1][2] - group[0][1] <= max_dur:
+        return [group]
+
+    def cost(i, j, target):
+        L = length(i, j)
+        if L > limit or (group[j - 1][2] - group[i][1]) > max_dur:
+            return None
+        c = ((L - target) / max(target, 1.0)) ** 2 * 100
+        if j < n:
+            if _keeps_next(texts[j - 1], dangling):
+                c += 40
+            if CLAUSE_END.search(texts[j - 1]):
+                c -= 15
+            if group[j][1] - group[j - 1][2] >= pause_break:
+                c -= 15
+        if j - i <= 2 and n > 4:
+            c += 30  # orphan fragment
+        return c
+
+    import math
+
+    best_cost, best_splits = None, None
+    k0 = max(1, math.ceil(total / limit))
+    for k in range(k0, min(n, k0 + 2) + 1):
+        target = total / k
+        INF = float("inf")
+        dp = [[INF] * (n + 1) for _ in range(k + 1)]
+        back = [[0] * (n + 1) for _ in range(k + 1)]
+        dp[0][0] = 0.0
+        for m in range(1, k + 1):
+            for j in range(1, n + 1):
+                for i in range(m - 1, j):
+                    if dp[m - 1][i] == INF:
+                        continue
+                    c = cost(i, j, target)
+                    if c is None:
+                        continue
+                    v = dp[m - 1][i] + c
+                    if v < dp[m][j]:
+                        dp[m][j], back[m][j] = v, i
+        if dp[k][n] == INF:
+            continue
+        total_cost = dp[k][n] + 10 * (k - k0)
+        if best_cost is None or total_cost < best_cost:
+            cuts, j = [], n
+            for m in range(k, 0, -1):
+                i = back[m][j]
+                cuts.append((i, j))
+                j = i
+            best_cost, best_splits = total_cost, list(reversed(cuts))
+    if not best_splits:  # a single word longer than the limit, or an impossible duration
+        out, cur = [], []
+        for w in group:
+            if cur and len(" ".join(x[0] for x in cur + [w])) > limit:
+                out.append(cur)
+                cur = []
+            cur.append(w)
+        return out + ([cur] if cur else [])
+    return [group[i:j] for i, j in best_splits]
 
 
 def captions_from_words(
@@ -109,49 +220,34 @@ def captions_from_words(
     lang: str = "id",
     max_chars: int = 42,
     max_lines: int = 2,
-    max_cps: float = 17.0,
-    min_dur: float = 0.8,
+    max_cps: Optional[float] = None,
+    min_dur: float = MIN_CUE,
     max_dur: float = 6.0,
     pause_break: float = 0.35,
-    gap: float = 0.04,
+    fps: float = 30.0,
     video_end: Optional[float] = None,
 ) -> List[Tuple[float, float, List[str]]]:
+    """Word timings -> cues: sentence by sentence, balanced splits, <= max_lines lines,
+    at least 5/6 s on screen when there is room, 2-frame gaps (Netflix timing rules)."""
     dangling = DANGLING.get(lang, set()) | DANGLING["en"]
+    cps = max_cps or READING_CPS.get(lang, 17.0)
+    gap = 2.0 / fps
     limit = max_chars * max_lines
     cues: List[List[Word]] = []
-    cur: List[Word] = []
-    for i, w in enumerate(words):
-        cur.append(w)
-        text = " ".join(x[0] for x in cur)
-        nxt = words[i + 1] if i + 1 < len(words) else None
-        if nxt is None:
-            break
-        nxt_text = text + " " + nxt[0]
-        pause = nxt[1] - w[2]
-        bare = w[0].lower().strip(",.!?")
-        is_number = bool(re.fullmatch(r"[\d.,%]+", bare))
-        hard = SENTENCE_END.search(w[0]) is not None or pause >= pause_break * 2
-        soft = CLAUSE_END.search(w[0]) is not None or pause >= pause_break
-        too_long = len(nxt_text) > limit or (nxt[2] - cur[0][1]) > max_dur
-        if (bare in dangling or is_number) and not hard and not too_long:
-            continue  # keep "di", "92", "the" with the word that follows
-        if hard or too_long or (soft and len(text) >= max_chars * 0.6):
-            cues.append(cur)
-            cur = []
-    if cur:
-        cues.append(cur)
+    for group in _sentence_groups(words, pause_break):
+        cues.extend(_balanced_split(group, limit, max_dur, dangling, pause_break))
 
     out: List[Tuple[float, float, List[str]]] = []
     for idx, cue in enumerate(cues):
         text = " ".join(w[0] for w in cue)
         start, end = cue[0][1], cue[-1][2]
         next_start = cues[idx + 1][0][1] if idx + 1 < len(cues) else (video_end if video_end else end + 2.0)
-        chars = len(text.replace(" ", ""))
-        need = max(min_dur, chars / max_cps)
+        need = max(min_dur, len(text.replace(" ", "")) / cps)
         end = max(end, min(start + need, next_start - gap))
+        end = min(end, next_start - gap, start + MAX_CUE) if idx + 1 < len(cues) else min(end, start + MAX_CUE)
         if video_end:
             end = min(end, video_end)
-        out.append((start, end, _split_lines(text, max_chars)))
+        out.append((start, max(end, start + 0.04), _split_lines(text, max_chars)))
     return out
 
 

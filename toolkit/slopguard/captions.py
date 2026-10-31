@@ -71,18 +71,29 @@ def parse_captions(text: str) -> List[Cue]:
     return cues
 
 
+# Netflix Timed Text Style Guide: adult reading speed 17 cps (Indonesian guide) / 20 cps
+# (English guide), events between 5/6 s and 7 s, at least 2 frames between events.
+READING_CPS = {"id": 17.0, "en": 20.0}
+
+
 def check_captions(
     text: str,
     subject: str = "captions",
     video_duration: Optional[float] = None,
-    max_cps: float = 20.0,
-    comfortable_cps: float = 17.0,
+    max_cps: Optional[float] = None,
+    comfortable_cps: float = 15.0,
     max_chars: int = 42,
     max_lines: int = 2,
     min_duration: float = 0.7,
     max_duration: float = 7.0,
+    lang: Optional[str] = None,
+    fps: float = 30.0,
 ) -> Report:
     report = Report(subject=subject, kind="captions")
+    if max_cps is None:
+        max_cps = READING_CPS.get(lang or "", 20.0)
+    report.metrics["reading-speed limit (chars/s)"] = max_cps
+    min_gap = 2.0 / fps
     cues = parse_captions(text)
     report.metrics["cues"] = len(cues)
     if not cues:
@@ -141,6 +152,26 @@ def check_captions(
                     f"Cue {cue.index} is on screen {cue.duration:.2f}s.",
                     at=at,
                     fix=f"Merge with a neighbour so every cue stays at least {min_duration:.1f}s.",
+                )
+            )
+        elif cue.duration < 5 / 6 - 1e-6:
+            report.add(
+                Finding(
+                    "captions.short",
+                    FINISH,
+                    f"Cue {cue.index} is on screen {cue.duration:.2f}s (streaming minimum is 5/6 s).",
+                    at=at,
+                    fix="Fine for punchy 1-3 word captions by design; otherwise hold it longer.",
+                )
+            )
+        if prev and 0 <= cue.start - prev.end < min_gap - 1e-6:
+            report.add(
+                Finding(
+                    "captions.gap",
+                    FINISH,
+                    f"Only {(cue.start - prev.end) * 1000:.0f} ms between cue {prev.index} and {cue.index} (want >= 2 frames).",
+                    at=at,
+                    fix="End the earlier cue 2 frames before the next one starts, so the change reads as a new cue.",
                 )
             )
         if cue.duration > max_duration:
@@ -207,3 +238,28 @@ def check_captions(
 
 def _clip(text: str, n: int = 60) -> str:
     return text if len(text) <= n else text[: n - 1] + "…"
+
+
+def near_cut_findings(cues: List[Cue], cuts: List[float], fps: float = 30.0) -> List[Finding]:
+    """Cue in/out times that land close to, but not on, a shot change flash on screen.
+    Netflix guidance: snap to the shot change (out-time 2 frames before it) or keep
+    at least 12 frames away."""
+    out: List[Finding] = []
+    if not cuts:
+        return out
+    snap, keep_away = 2.0 / fps, 12.0 / fps
+    for cue in cues:
+        for label, t in (("starts", cue.start), ("ends", cue.end)):
+            nearest = min(cuts, key=lambda c: abs(c - t))
+            dist = abs(nearest - t)
+            if snap < dist < keep_away:
+                out.append(
+                    Finding(
+                        "captions.near-cut",
+                        FINISH,
+                        f"Cue {cue.index} {label} {dist * 1000:.0f} ms from the shot change at {nearest:.2f}s.",
+                        at=f"{t:.2f}s",
+                        fix="Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away.",
+                    )
+                )
+    return out

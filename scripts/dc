@@ -1,0 +1,4 @@
+#!/bin/sh
+# docker compose dengan versi terpin (versions.env) + rahasia (.env, atau ENV_FILE=...).
+cd "$(dirname "$0")/.." || exit 1
+exec docker compose --env-file versions.env --env-file "${ENV_FILE:-.env}" "$@"

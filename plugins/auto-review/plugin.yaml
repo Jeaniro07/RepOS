@@ -1,0 +1,3 @@
+name: auto-review
+version: "0.1"
+description: Pagar tool-call per profil (deny > allow > approve), mode dry-run/enforce, log audit JSONL.

@@ -1,7 +1,16 @@
+# Fase 0 (bot self-hosted)
+vendor/
+.env
+data/
+node_modules/
+eval/rakazo/work/
+
+# Python
 __pycache__/
 *.pyc
 *.egg-info/
 .venv/
+
+# slopguard (video anti-slop)
 *.qa/
 .slopguard/
-.env

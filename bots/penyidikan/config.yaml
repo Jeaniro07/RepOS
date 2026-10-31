@@ -1,0 +1,7 @@
+# Penyidikan: tanpa komputer, tanpa internet, tanpa konektor. Hanya memori, skill, dan berkas lokal.
+agent:
+  disabled_toolsets: [browser, computer_use, terminal, code_execution, web]
+plugins:
+  enabled: [auto-review]
+approvals:
+  cron_mode: deny

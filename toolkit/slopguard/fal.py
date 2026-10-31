@@ -246,7 +246,7 @@ def download(url: str, out_dir: str, stem: str) -> str:
     os.makedirs(out_dir, exist_ok=True)
     parsed = urllib.parse.urlparse(url)
     ext = os.path.splitext(parsed.path)[1] or ".bin"
-    dest = os.path.join(out_dir, f"{stem}{ext}")
+    dest = os.path.abspath(os.path.join(out_dir, f"{stem}{ext}"))  # absolute: safe to pass to the next step
     _, data = _request("GET", url, auth=False, timeout=600)
     with open(dest, "wb") as fh:
         fh.write(data)

@@ -1,0 +1,6 @@
+shot,start,end,narration,idea,visual,source_type,source,license,real_person,notes
+1,0,4.5,Kopi saya selalu pahit,masalahnya terlihat,kopi dituang,footage,assets/pour.mp4,rekaman sendiri,no,
+2,4.5,6.5,Ternyata masalahnya air,penyebab: air,ketel mendidih,footage,assets/kettle.mp4,rekaman sendiri,no,
+3,6.5,12,Air mendidih 100 derajat,ekstraksi berlebih,diagram suhu + batang senyawa pahit,code,data dari [1],,no,
+4,12,16.5,turunkan ke 92 derajat,solusi,uap di atas cangkir + angka 92,generated,fal (rencana),,no,
+5,16.5,20,Hasilnya lebih manis,hasil,mencicipi,footage,assets/taste.mp4,rekaman sendiri,no,

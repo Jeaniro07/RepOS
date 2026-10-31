@@ -256,7 +256,7 @@ def run(sim: Sim):
     # 4. Script loop
     sim.write(f"{proj}/script.md", open(os.path.join(SCEN, "script-v1.md")).read())
     sim.sh("Naskah draf 1 → lint (harus DIBLOKIR)", "antislop-script", f"cd ~/{proj} && slopguard lint-script script.md | sed -n 3,6p", expect=1)
-    sim.sh("/cek-slop pada draf 1 (ringkas)", "cek-slop (command)", f"cd ~/{proj} && slopguard lint-script script.md --json | python3 -c \"import json,sys;d=json.load(sys.stdin);print(d['counts']);print(sorted({{f['gate'] for f in d['findings']}}))\"", expect=0)
+    sim.sh("/cek-slop pada draf 1 (ringkas)", "cek-slop (command)", f"cd ~/{proj} && slopguard lint-script script.md --json | python3 -c \"import json,sys;d=json.load(sys.stdin);print(d['counts']);print(sorted({{f['gate'] for f in d['findings']}}))\"", expect=1)
     sim.write(f"{proj}/script.md", open(os.path.join(SCEN, "script-v2.md")).read())
     sim.sh("Naskah draf 2 → lint (harus CLEAR)", "antislop-script", f"cd ~/{proj} && slopguard lint-script script.md | sed -n 3,6p", expect=0)
 

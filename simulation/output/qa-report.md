@@ -2,7 +2,7 @@
 
 - Subject: `edit/preview.mp4`
 - Verdict: **CLEAR: no open FLOOR or REFLEX findings. Still review it with fresh eyes.**
-- Floor 0 FAIL · Reflex 0 open (0 waived) · Finish 7 notes
+- Floor 0 FAIL · Reflex 0 open (0 waived) · Finish 1 notes
 
 ## Measured
 
@@ -19,29 +19,23 @@
 - dead-air gaps: 0
 - frozen share of runtime: 0%
 - flicker stretches: 0
-- first frame luma / range: 114 / 57
+- first frame luma / range: 133 / 56
 - cuts detected: 3
 - mean shot length (s): 4.95
 - cut times (s): 7.17, 12.30, 16.97
 - captions: reading-speed limit (chars/s): 17.00
 - captions: cues: 6
-- captions: mean reading speed (chars/s): 11.80
+- captions: mean reading speed (chars/s): 10.40
 - ledger: shots: 5
 - ledger: runtime in ledger (s): 19.75
 - ledger: runtime by source: footage 50%, code 26%, generated 24%
-- contact sheets: /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/cuts.jpg, /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/safezones.jpg
+- contact sheets: /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/cuts.jpg, /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/safezones.jpg
 
 ## Findings
 
 | | Gate | Where | Problem | Fix |
 |---|---|---|---|---|
-| NOTE | `captions.near-cut` | 12.04s | Cue 4 ends 255 ms from the shot change at 12.30s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
-| NOTE | `captions.near-cut` | 12.60s | Cue 5 starts 295 ms from the shot change at 12.30s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
-| NOTE | `captions.near-cut` | 16.70s | Cue 5 ends 263 ms from the shot change at 16.97s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
-| NOTE | `captions.near-cut` | 17.25s | Cue 6 starts 287 ms from the shot change at 16.97s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
-| NOTE | `captions.near-cut` | 6.91s | Cue 2 ends 262 ms from the shot change at 7.17s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
-| NOTE | `captions.near-cut` | 7.46s | Cue 3 starts 288 ms from the shot change at 7.17s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
-| NOTE | `encode.bitrate` | - | 2.0 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode. | Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p). |
+| NOTE | `encode.bitrate` | - | 1.8 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode. | Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p). |
 
 ## Not measurable here: check by eye/ear and say so
 

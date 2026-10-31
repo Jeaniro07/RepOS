@@ -43,3 +43,6 @@ tanpa root, simulasi tetap jalan sebagai user saat ini dengan home dan PATH teri
 7. Contact sheet memperlihatkan caption 2 baris (di SRT) tampil 4 baris di layar: 42 karakter/baris terlalu panjang untuk
    lebar vertikal 1080 px, dan angka QA tidak bisa melihatnya. `slopguard captions` kini memakai 28 karakter/baris untuk
    proyek vertikal, pemeriksaan memakai batas 32, dan skill perakitan menyuruh agent mengecek wrapping di contact sheet.
+8. Gate baru dari riset (standar Netflix) langsung menemukan masalah di simulasi: setiap caption berakhir ~260 ms sebelum
+   pergantian shot lalu muncul lagi ~290 ms sesudahnya, sehingga terlihat berkedip di sekitar potongan.
+   `slopguard captions --cuts` kini menempelkan caption ke titik potong (2 frame sebelum / tepat di potongan).

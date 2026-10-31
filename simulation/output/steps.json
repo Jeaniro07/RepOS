@@ -19,7 +19,7 @@
     "expected": 0,
     "ok": true,
     "seconds": 0,
-    "output": "/home/user/RepOS/rakazo-plugin: 17 files, 52444 bytes, 7 skills/agents\nOK\n"
+    "output": "/home/user/RepOS/rakazo-plugin: 17 files, 52550 bytes, 7 skills/agents\nOK\n"
   },
   {
     "step": "Komputer bot siap: user non-root, Python 3.11, tanpa ffmpeg/node/apt/pip/uv di PATH",
@@ -51,8 +51,8 @@
     "exit": 0,
     "expected": 0,
     "ok": true,
-    "seconds": 29.3,
-    "output": "downloading https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n8.1-latest-linux64-gpl-8.1.tar.xz (about 150 MB)...\ninstalled /tmp/antislop-sim-8o39fzua/home/.local/share/slopguard/bin/ffmpeg\ninstalled /tmp/antislop-sim-8o39fzua/home/.local/share/slopguard/bin/ffprobe\nslopguard 0.1.0  python 3.11.18\nffmpeg : /tmp/antislop-sim-8o39fzua/home/.local/bin/ffmpeg  (version n8.1.3-27-g8dca1586f4-20261031)\nffprobe: /tmp/antislop-sim-8o39fzua/home/.local/bin/ffprobe\nFAL_KEY: not set (needed only for fal generation)\nfilters: all present\nslopguard 0.1.0  python 3.11.18\nffmpeg : /tmp/antislop-sim-8o39fzua/home/.local/bin/ffmpeg  (version n8.1.3-27-g8dca1586f4-20261031)\nffprobe: /tmp/antislop-sim-8o39fzua/home/.local/bin/ffprobe\nFAL_KEY: not set (needed only for fal generation)\nfilters: all present\n\nCloning into '/tmp/antislop-sim-8o39fzua/home/antislop/RepOS'...\n"
+    "seconds": 31.2,
+    "output": "downloading https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n8.1-latest-linux64-gpl-8.1.tar.xz (about 150 MB)...\ninstalled /tmp/antislop-sim-dbnhxoiu/home/.local/share/slopguard/bin/ffmpeg\ninstalled /tmp/antislop-sim-dbnhxoiu/home/.local/share/slopguard/bin/ffprobe\nslopguard 0.1.0  python 3.11.18\nffmpeg : /tmp/antislop-sim-dbnhxoiu/home/.local/bin/ffmpeg  (version n8.1.3-27-g8dca1586f4-20261031)\nffprobe: /tmp/antislop-sim-dbnhxoiu/home/.local/bin/ffprobe\nFAL_KEY: not set (needed only for fal generation)\nfilters: all present\nslopguard 0.1.0  python 3.11.18\nffmpeg : /tmp/antislop-sim-dbnhxoiu/home/.local/bin/ffmpeg  (version n8.1.3-27-g8dca1586f4-20261031)\nffprobe: /tmp/antislop-sim-dbnhxoiu/home/.local/bin/ffprobe\nFAL_KEY: not set (needed only for fal generation)\nfilters: all present\n\nCloning into '/tmp/antislop-sim-dbnhxoiu/home/antislop/RepOS'...\n"
   },
   {
     "step": "ffmpeg kini bisa dipanggil langsung (untuk video-assembly)",
@@ -63,7 +63,7 @@
     "expected": 0,
     "ok": true,
     "seconds": 0.0,
-    "output": "/tmp/antislop-sim-8o39fzua/home/.local/bin/ffmpeg\n/tmp/antislop-sim-8o39fzua/home/.local/bin/ffprobe\n/tmp/antislop-sim-8o39fzua/home/.local/bin/slopguard\nffmpeg version n8.1.3-27-g8dca1586f4-20261031 Copyright (c) 2000-2026 the FFmpeg developers\n"
+    "output": "/tmp/antislop-sim-dbnhxoiu/home/.local/bin/ffmpeg\n/tmp/antislop-sim-dbnhxoiu/home/.local/bin/ffprobe\n/tmp/antislop-sim-dbnhxoiu/home/.local/bin/slopguard\nffmpeg version n8.1.3-27-g8dca1586f4-20261031 Copyright (c) 2000-2026 the FFmpeg developers\n"
   },
   {
     "step": "Tes toolkit di komputer bot",
@@ -74,7 +74,7 @@
     "expected": 0,
     "ok": true,
     "seconds": 17.4,
-    "output": "\nOK\nwrote /tmp/tmp20po18_p/edit/master.srt: 2 cues from 9 words, <= 28 chars/line; NOT YET: fix or waive (with a reason) every open REFLEX finding.\n"
+    "output": "\nOK\nwrote /tmp/tmpkfi_y5tl/edit/master.srt: 2 cues from 9 words, <= 28 chars/line; NOT YET: fix or waive (with a reason) every open REFLEX finding.\n"
   },
   {
     "step": "request_secret {name: fal-key, auth: command} → pengguna menyimpan kunci di kartu terlindung",
@@ -95,7 +95,7 @@
     "exit": 0,
     "expected": 0,
     "ok": true,
-    "seconds": 0.2,
+    "seconds": 0.1,
     "output": "FAL_KEY: set\n"
   },
   {
@@ -118,7 +118,7 @@
     "expected": 0,
     "ok": true,
     "seconds": 0.1,
-    "output": "created /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/slopguard.json\ncreated /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/BRIEF.md\ncreated /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/SPEC.md\ncreated /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/script.md\ncreated /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/ledger.csv\ncreated /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/waivers.json\ncreated /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/project.md\n"
+    "output": "created /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/slopguard.json\ncreated /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/BRIEF.md\ncreated /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/SPEC.md\ncreated /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/script.md\ncreated /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/ledger.csv\ncreated /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/waivers.json\ncreated /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/project.md\n"
   },
   {
     "step": "Brief diisi, 3 alur cerita diusulkan, pengguna memilih alur 1; SPEC.md ditulis",
@@ -228,7 +228,7 @@
     "expected": 0,
     "ok": true,
     "seconds": 7.0,
-    "output": "{\n  \"request_id\": \"ff60736bf21146acb49f9f638137ec58\",\n  \"files\": [\n    \"/tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/gen/voice/voice-ff60736b-0.wav\"\n  ]\n}\n\nstatus: IN_PROGRESS\nstatus: COMPLETED\n"
+    "output": "{\n  \"request_id\": \"638b9c344e284928a8803ae76ee349a0\",\n  \"files\": [\n    \"/tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/gen/voice/voice-638b9c34-0.wav\"\n  ]\n}\n\nstatus: IN_PROGRESS\nstatus: COMPLETED\n"
   },
   {
     "step": "fal 2/4: transkrip per kata (file lokal di-upload otomatis)",
@@ -239,7 +239,7 @@
     "expected": 0,
     "ok": true,
     "seconds": 3.1,
-    "output": "{\n  \"request_id\": \"29062ff510244cfda41ea8e852c6dae6\",\n  \"files\": []\n}\n\nstatus: IN_PROGRESS\nstatus: COMPLETED\n"
+    "output": "{\n  \"request_id\": \"10257654b37842c380a84e63f200e088\",\n  \"files\": []\n}\n\nstatus: IN_PROGRESS\nstatus: COMPLETED\n"
   },
   {
     "step": "fal 3/4: still shot 4",
@@ -249,8 +249,8 @@
     "exit": 0,
     "expected": 0,
     "ok": true,
-    "seconds": 3.9,
-    "output": "{\n  \"request_id\": \"6ca5bf307c6748668c458ec49737f3db\",\n  \"files\": [\n    \"/tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/gen/shot4/shot4-still-6ca5bf30-0.png\"\n  ]\n}\n\nstatus: IN_PROGRESS\nstatus: COMPLETED\n"
+    "seconds": 3.8,
+    "output": "{\n  \"request_id\": \"2533bea8fc664876800cd1d92c57368e\",\n  \"files\": [\n    \"/tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/gen/shot4/shot4-still-2533bea8-0.png\"\n  ]\n}\n\nstatus: IN_PROGRESS\nstatus: COMPLETED\n"
   },
   {
     "step": "fal 4/4: gerak dari still",
@@ -260,8 +260,8 @@
     "exit": 0,
     "expected": 0,
     "ok": true,
-    "seconds": 4.9,
-    "output": "{\n  \"request_id\": \"f4fffba3b8e04ac5a95e15ecd29858d4\",\n  \"files\": [\n    \"/tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/gen/shot4/shot4-motion-f4fffba3-0.mp4\"\n  ]\n}\n\nstatus: IN_PROGRESS\nstatus: COMPLETED\n"
+    "seconds": 4.8,
+    "output": "{\n  \"request_id\": \"6b419dbda5464bdd8ad53a3ca0805b7e\",\n  \"files\": [\n    \"/tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/gen/shot4/shot4-motion-6b419dbd-0.mp4\"\n  ]\n}\n\nstatus: IN_PROGRESS\nstatus: COMPLETED\n"
   },
   {
     "step": "Panggilan ke-5 di luar rencana (harus ditolak oleh batas anggaran)",
@@ -278,7 +278,7 @@
     "step": "Lihat hasil generatif di contact sheet sebelum dipakai",
     "skill": "fal-media",
     "actor": "bot",
-    "command": "cd ~/videos/kopi-pahit && slopguard sheet /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/gen/shot4/shot4-motion-f4fffba3-0.mp4 --out gen/shot4/sheet --count 6",
+    "command": "cd ~/videos/kopi-pahit && slopguard sheet /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/gen/shot4/shot4-motion-6b419dbd-0.mp4 --out gen/shot4/sheet --count 6",
     "exit": 0,
     "expected": 0,
     "ok": true,
@@ -293,7 +293,7 @@
     "exit": 0,
     "expected": 0,
     "ok": true,
-    "seconds": 8.3,
+    "seconds": 6.6,
     "output": ""
   },
   {
@@ -304,7 +304,7 @@
     "exit": 0,
     "expected": 0,
     "ok": true,
-    "seconds": 4.9,
+    "seconds": 3.8,
     "output": ""
   },
   {
@@ -315,7 +315,7 @@
     "exit": 0,
     "expected": 0,
     "ok": true,
-    "seconds": 6.1,
+    "seconds": 6.3,
     "output": ""
   },
   {
@@ -330,10 +330,10 @@
     "output": ""
   },
   {
-    "step": "Caption dari timestamp kata (slopguard captions)",
+    "step": "Caption dari timestamp kata, ditempel ke titik potong (slopguard captions --cuts)",
     "skill": "video-assembly",
     "actor": "bot",
-    "command": "cd ~/videos/kopi-pahit && slopguard captions gen/transcript/stt-29062ff5.json --out edit/master.srt --lang id",
+    "command": "cd ~/videos/kopi-pahit && slopguard captions gen/transcript/stt-10257654.json --out edit/master.srt --lang id --cuts 4.708,7.18,12.32,16.979",
     "exit": 0,
     "expected": 0,
     "ok": true,
@@ -348,7 +348,7 @@
     "exit": 0,
     "expected": 0,
     "ok": true,
-    "seconds": 15.3,
+    "seconds": 15.5,
     "output": "{\n  \"before_lufs\": -16.26,\n  \"before_true_peak\": -2.99,\n  \"after_lufs\": -14.0,\n  \"after_true_peak\": -1.5\n}\n"
   },
   {
@@ -359,8 +359,8 @@
     "exit": 2,
     "expected": 2,
     "ok": true,
-    "seconds": 8.3,
-    "output": "NOT YET: fix or waive (with a reason) every open REFLEX finding.\nREFLEX picture.frozen 7.47s Principal picture does not change for 2.7s (max 2.5s).\nFINISH captions.near-cut 12.04s Cue 4 ends 255 ms from the shot change at 12.30s.\nFINISH captions.near-cut 12.60s Cue 5 starts 295 ms from the shot change at 12.30s.\nFINISH captions.near-cut 16.70s Cue 5 ends 263 ms from the shot change at 16.97s.\nFINISH captions.near-cut 17.25s Cue 6 starts 287 ms from the shot change at 16.97s.\nFINISH captions.near-cut 6.91s Cue 2 ends 262 ms from the shot change at 7.17s.\nFINISH captions.near-cut 7.46s Cue 3 starts 288 ms from the shot change at 7.17s.\nFINISH encode.bitrate None 2.0 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode.\n"
+    "seconds": 8.7,
+    "output": "NOT YET: fix or waive (with a reason) every open REFLEX finding.\nREFLEX picture.frozen 7.20s Principal picture does not change for 3.0s (max 2.5s).\nFINISH encode.bitrate None 1.8 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode.\n"
   },
   {
     "step": "Perbaikan: shot 3 diubah dari kartu diam menjadi diagram yang bergerak sesuai narasi (batang 'senyawa pahit' terisi)",
@@ -381,7 +381,7 @@
     "exit": 0,
     "expected": 0,
     "ok": true,
-    "seconds": 18.8,
+    "seconds": 17.3,
     "output": "{\n  \"before_lufs\": -16.26,\n  \"before_true_peak\": -2.99,\n  \"after_lufs\": -14.0,\n  \"after_true_peak\": -1.5\n}\n"
   },
   {
@@ -392,8 +392,8 @@
     "exit": 0,
     "expected": 0,
     "ok": true,
-    "seconds": 8.6,
-    "output": "hars/s): 17.00\n- captions: cues: 6\n- captions: mean reading speed (chars/s): 11.80\n- ledger: shots: 5\n- ledger: runtime in ledger (s): 19.75\n- ledger: runtime by source: footage 50%, code 26%, generated 24%\n- contact sheets: /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/cuts.jpg, /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/safezones.jpg\n\n## Findings\n\n| | Gate | Where | Problem | Fix |\n|---|---|---|---|---|\n| NOTE | `captions.near-cut` | 12.04s | Cue 4 ends 255 ms from the shot change at 12.30s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |\n| NOTE | `captions.near-cut` | 12.60s | Cue 5 starts 295 ms from the shot change at 12.30s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |\n| NOTE | `captions.near-cut` | 16.70s | Cue 5 ends 263 ms from the shot change at 16.97s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |\n| NOTE | `captions.near-cut` | 17.25s | Cue 6 starts 287 ms from the shot change at 16.97s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |\n| NOTE | `captions.near-cut` | 6.91s | Cue 2 ends 262 ms from the shot change at 7.17s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |\n| NOTE | `captions.near-cut` | 7.46s | Cue 3 starts 288 ms from the shot change at 7.17s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |\n| NOTE | `encode.bitrate` | - | 2.0 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode. | Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p). |\n\n## Not measurable here: check by eye/ear and say so\n\n- [ ] Watch it once at full speed on a phone-sized window; note the first moment you'd swipe away.\n- [ ] Listen through headphones: voice intelligible over music, no pops at cuts, effects tied to visible events.\n- [ ] Every on-screen object reads as what it is without a label; nothing important sits under platform UI.\n- [ ] Realistic AI-generated people, places or events are disclosed on upload (platform 'altered or synthetic' label).\n- [ ] Nothing shows a real person saying or doing something they did not say or do.\n- [ ] Every cue matches the spoken words exactly (names, numbers, units kept together).\n- [ ] Line breaks fall on natural phrase boundaries, not mid-phrase.\n- [ ] Captions sit inside the title-safe area and never sit under platform UI or overlays.\n- [ ] safezones.jpg: no caption, face, product or key text inside the red platform-UI bands (approximate; check in each app).\n\n_A measured pass is not a good video. Numbers catch what is broken; a fresh-context critic catches what is weak. Report what was measured and what nobody checked._\n\nwrote /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/qa-report.md, /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/qa-report.json\n"
+    "seconds": 8.4,
+    "output": "# slopguard video report\n\n- Subject: `edit/preview.mp4`\n- Verdict: **CLEAR: no open FLOOR or REFLEX findings. Still review it with fresh eyes.**\n- Floor 0 FAIL · Reflex 0 open (0 waived) · Finish 1 notes\n\n## Measured\n\n- size: 1080x1920\n- duration (s): 19.80\n- fps: 30.00\n- video codec: h264\n- audio: aac 48000 Hz\n- target duration (s): 20\n- bits per pixel: 0.03\n- integrated loudness (LUFS): -14.00\n- true peak (dBTP): -1.50\n- loudness range (LU): 1.70\n- dead-air gaps: 0\n- frozen share of runtime: 0%\n- flicker stretches: 0\n- first frame luma / range: 133 / 56\n- cuts detected: 3\n- mean shot length (s): 4.95\n- cut times (s): 7.17, 12.30, 16.97\n- captions: reading-speed limit (chars/s): 17.00\n- captions: cues: 6\n- captions: mean reading speed (chars/s): 10.40\n- ledger: shots: 5\n- ledger: runtime in ledger (s): 19.75\n- ledger: runtime by source: footage 50%, code 26%, generated 24%\n- contact sheets: /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/cuts.jpg, /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/safezones.jpg\n\n## Findings\n\n| | Gate | Where | Problem | Fix |\n|---|---|---|---|---|\n| NOTE | `encode.bitrate` | - | 1.8 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode. | Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p). |\n\n## Not measurable here: check by eye/ear and say so\n\n- [ ] Watch it once at full speed on a phone-sized window; note the first moment you'd swipe away.\n- [ ] Listen through headphones: voice intelligible over music, no pops at cuts, effects tied to visible events.\n- [ ] Every on-screen object reads as what it is without a label; nothing important sits under platform UI.\n- [ ] Realistic AI-generated people, places or events are disclosed on upload (platform 'altered or synthetic' label).\n- [ ] Nothing shows a real person saying or doing something they did not say or do.\n- [ ] Every cue matches the spoken words exactly (names, numbers, units kept together).\n- [ ] Line breaks fall on natural phrase boundaries, not mid-phrase.\n- [ ] Captions sit inside the title-safe area and never sit under platform UI or overlays.\n- [ ] safezones.jpg: no caption, face, product or key text inside the red platform-UI bands (approximate; check in each app).\n\n_A measured pass is not a good video. Numbers catch what is broken; a fresh-context critic catches what is weak. Report what was measured and what nobody checked._\n\nwrote /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/qa-report.md, /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/qa-report.json\n"
   },
   {
     "step": "Bahan untuk helper slop-critic tersedia (run_subagent dijalankan oleh Rakazo)",
@@ -404,7 +404,7 @@
     "expected": 0,
     "ok": true,
     "seconds": 0.0,
-    "output": "-rw-r--r-- 1 rakazo-sim rakazo-sim   1046 Oct 31 14:12 BRIEF.md\n-rw-r--r-- 1 rakazo-sim rakazo-sim   1098 Oct 31 14:12 SPEC.md\n-rw-r--r-- 1 rakazo-sim rakazo-sim  59967 Oct 31 14:13 edit/qa/cuts.jpg\n-rw-r--r-- 1 rakazo-sim rakazo-sim 209428 Oct 31 14:13 edit/qa/overview.jpg\n-rw-r--r-- 1 rakazo-sim rakazo-sim   3530 Oct 31 14:13 edit/qa/qa-report.md\n-rw-r--r-- 1 rakazo-sim rakazo-sim 118275 Oct 31 14:13 edit/qa/safezones.jpg\n-rw-r--r-- 1 rakazo-sim rakazo-sim    787 Oct 31 14:13 ledger.csv\n-rw-r--r-- 1 rakazo-sim rakazo-sim    496 Oct 31 14:12 script.md\n"
+    "output": "-rw-r--r-- 1 rakazo-sim rakazo-sim   1046 Oct 31 14:17 BRIEF.md\n-rw-r--r-- 1 rakazo-sim rakazo-sim   1098 Oct 31 14:17 SPEC.md\n-rw-r--r-- 1 rakazo-sim rakazo-sim  70172 Oct 31 14:18 edit/qa/cuts.jpg\n-rw-r--r-- 1 rakazo-sim rakazo-sim 214446 Oct 31 14:18 edit/qa/overview.jpg\n-rw-r--r-- 1 rakazo-sim rakazo-sim   2472 Oct 31 14:18 edit/qa/qa-report.md\n-rw-r--r-- 1 rakazo-sim rakazo-sim 118709 Oct 31 14:18 edit/qa/safezones.jpg\n-rw-r--r-- 1 rakazo-sim rakazo-sim    787 Oct 31 14:17 ledger.csv\n-rw-r--r-- 1 rakazo-sim rakazo-sim    496 Oct 31 14:17 script.md\n"
   },
   {
     "step": "Serahkan: final.mp4 + SRT + REVIEW + ledger (tanpa mengunggah)",
@@ -415,7 +415,7 @@
     "expected": 0,
     "ok": true,
     "seconds": 0.0,
-    "output": "total 4924\ndrwxr-xr-x 2 rakazo-sim rakazo-sim    4096 Oct 31 14:13 .\ndrwxr-xr-x 7 rakazo-sim rakazo-sim    4096 Oct 31 14:13 ..\n-rw-r--r-- 1 rakazo-sim rakazo-sim     877 Oct 31 14:13 REVIEW.md\n-rw-r--r-- 1 rakazo-sim rakazo-sim 5019485 Oct 31 14:13 final.mp4\n-rw-r--r-- 1 rakazo-sim rakazo-sim     415 Oct 31 14:13 final.srt\n-rw-r--r-- 1 rakazo-sim rakazo-sim     787 Oct 31 14:13 ledger.csv\n"
+    "output": "total 4432\ndrwxr-xr-x 2 rakazo-sim rakazo-sim    4096 Oct 31 14:18 .\ndrwxr-xr-x 7 rakazo-sim rakazo-sim    4096 Oct 31 14:18 ..\n-rw-r--r-- 1 rakazo-sim rakazo-sim     877 Oct 31 14:18 REVIEW.md\n-rw-r--r-- 1 rakazo-sim rakazo-sim 4517424 Oct 31 14:18 final.mp4\n-rw-r--r-- 1 rakazo-sim rakazo-sim     415 Oct 31 14:18 final.srt\n-rw-r--r-- 1 rakazo-sim rakazo-sim     787 Oct 31 14:18 ledger.csv\n"
   },
   {
     "step": "Audit keamanan: anggaran, kunci, publikasi",

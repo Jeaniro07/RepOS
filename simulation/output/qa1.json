@@ -7,7 +7,7 @@
     "floor": 0,
     "reflex_open": 1,
     "reflex_waived": 0,
-    "finish": 7
+    "finish": 1
   },
   "metrics": {
     "size": "1080x1920",
@@ -16,14 +16,14 @@
     "video codec": "h264",
     "audio": "aac 48000 Hz",
     "target duration (s)": 20,
-    "bits per pixel": 0.033,
+    "bits per pixel": 0.029,
     "integrated loudness (LUFS)": -14.0,
     "true peak (dBTP)": -1.5,
     "loudness range (LU)": 1.7,
     "dead-air gaps": 0,
-    "frozen share of runtime": "14%",
+    "frozen share of runtime": "15%",
     "flicker stretches": 0,
-    "first frame luma / range": "114 / 57",
+    "first frame luma / range": "133 / 56",
     "cuts detected": 3,
     "mean shot length (s)": 4.95,
     "cut times (s)": [
@@ -33,79 +33,19 @@
     ],
     "captions: reading-speed limit (chars/s)": 17.0,
     "captions: cues": 6,
-    "captions: mean reading speed (chars/s)": 11.8,
+    "captions: mean reading speed (chars/s)": 10.4,
     "ledger: shots": 5,
     "ledger: runtime in ledger (s)": 19.75,
     "ledger: runtime by source": "footage 50%, code 26%, generated 24%",
-    "contact sheets": "/tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/cuts.jpg, /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/safezones.jpg"
+    "contact sheets": "/tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/cuts.jpg, /tmp/antislop-sim-dbnhxoiu/home/videos/kopi-pahit/edit/qa/safezones.jpg"
   },
   "findings": [
     {
       "gate": "picture.frozen",
       "tier": "REFLEX",
-      "message": "Principal picture does not change for 2.7s (max 2.5s).",
-      "at": "7.47s",
+      "message": "Principal picture does not change for 3.0s (max 2.5s).",
+      "at": "7.20s",
       "fix": "Give the frame a meaningful event (a reveal, an action, a new shot). Subtitle turnover or a slow zoom does not count.",
-      "evidence": null,
-      "waived": false,
-      "waiver_reason": null
-    },
-    {
-      "gate": "captions.near-cut",
-      "tier": "FINISH",
-      "message": "Cue 4 ends 255 ms from the shot change at 12.30s.",
-      "at": "12.04s",
-      "fix": "Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away.",
-      "evidence": null,
-      "waived": false,
-      "waiver_reason": null
-    },
-    {
-      "gate": "captions.near-cut",
-      "tier": "FINISH",
-      "message": "Cue 5 starts 295 ms from the shot change at 12.30s.",
-      "at": "12.60s",
-      "fix": "Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away.",
-      "evidence": null,
-      "waived": false,
-      "waiver_reason": null
-    },
-    {
-      "gate": "captions.near-cut",
-      "tier": "FINISH",
-      "message": "Cue 5 ends 263 ms from the shot change at 16.97s.",
-      "at": "16.70s",
-      "fix": "Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away.",
-      "evidence": null,
-      "waived": false,
-      "waiver_reason": null
-    },
-    {
-      "gate": "captions.near-cut",
-      "tier": "FINISH",
-      "message": "Cue 6 starts 287 ms from the shot change at 16.97s.",
-      "at": "17.25s",
-      "fix": "Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away.",
-      "evidence": null,
-      "waived": false,
-      "waiver_reason": null
-    },
-    {
-      "gate": "captions.near-cut",
-      "tier": "FINISH",
-      "message": "Cue 2 ends 262 ms from the shot change at 7.17s.",
-      "at": "6.91s",
-      "fix": "Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away.",
-      "evidence": null,
-      "waived": false,
-      "waiver_reason": null
-    },
-    {
-      "gate": "captions.near-cut",
-      "tier": "FINISH",
-      "message": "Cue 3 starts 288 ms from the shot change at 7.17s.",
-      "at": "7.46s",
-      "fix": "Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away.",
       "evidence": null,
       "waived": false,
       "waiver_reason": null
@@ -113,7 +53,7 @@
     {
       "gate": "encode.bitrate",
       "tier": "FINISH",
-      "message": "2.0 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode.",
+      "message": "1.8 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode.",
       "at": null,
       "fix": "Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p).",
       "evidence": null,

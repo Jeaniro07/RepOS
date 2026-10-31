@@ -304,6 +304,8 @@ def run(sim: Sim):
 
     # 9. Assembly from the transcript (cuts at sentence gaps)
     words = json.load(open(transcript_json))["result"]["words"]
+    if not words:
+        raise RuntimeError("transcript has no words; cannot cut or caption")
     sentences, cur = [], []
     for w in words:
         cur.append(w)
@@ -345,16 +347,18 @@ def run(sim: Sim):
     def render(version):
         lines = ["set -e", "mkdir -p edit/clips"]
         for i, ((kind, src, start), d) in enumerate(zip(plan, durs), start=1):
-            lines.append(shot_script(i, d, kind, src, start, version=version))
+            lines.append("timeout -s KILL 600 " + shot_script(i, d, kind, src, start, version=version))
         lines.append("printf \"file 'clips/shot%d.mp4'\\n\" 1 2 3 4 5 > edit/clips.txt")
-        lines.append("ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i edit/clips.txt -c copy edit/picture.mp4")
+        lines.append("timeout -s KILL 300 ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i edit/clips.txt -c copy edit/picture.mp4")
         style = "FontName=DejaVu Sans,Bold=1,FontSize=11,PrimaryColour=&H00FFFFFF,OutlineColour=&H00171A1D,BorderStyle=1,Outline=1.2,Shadow=0,Alignment=2,MarginV=58"
-        lines.append(f"ffmpeg -hide_banner -loglevel error -y -i edit/picture.mp4 -i {voice_rel} "
-                     f"-filter_complex \"[0:v]subtitles={srt}:fontsdir={FONT_DIR}:force_style='{style}'[v];[1:a]apad,atrim=0:{total}[a]\" "
-                     f"-map \"[v]\" -map \"[a]\" -t {total} -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p -c:a aac -b:a 192k edit/preview_raw.mp4")
+        lines.append(f"timeout -s KILL 600 ffmpeg -hide_banner -loglevel error -y -i edit/picture.mp4 "
+                     f"-vf \"subtitles={srt}:fontsdir={FONT_DIR}:force_style='{style}'\" -an "
+                     f"-c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p edit/picture_subs.mp4")
+        lines.append(f"timeout -s KILL 300 ffmpeg -hide_banner -loglevel error -y -i edit/picture_subs.mp4 -i {voice_rel} "
+                     f"-map 0:v -map 1:a -c:v copy -af apad -t {total} -c:a aac -b:a 192k edit/preview_raw.mp4")
         lines.append("slopguard master edit/preview_raw.mp4 --out edit/preview.mp4")
         sim.write(f"{proj}/edit/render_v{version}.sh", "\n".join(lines) + "\n")
-        return sim.sh(f"Render v{version}: shot per segmen → concat -c copy → caption TERAKHIR → master -14 LUFS", "video-assembly", f"cd ~/{proj} && bash edit/render_v{version}.sh", expect=0)
+        return sim.sh(f"Render v{version}: shot per segmen → concat -c copy → caption TERAKHIR (pass sendiri) → mux audio → master -14 LUFS", "video-assembly", f"cd ~/{proj} && bash edit/render_v{version}.sh", expect=0)
 
     render(1)
     code, out = sim.sh("QA pass 1 (harus menemukan kartu judul diam di shot 3)", "video-qa", f"cd ~/{proj} && slopguard qa edit/preview.mp4 --captions {srt} --json > edit/qa1.json; ec=$?; python3 -c \"import json;d=json.load(open('edit/qa1.json'));print(d['verdict']);[print(f['tier'],f['gate'],f.get('at'),f['message']) for f in d['findings']]\"; exit $ec", expect=2)

@@ -113,18 +113,24 @@ class Media:
         return name, words
 
 
+def _digest(path: str) -> str:
+    with open(path, "rb") as fh:
+        return hashlib.sha256(fh.read()).hexdigest()
+
+
 def run_model(endpoint: str, payload: dict, media: Media, base: str) -> dict:
     e = endpoint.lower()
     if "speech-to-text" in e or "scribe" in e or "wizper" in e or "whisper" in e:
         url = payload.get("audio_url", "")
-        key = os.path.basename(urlparse(url).path)
-        words = STATE["word_timings"].get(key)
+        local = media.path(os.path.basename(urlparse(url).path))
+        # Match by content, so an uploaded copy of our own TTS output is recognised.
+        words = STATE["word_timings"].get(_digest(local)) if os.path.exists(local) else None
         if words is None:
             return {"text": "", "words": [], "note": "fake server only transcribes audio made by its own TTS"}
         return {"text": " ".join(w["text"] for w in words), "language_code": "ind", "words": words}
     if "tts" in e or "speech-2" in e or "text-to-speech" in e:
         name, words = media.speech(payload.get("text") or payload.get("prompt") or "")
-        STATE["word_timings"][name] = words
+        STATE["word_timings"][_digest(media.path(name))] = words
         return {"audio": {"url": f"{base}/files/{name}", "content_type": "audio/wav"}}
     if "video" in e or "seedance" in e or "kling" in e or "veo" in e:
         src = payload.get("image_url", "")

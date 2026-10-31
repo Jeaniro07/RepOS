@@ -37,13 +37,20 @@ if Node is missing, install it in your home folder (for example a Node 22 tarbal
 4. **Overlays shifted to their window** with `setpts=PTS-STARTPTS+<start>/TB`, so frame 0 of the animation
    appears at the window start.
 5. **Captions are built on the output timeline** (`output_time = word.start - segment.start + segment.offset`)
-   and **applied last**, after every overlay.
-6. **Master once.** Mix to PCM, then two-pass `loudnorm=I=-14:TP=-1:LRA=11` on the final mix. Duck music
-   12-15 dB under speech; ramp it out before the end card.
+   and **applied last**, after every overlay. Build them with `slopguard captions <transcript.json> --out edit/master.srt`
+   (add `--edl edit/edl.json` when the transcript is of the source footage, not of the final narration).
+   Burn them in their own pass on the picture (`-vf subtitles=...:fontsdir=/usr/share/fonts/truetype/dejavu -an`),
+   then mux the audio in a separate pass with `-c:v copy -af apad -t <duration>`. Keeping captions and audio in
+   one filtergraph has hung some ffmpeg builds.
+6. **Master once.** `slopguard master edit/preview_raw.mp4 --out edit/preview.mp4` runs the two-pass loudnorm
+   (-14 LUFS, -1.5 dBTP, video stream copied). Duck music 12-15 dB under speech; ramp it out before the end card.
 7. **Never stretch or speed up narration to fit pictures**; change the pictures.
 8. **Deterministic renders**: no `Date.now()`/unseeded random in HTML/React; same input, same frames.
 9. **Output spec** from `slopguard.json` (default vertical 1080x1920@30). H.264 yuv420p CRF 18-20,
    AAC 48 kHz, `-movflags +faststart`.
+10. **Bounded renders.** Write each render as a script in `edit/` and run every ffmpeg call under
+    `timeout -s KILL <seconds>` (about 30x the clip length is generous). A call that shows no progress is
+    killed and simplified, never left spinning.
 
 ## Captions
 

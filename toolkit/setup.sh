@@ -24,21 +24,29 @@ ffmpeg_ok() {
 }
 
 install_static() {
-  local os arch asset url tmp
+  local os arch plat url tmp asset ok rel
   os="$(uname -s)"; arch="$(uname -m)"
   if [ "${os}" != "Linux" ]; then
     echo "static download is Linux-only; on macOS run: brew install ffmpeg" >&2
     return 1
   fi
   case "${arch}" in
-    x86_64|amd64) asset="ffmpeg-master-latest-linux64-gpl.tar.xz" ;;
-    aarch64|arm64) asset="ffmpeg-master-latest-linuxarm64-gpl.tar.xz" ;;
+    x86_64|amd64) plat="linux64" ;;
+    aarch64|arm64) plat="linuxarm64" ;;
     *) echo "unsupported arch ${arch}" >&2; return 1 ;;
   esac
-  url="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/${asset}"
+  # Prefer a stable release branch. The master (dev) snapshot has been seen to hang
+  # when captions and audio share one filtergraph; it is only the last resort.
+  # Override with SLOPGUARD_FFMPEG_RELEASE=8.2 (for example) when a newer branch ships.
+  rel="${SLOPGUARD_FFMPEG_RELEASE:-8.1}"
   tmp="$(mktemp -d)"
-  echo "downloading ${url} (about 150 MB)..."
-  curl -fL --retry 3 -o "${tmp}/ff.tar.xz" "${url}"
+  ok=0
+  for asset in "ffmpeg-n${rel}-latest-${plat}-gpl-${rel}.tar.xz" "ffmpeg-master-latest-${plat}-gpl.tar.xz"; do
+    url="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/${asset}"
+    echo "downloading ${url} (about 150 MB)..."
+    if curl -fL --retry 3 -o "${tmp}/ff.tar.xz" "${url}"; then ok=1; break; fi
+  done
+  [ "${ok}" = 1 ] || { rm -rf "${tmp}"; return 1; }
   # Extract only the two binaries with Python (no xz-utils needed).
   python3 - "${tmp}/ff.tar.xz" "${BIN}" <<'PY'
 import os, sys, tarfile

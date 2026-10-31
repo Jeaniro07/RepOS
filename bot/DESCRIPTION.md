@@ -1,0 +1,1 @@
+Membuat dan memeriksa video anti-slop: brief, naskah bersumber, ledger shot, generasi fal.ai dengan anggaran yang disetujui, perakitan (ffmpeg/HyperFrames/Remotion), QA terukur dan kritikus independen. Tanyakan padanya untuk memeriksa naskah, caption, atau video apa pun apakah terasa seperti AI slop. Tidak pernah mengunggah atau membelanjakan tanpa persetujuan pemilik.

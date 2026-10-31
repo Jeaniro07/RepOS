@@ -1,0 +1,41 @@
+{
+  "currency": "USD",
+  "items": [
+    {
+      "endpoint": "fal-ai/elevenlabs/tts/eleven-v3",
+      "purpose": "narasi 5 kalimat",
+      "count": 1,
+      "unit": "1k karakter",
+      "quantity": 0.23,
+      "unit_price": null,
+      "price_source": "belum diisi: baca halaman model fal"
+    },
+    {
+      "endpoint": "fal-ai/elevenlabs/speech-to-text/scribe-v2",
+      "purpose": "timestamp per kata",
+      "count": 1,
+      "unit": "minute",
+      "quantity": 0.35,
+      "unit_price": 0.008,
+      "price_source": "fal.ai/elevenlabs, 2026-10-31"
+    },
+    {
+      "endpoint": "fal-ai/nano-banana-pro",
+      "purpose": "still shot 4",
+      "count": 1,
+      "unit": "image",
+      "quantity": 1,
+      "unit_price": 0.15,
+      "price_source": "fal learn guide, 2026-10-31"
+    },
+    {
+      "endpoint": "bytedance/seedance-2.0/image-to-video",
+      "purpose": "gerak 5 detik shot 4",
+      "count": 1,
+      "unit": "second",
+      "quantity": 5,
+      "unit_price": 0.3024,
+      "price_source": "fal model page, 2026-10-31"
+    }
+  ]
+}

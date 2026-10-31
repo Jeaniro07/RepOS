@@ -47,7 +47,7 @@ Three tiers (the structure is borrowed from Nutlope/hallmark's Floor / Reflex / 
 | captions.overlap / beyond-end / timing / parse | FLOOR | Broken captions |
 | captions.reading-speed | REFLEX | More than 20 characters per second |
 | captions.flash | REFLEX | Cue on screen under 0.7 s |
-| captions.line-length / lines | REFLEX | More than 42 characters per line or more than 2 lines |
+| captions.line-length / lines | REFLEX | More than 32 characters per line on vertical video (42 on landscape), or more than 2 lines |
 | captions.emoji | REFLEX | Emoji inside captions |
 | captions.dense / long-hold / all-caps | FINISH | Comfort notes |
 

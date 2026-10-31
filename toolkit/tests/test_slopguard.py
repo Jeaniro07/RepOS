@@ -340,6 +340,20 @@ class Build(unittest.TestCase):
         srt = build.to_srt(cues)
         self.assertEqual(captions.check_captions(srt).exit_code(), EXIT_CLEAN)
 
+    def test_vertical_projects_get_short_caption_lines(self):
+        from slopguard import cli
+        long = {"words": [{"text": w, "start": i * 0.4, "end": i * 0.4 + 0.35, "type": "word"}
+                          for i, w in enumerate("Air mendidih seratus derajat mengekstrak terlalu banyak senyawa pahit.".split())]}
+        with tempfile.TemporaryDirectory() as d:
+            project.init_project(d, "t", fmt="vertical")
+            words = os.path.join(d, "words.json")
+            with open(words, "w") as fh:
+                json.dump(long, fh)
+            out = os.path.join(d, "edit", "master.srt")
+            cli.main(["captions", words, "--out", out])
+            lines = [l for l in open(out).read().splitlines() if l and "-->" not in l and not l.isdigit()]
+            self.assertTrue(lines and max(len(l) for l in lines) <= 28, lines)
+
     def test_edl_mapping(self):
         from slopguard import build
         words = build.extract_words(self.SCRIBE)

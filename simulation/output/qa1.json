@@ -1,0 +1,73 @@
+{
+  "subject": "edit/preview.mp4",
+  "kind": "video",
+  "verdict": "NOT YET: fix or waive (with a reason) every open REFLEX finding.",
+  "exit_code": 2,
+  "counts": {
+    "floor": 0,
+    "reflex_open": 1,
+    "reflex_waived": 0,
+    "finish": 1
+  },
+  "metrics": {
+    "size": "1080x1920",
+    "duration (s)": 19.8,
+    "fps": 30.0,
+    "video codec": "h264",
+    "audio": "aac 48000 Hz",
+    "target duration (s)": 20,
+    "bits per pixel": 0.029,
+    "integrated loudness (LUFS)": -14.0,
+    "true peak (dBTP)": -1.5,
+    "loudness range (LU)": 1.7,
+    "dead-air gaps": 0,
+    "frozen share of runtime": "23%",
+    "first frame luma / range": "116 / 48",
+    "cuts detected": 4,
+    "mean shot length (s)": 3.96,
+    "cut times (s)": [
+      4.7,
+      7.17,
+      12.3,
+      16.97
+    ],
+    "captions: cues": 5,
+    "captions: mean reading speed (chars/s)": 11.3,
+    "ledger: shots": 5,
+    "ledger: runtime in ledger (s)": 19.75,
+    "ledger: runtime by source": "footage 50%, code 26%, generated 24%",
+    "contact sheets": "/tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/cuts.jpg"
+  },
+  "findings": [
+    {
+      "gate": "picture.frozen",
+      "tier": "REFLEX",
+      "message": "Principal picture does not change for 4.6s (max 2.5s).",
+      "at": "7.47s",
+      "fix": "Give the frame a meaningful event (a reveal, an action, a new shot). Subtitle turnover or a slow zoom does not count.",
+      "evidence": null,
+      "waived": false,
+      "waiver_reason": null
+    },
+    {
+      "gate": "encode.bitrate",
+      "tier": "FINISH",
+      "message": "1.8 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode.",
+      "at": null,
+      "fix": "Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p).",
+      "evidence": null,
+      "waived": false,
+      "waiver_reason": null
+    }
+  ],
+  "manual_checks": [
+    "Watch it once at full speed on a phone-sized window; note the first moment you'd swipe away.",
+    "Listen through headphones: voice intelligible over music, no pops at cuts, effects tied to visible events.",
+    "Every on-screen object reads as what it is without a label; nothing important sits under platform UI.",
+    "Realistic AI-generated people, places or events are disclosed on upload (platform 'altered or synthetic' label).",
+    "Nothing shows a real person saying or doing something they did not say or do.",
+    "Every cue matches the spoken words exactly (names, numbers, units kept together).",
+    "Line breaks fall on natural phrase boundaries, not mid-phrase.",
+    "Captions sit inside the title-safe area and never sit under platform UI or overlays."
+  ]
+}

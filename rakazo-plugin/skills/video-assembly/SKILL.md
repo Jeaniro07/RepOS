@@ -57,7 +57,9 @@ if Node is missing, install it in your home folder (for example a Node 22 tarbal
 ## Captions
 
 - Chunk by meaning: keep names, numbers with units, and short phrases together; break at natural pauses.
-- At most two lines, about 42 characters per line, at most 20 characters per second, each cue at least 0.7 s.
+- At most two lines; about 28 characters per line on vertical video (42 on landscape); at most 20 characters per
+  second; each cue at least 0.7 s. After burning, check `overview.jpg`: a cue that wraps to 3+ lines on screen means
+  shorter lines, never a font under 2.6% of the frame's short side.
 - Inside the title-safe area and above the platform buttons; never over the face or the product.
 - Style is a choice in `SPEC.md`: short punchy chunks for fast social, natural sentences for explainers.
 - Check: `slopguard check-captions edit/master.srt --video edit/preview.mp4`.

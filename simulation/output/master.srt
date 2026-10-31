@@ -1,0 +1,22 @@
+1
+00:00:00,250 --> 00:00:04,433
+Kopi saya selalu pahit,
+padahal bijinya mahal.
+
+2
+00:00:04,983 --> 00:00:06,905
+Ternyata masalahnya air.
+
+3
+00:00:07,455 --> 00:00:12,045
+Air mendidih seratus derajat mengekstrak
+terlalu banyak senyawa pahit.
+
+4
+00:00:12,595 --> 00:00:16,704
+Saya turunkan ke sekitar
+sembilan puluh dua derajat.
+
+5
+00:00:17,254 --> 00:00:18,952
+Hasilnya lebih manis.

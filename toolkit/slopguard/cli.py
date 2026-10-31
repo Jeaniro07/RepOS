@@ -26,6 +26,26 @@ def _read(path: str) -> str:
         return fh.read()
 
 
+VERTICAL_CHARS, LANDSCAPE_CHARS = 28, 42
+VERTICAL_CHECK, LANDSCAPE_CHECK = 32, 42
+
+
+def _is_vertical(video=None, cfg=None) -> bool:
+    """Captions on a 1080-wide vertical frame need shorter lines than broadcast's 42."""
+    if video:
+        p = media.probe(video)
+        w, h = p.display_size
+        return h > w
+    target = (cfg or {}).get("target")
+    if target:
+        try:
+            w, h = videoqa.parse_target(target)
+            return h > w
+        except ValueError:
+            return False
+    return False
+
+
 def cmd_init(a) -> int:
     written = project.init_project(a.path, a.title or os.path.basename(os.path.abspath(a.path)), a.format, a.duration, a.lang, a.max_calls)
     for w in written:
@@ -50,7 +70,8 @@ def cmd_lint_script(a) -> int:
 
 def cmd_captions(a) -> int:
     duration = media.probe(a.video).duration if a.video else None
-    report = captions.check_captions(_read(a.file), subject=a.file, video_duration=duration, max_cps=a.max_cps, max_chars=a.max_chars)
+    max_chars = a.max_chars or (VERTICAL_CHECK if _is_vertical(a.video, project.load_config(a.file)) else LANDSCAPE_CHECK)
+    report = captions.check_captions(_read(a.file), subject=a.file, video_duration=duration, max_cps=a.max_cps, max_chars=max_chars)
     write_outputs(report, a.out, "captions")
     _print(report, a.json)
     return report.exit_code()
@@ -87,7 +108,11 @@ def cmd_qa(a) -> int:
         return EXIT_USAGE
     caps = a.captions
     if caps:
-        cr = captions.check_captions(_read(caps), subject=caps, video_duration=probe.duration if probe else None)
+        vertical = bool(probe and probe.display_size[1] > probe.display_size[0])
+        cr = captions.check_captions(
+            _read(caps), subject=caps, video_duration=probe.duration if probe else None,
+            max_chars=VERTICAL_CHECK if vertical else LANDSCAPE_CHECK,
+        )
         report.extend(cr.findings)
         report.metrics.update({f"captions: {k}": v for k, v in cr.metrics.items()})
         report.manual_checks += cr.manual_checks
@@ -176,11 +201,13 @@ def cmd_build_captions(a) -> int:
     cfg = project.load_config(a.out)
     lang = a.lang or cfg.get("lang", "id")
     video_end = media.probe(a.video).duration if a.video else None
-    cues = build.captions_from_words(words, lang=lang, max_chars=a.max_chars, max_cps=a.max_cps, video_end=video_end)
+    max_chars = a.max_chars or (VERTICAL_CHARS if _is_vertical(a.video, cfg) else LANDSCAPE_CHARS)
+    cues = build.captions_from_words(words, lang=lang, max_chars=max_chars, max_cps=a.max_cps, video_end=video_end)
     with open(a.out, "w", encoding="utf-8") as fh:
         fh.write(build.to_srt(cues))
-    report = captions.check_captions(_read(a.out), subject=a.out, video_duration=video_end)
-    print(f"wrote {a.out}: {len(cues)} cues from {len(words)} words; {report.verdict()}")
+    check_chars = VERTICAL_CHECK if max_chars <= VERTICAL_CHARS else LANDSCAPE_CHECK
+    report = captions.check_captions(_read(a.out), subject=a.out, video_duration=video_end, max_chars=check_chars)
+    print(f"wrote {a.out}: {len(cues)} cues from {len(words)} words, <= {max_chars} chars/line; {report.verdict()}")
     return report.exit_code()
 
 
@@ -244,7 +271,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("file")
     s.add_argument("--video", help="rendered video, to check cues against its duration")
     s.add_argument("--max-cps", type=float, default=20.0)
-    s.add_argument("--max-chars", type=int, default=42)
+    s.add_argument("--max-chars", type=int, help="default: 28 (build) / 32 (check) for vertical video, 42 otherwise")
     s.add_argument("--out")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_captions)
@@ -306,7 +333,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--edl", help="EDL JSON with ranges[{start,end}] to map source time to output time")
     s.add_argument("--video", help="rendered video, to clamp cues to its end")
     s.add_argument("--lang", choices=["id", "en"])
-    s.add_argument("--max-chars", type=int, default=42)
+    s.add_argument("--max-chars", type=int, help="default: 28 (build) / 32 (check) for vertical video, 42 otherwise")
     s.add_argument("--max-cps", type=float, default=17.0)
     s.set_defaults(func=cmd_build_captions)
 

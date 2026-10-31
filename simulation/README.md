@@ -37,3 +37,9 @@ tanpa root, simulasi tetap jalan sebagai user saat ini dengan home dan PATH teri
    stabil 8.1, dan skill perakitan membakar caption dan mux audio di pass terpisah dengan `timeout -s KILL`.
 5. Perintah baru agar agent tidak berimprovisasi pada langkah deterministik: `slopguard captions` (timestamp kata → SRT)
    dan `slopguard master` (loudness dua pass).
+6. Agent menjalankan perintah tanpa terminal. Dengan stdin tertutup, ffmpeg membaca byte file input sebagai perintah
+   keyboard (data rusak, lalu menunggu selamanya sampai dibunuh). Semua pemanggilan ffmpeg kini memakai `-nostdin`
+   (slopguard memaksanya; skill perakitan mewajibkannya), dan setiap render dibatasi `timeout -s KILL`.
+7. Contact sheet memperlihatkan caption 2 baris (di SRT) tampil 4 baris di layar: 42 karakter/baris terlalu panjang untuk
+   lebar vertikal 1080 px, dan angka QA tidak bisa melihatnya. `slopguard captions` kini memakai 28 karakter/baris untuk
+   proyek vertikal, pemeriksaan memakai batas 32, dan skill perakitan menyuruh agent mengecek wrapping di contact sheet.

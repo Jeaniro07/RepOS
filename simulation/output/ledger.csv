@@ -1,0 +1,6 @@
+shot,start,end,narration,idea,visual,source_type,source,license,real_person,notes
+1,0.0,4.708,Kopi saya selalu pahit padahal bijinya mahal.,masalahnya terlihat,kopi dituang,footage,assets/pour.mp4,rekaman sendiri,no,
+2,4.708,7.18,Ternyata masalahnya air.,penyebab: air,ketel mendidih,footage,assets/kettle.mp4,rekaman sendiri,no,
+3,7.18,12.32,Air mendidih seratus derajat mengekstrak terlalu banyak senyawa pahit.,ekstraksi berlebih,diagram suhu + batang senyawa pahit,code,data dari [1],,no,
+4,12.32,16.979,Saya turunkan ke sekitar sembilan puluh dua derajat.,solusi,uap di atas cangkir + angka 92,generated,fal-ai/nano-banana-pro + bytedance/seedance-2.0/image-to-video (5bfac8bb),,no,
+5,16.979,19.752,Hasilnya lebih manis.,hasil,mencicipi,footage,assets/taste.mp4,rekaman sendiri,no,

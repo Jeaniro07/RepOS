@@ -26,6 +26,7 @@ import json
 import os
 import pwd
 import re
+import secrets
 import shutil
 import signal
 import subprocess
@@ -37,7 +38,7 @@ import time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SIM = os.path.join(ROOT, "simulation")
 SCEN = os.path.join(SIM, "scenario")
-FAKE_KEY = "sim-NOT-A-REAL-FAL-KEY-7f3a9c"
+FAKE_KEY = "sim-not-a-real-key-" + secrets.token_hex(12)  # random per run, so no file can contain it by accident
 BLOCKED_TOOLS = {"ffmpeg", "ffprobe", "ffplay", "node", "nodejs", "npm", "npx", "apt", "apt-get", "dpkg", "pip", "pip3",
                  "uv", "uvx", "docker", "sudo", "su", "python3", "python", "pytest", "brew", "snap", "yarn", "pnpm", "bun"}
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
@@ -350,7 +351,7 @@ def run(sim: Sim):
             lines.append("timeout -s KILL 600 " + shot_script(i, d, kind, src, start, version=version))
         lines.append("printf \"file 'clips/shot%d.mp4'\\n\" 1 2 3 4 5 > edit/clips.txt")
         lines.append("timeout -s KILL 300 ffmpeg -nostdin -hide_banner -loglevel error -y -f concat -safe 0 -i edit/clips.txt -c copy edit/picture.mp4")
-        style = "FontName=DejaVu Sans,Bold=1,FontSize=11,PrimaryColour=&H00FFFFFF,OutlineColour=&H00171A1D,BorderStyle=1,Outline=1.2,Shadow=0,Alignment=2,MarginV=58"
+        style = "FontName=DejaVu Sans,Bold=1,FontSize=8,MarginL=8,MarginR=8,PrimaryColour=&H00FFFFFF,OutlineColour=&H00171A1D,BorderStyle=1,Outline=1.2,Shadow=0,Alignment=2,MarginV=58"
         lines.append(f"timeout -s KILL 600 ffmpeg -nostdin -hide_banner -loglevel error -y -i edit/picture.mp4 "
                      f"-vf \"subtitles={srt}:fontsdir={FONT_DIR}:force_style='{style}'\" -an "
                      f"-c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p edit/picture_subs.mp4")

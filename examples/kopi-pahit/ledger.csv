@@ -1,0 +1,6 @@
+shot,start,end,narration,idea,visual,source_type,source,license,real_person,notes
+1,0,3.3,Kopi saya selalu pahit,masalahnya terlihat,tuang kopi close-up,footage,assets/pour.mp4,own recording,no,
+2,3.3,5.2,Ternyata masalahnya air,penyebab: air,ketel mendidih,footage,assets/kettle.mp4,own recording,no,
+3,5.2,9.8,Air mendidih 100 derajat,ekstraksi berlebih,diagram suhu vs pahit,code,data dari [1],,no,
+4,9.8,12.2,turunkan ke 92 derajat,solusi,termometer 92,footage,assets/thermo.mp4,own recording,no,
+5,12.2,16.0,Hasilnya lebih manis,hasil,cicip + ekspresi,footage,assets/taste.mp4,own recording,no,

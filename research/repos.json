@@ -1,0 +1,1077 @@
+{
+  "checked": "2026-10-31",
+  "count": 153,
+  "repos": [
+    {
+      "category": "Referensi utama (yang Anda minta)",
+      "repo": "remotion-dev/remotion",
+      "url": "https://github.com/remotion-dev/remotion",
+      "description": "Video sebagai kode React; punya Agent Skills resmi (remotion-create, remotion-markup, captions, voiceover, render).",
+      "note": "Ambil: aturan layout video (ukuran teks minimum, safe area), calculateMetadata untuk durasi dari voiceover. Lisensi khusus: gratis untuk individu/perusahaan kecil, perusahaan besar butuh Company License."
+    },
+    {
+      "category": "Referensi utama (yang Anda minta)",
+      "repo": "browser-use/video-use",
+      "url": "https://github.com/browser-use/video-use",
+      "description": "Skill Claude Code untuk mengedit footage mentah lewat percakapan: transkrip word-level + timeline_view PNG, EDL, render, self-eval.",
+      "note": "Ambil: 12 hard rules produksi (caption terakhir, fade 30 ms, potong di batas kata, extract per segmen), loop self-eval maks 3, critic sub-agent, project.md sebagai memori. MIT."
+    },
+    {
+      "category": "Referensi utama (yang Anda minta)",
+      "repo": "Vincentwei1021/video-shotcraft",
+      "url": "https://github.com/Vincentwei1021/video-shotcraft",
+      "description": "Skill video promo produk sinematik: 124 kartu resep shot, Remotion, beat sync, sound design, frame QA, final review independen.",
+      "note": "Ambil: aturan estetika berbasis kasus (hold 1 s, kecepatan dari akselerasi, slam layar penuh <= 3x), tiga mode (template/otonom/kolaborasi), audit akhir dengan konteks bersih. Apache-2.0."
+    },
+    {
+      "category": "Referensi utama (yang Anda minta)",
+      "repo": "Vincentwei1021/video-talkcraft",
+      "url": "https://github.com/Vincentwei1021/video-talkcraft",
+      "description": "Saudara shotcraft untuk video explainer berbasis voiceover: setiap beat gerak dikunci ke suara.",
+      "note": "Lisensi PolyForm Noncommercial: pemakaian komersial toolkit butuh izin penulis."
+    },
+    {
+      "category": "Referensi utama (yang Anda minta)",
+      "repo": "kaomei/stickman-video-director",
+      "url": "https://github.com/kaomei/stickman-video-director",
+      "description": "Skill video stickman: mode Director (storyboard + prompt per klip) dan Autopilot (ilustrasi + micro-animasi + narasi + caption).",
+      "note": "Ambil: gate 'tidak ada gambar utama diam > 2.5 s', ledger per shot (frasa, ide, aksi, bukti), pass khusus 30 detik pertama, larangan mengarang angka/testimoni demi hook. MIT."
+    },
+    {
+      "category": "Referensi utama (yang Anda minta)",
+      "repo": "Nutlope/hallmark",
+      "url": "https://github.com/Nutlope/hallmark",
+      "description": "Skill desain anti-'AI-generated look' dengan sloplint, 50 tema, reviewer konteks bersih.",
+      "note": "Ambil: struktur gate Floor / Reflex / Finish, waiver harus tercatat dengan alasan, 'fabricated pass is itself slop', foto berlisensi terbuka dengan kredit. MIT."
+    },
+    {
+      "category": "Referensi utama (yang Anda minta)",
+      "repo": "heygen-com/hyperframes",
+      "url": "https://github.com/heygen-com/hyperframes",
+      "description": "HTML/CSS/GSAP dirender deterministik jadi MP4; CLI check/snapshot/render; skill untuk agent.",
+      "note": "Ambil: SPEC.md (setiap kata sifat jadi angka), daftar 'BANNED by default', angka komposisi (teks >= 2.6% sisi pendek, 0.5 s + 0.3 s/kata), review P0/P1/P2, warning dead_stretch/first_frame_empty/film_silent. Apache-2.0."
+    },
+    {
+      "category": "Ekosistem Rakazo",
+      "repo": "elie222/rakazo",
+      "url": "https://github.com/elie222/rakazo",
+      "description": "Platform bot AI self-hosted (alternatif Grok Bot): bot persisten, memori, routines, komputer sandbox, approvals, plugin skills + MCP.",
+      "note": "Target platform. Format plugin: plugin.json + skills/*/SKILL.md + commands/ + agents/ + mcp.json."
+    },
+    {
+      "category": "Ekosistem Rakazo",
+      "repo": "elie222/botdirectory.ai",
+      "url": "https://github.com/elie222/botdirectory.ai",
+      "description": "Direktori prompt bot untuk Grok Bot dan Rakazo.",
+      "note": "Format listing: bots/<slug>.md (lihat bot/botdirectory-listing.md)."
+    },
+    {
+      "category": "Ekosistem Rakazo",
+      "repo": "PramodDutta/botskills",
+      "url": "https://github.com/PramodDutta/botskills",
+      "description": "Setup bot siap tempel untuk Grok Bot dan Rakazo; tiap listing menyatakan satu aksi yang tidak pernah diambil tanpa pemilik.",
+      "note": "Ambil: konvensi 'aksi yang tidak pernah tanpa Anda' (unggah + belanja fal.ai)."
+    },
+    {
+      "category": "Ekosistem Rakazo",
+      "repo": "cogine-ai/CogineBot",
+      "url": "https://github.com/cogine-ai/CogineBot",
+      "description": "Grok Bot open-source berbasis Rakazo (WIP).",
+      "note": ""
+    },
+    {
+      "category": "Ekosistem Rakazo",
+      "repo": "nicolaeser/RakazoManager",
+      "url": "https://github.com/nicolaeser/RakazoManager",
+      "description": "CLI untuk memasang dan mengoperasikan Rakazo self-hosted dengan Docker Compose.",
+      "note": ""
+    },
+    {
+      "category": "Ekosistem Rakazo",
+      "repo": "luinbytes/rakazo-android",
+      "url": "https://github.com/luinbytes/rakazo-android",
+      "description": "Klien Android native komunitas untuk Rakazo.",
+      "note": ""
+    },
+    {
+      "category": "Ekosistem Rakazo",
+      "repo": "ComposioHQ/composio",
+      "url": "https://github.com/ComposioHQ/composio",
+      "description": "Katalog integrasi aplikasi yang didukung Rakazo.",
+      "note": "Untuk menghubungkan YouTube/Drive bila diperlukan (unggah tetap butuh persetujuan)."
+    },
+    {
+      "category": "fal.ai",
+      "repo": "fal-ai/fal",
+      "url": "https://github.com/fal-ai/fal",
+      "description": "SDK Python resmi fal (fal_client) dan serverless.",
+      "note": "Sumber endpoint queue/status/upload yang dipakai slopguard/fal.py."
+    },
+    {
+      "category": "fal.ai",
+      "repo": "fal-ai/fal-js",
+      "url": "https://github.com/fal-ai/fal-js",
+      "description": "SDK JavaScript resmi fal.",
+      "note": "Untuk proyek Remotion/HyperFrames berbasis Node."
+    },
+    {
+      "category": "fal.ai",
+      "repo": "fal-ai-community/skills",
+      "url": "https://github.com/fal-ai-community/skills",
+      "description": "Skill agent resmi komunitas fal: model-routing, fal-prompting, cinematography, storytelling, workflow.",
+      "note": "Sumber tabel endpoint di skills/fal-media/references/fal-models.md."
+    },
+    {
+      "category": "fal.ai",
+      "repo": "fal-ai-community/genmedia-cli",
+      "url": "https://github.com/fal-ai-community/genmedia-cli",
+      "description": "CLI agent-first untuk fal: cari, run, schema, pricing 1200+ endpoint.",
+      "note": "Opsional: verifikasi schema/harga sebelum rencana generasi."
+    },
+    {
+      "category": "fal.ai",
+      "repo": "raveenb/fal-mcp-server",
+      "url": "https://github.com/raveenb/fal-mcp-server",
+      "description": "MCP server pihak ketiga untuk fal (gambar, video, musik, audio).",
+      "note": "Alternatif bila MCP resmi mcp.fal.ai tidak dipakai."
+    },
+    {
+      "category": "fal.ai",
+      "repo": "piebro/fal-ai-mcp-server",
+      "url": "https://github.com/piebro/fal-ai-mcp-server",
+      "description": "MCP server pihak ketiga untuk fal.ai.",
+      "note": ""
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "calesthio/OpenMontage",
+      "url": "https://github.com/calesthio/OpenMontage",
+      "description": "Sistem produksi video agentic open-source: banyak pipeline, tools Python, skill pengetahuan produksi.",
+      "note": "Pembanding arsitektur; lisensi AGPL-3.0 (cek sebelum menggabungkan kode)."
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "digitalsamba/claude-code-video-toolkit",
+      "url": "https://github.com/digitalsamba/claude-code-video-toolkit",
+      "description": "Workspace produksi video untuk Claude Code: naskah, voiceover, musik, visual, render.",
+      "note": ""
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "wilwaldon/Claude-Code-Video-Toolkit",
+      "url": "https://github.com/wilwaldon/Claude-Code-Video-Toolkit",
+      "description": "Daftar skill, MCP server dan alat video untuk Claude Code (Remotion, Manim, rekaman layar, FFmpeg).",
+      "note": ""
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "hassancs91/claude-faceless-shorts-creator",
+      "url": "https://github.com/hassancs91/claude-faceless-shorts-creator",
+      "description": "Pabrik Shorts faceless berbasis Claude Code: jalur TSX (Remotion), generatif (fal, karakter terkunci), kolase.",
+      "note": "Contoh karakter berulang yang konsisten via fal; tetap perlu gate anti-slop."
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "JJenglert1/remotion-claude-video",
+      "url": "https://github.com/JJenglert1/remotion-claude-video",
+      "description": "Starter kit Remotion + Claude Code dengan skill bawaan.",
+      "note": ""
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "kajisho5/ffmpeg-skill",
+      "url": "https://github.com/kajisho5/ffmpeg-skill",
+      "description": "Skill + MCP: agent mengedit footage dengan FFmpeg lokal lalu mengecek hasilnya sendiri; stdlib Python.",
+      "note": "Pendekatan serupa slopguard (lokal, tanpa API)."
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "remotion-dev/skills",
+      "url": "https://github.com/remotion-dev/skills",
+      "description": "Agent Skills resmi Remotion (npx skills add remotion-dev/skills).",
+      "note": ""
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "remotion-dev/template-tiktok",
+      "url": "https://github.com/remotion-dev/template-tiktok",
+      "description": "Template Remotion untuk video vertikal dengan caption ala TikTok.",
+      "note": ""
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "remotion-dev/github-unwrapped",
+      "url": "https://github.com/remotion-dev/github-unwrapped",
+      "description": "Contoh produksi Remotion skala besar (video personal dari data).",
+      "note": "Contoh 'data asli digambar dengan kode'."
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "heygen-com/skills",
+      "url": "https://github.com/heygen-com/skills",
+      "description": "Skill HeyGen untuk avatar dan video-edit lewat ffmpeg.",
+      "note": "Avatar hanya dengan persetujuan orang yang ditampilkan."
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "HKUDS/ViMax",
+      "url": "https://github.com/HKUDS/ViMax",
+      "description": "Kerangka multi-agent (sutradara, penulis, produser, generator) untuk video multi-shot konsisten.",
+      "note": "Ambil: pemisahan peran; tambahkan gate kebenaran yang tidak ada di sana."
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "HKUDS/VideoAgent",
+      "url": "https://github.com/HKUDS/VideoAgent",
+      "description": "Kerangka all-in-one untuk memahami, mengedit, dan membuat video.",
+      "note": ""
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "HITsz-TMG/FilmAgent",
+      "url": "https://github.com/HITsz-TMG/FilmAgent",
+      "description": "Repo kini berisi VideoClaw: karyawan AI pembuat video kreatif (drama pendek, explainer, avatar).",
+      "note": "README berubah dari FilmAgent asli; cek isi sebelum memakai."
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "showlab/MovieAgent",
+      "url": "https://github.com/showlab/MovieAgent",
+      "description": "Generasi film otomatis lewat perencanaan multi-agent CoT (kode riset).",
+      "note": ""
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "Huanshere/VideoLingo",
+      "url": "https://github.com/Huanshere/VideoLingo",
+      "description": "Subtitle, terjemahan, dan dubbing tingkat Netflix untuk video.",
+      "note": "Ambil: segmentasi subtitle per makna, panjang baris."
+    },
+    {
+      "category": "Agent & skill produksi video",
+      "repo": "krillinai/KrillinAI",
+      "url": "https://github.com/krillinai/KrillinAI",
+      "description": "Terjemahan dan dubbing video dengan pemrosesan subtitle.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "FFmpeg/FFmpeg",
+      "url": "https://github.com/FFmpeg/FFmpeg",
+      "description": "Mesin dasar semua render dan pengukuran (ebur128, silencedetect, blackdetect, freezedetect, loudnorm).",
+      "note": "Dipakai langsung oleh slopguard."
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "motion-canvas/motion-canvas",
+      "url": "https://github.com/motion-canvas/motion-canvas",
+      "description": "Animasi vektor dengan kode TypeScript untuk explainer.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "redotvideo/revideo",
+      "url": "https://github.com/redotvideo/revideo",
+      "description": "Fork Motion Canvas untuk render video terprogram via API.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "ManimCommunity/manim",
+      "url": "https://github.com/ManimCommunity/manim",
+      "description": "Animasi matematika/diagram (versi komunitas).",
+      "note": "Untuk diagram dan grafik yang menjelaskan."
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "3b1b/manim",
+      "url": "https://github.com/3b1b/manim",
+      "description": "Manim asli 3Blue1Brown.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "mifi/editly",
+      "url": "https://github.com/mifi/editly",
+      "description": "Editor video deklaratif (JSON) berbasis Node + ffmpeg.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "mifi/lossless-cut",
+      "url": "https://github.com/mifi/lossless-cut",
+      "description": "Pemotong video lossless (GUI) untuk memilih take.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "WyattBlue/auto-editor",
+      "url": "https://github.com/WyattBlue/auto-editor",
+      "description": "Memotong bagian diam/tidak bergerak otomatis.",
+      "note": "Hati-hati: memotong otomatis bukan berarti memotong pada makna."
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "Breakthrough/PySceneDetect",
+      "url": "https://github.com/Breakthrough/PySceneDetect",
+      "description": "Deteksi pergantian scene.",
+      "note": "Alternatif deteksi cut yang lebih akurat dari filter scene ffmpeg."
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "Zulko/moviepy",
+      "url": "https://github.com/Zulko/moviepy",
+      "description": "Editing video dengan Python.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "kkroening/ffmpeg-python",
+      "url": "https://github.com/kkroening/ffmpeg-python",
+      "description": "Binding Python untuk merangkai filter ffmpeg.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "PyAV-Org/PyAV",
+      "url": "https://github.com/PyAV-Org/PyAV",
+      "description": "Binding Pythonic ke library FFmpeg (decode frame per frame).",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "abhiTronix/vidgear",
+      "url": "https://github.com/abhiTronix/vidgear",
+      "description": "Framework pemrosesan video Python berperforma tinggi.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "OpenCut-app/OpenCut",
+      "url": "https://github.com/OpenCut-app/OpenCut",
+      "description": "Editor video open-source (sedang ditulis ulang dengan Editor API dan MCP untuk agent).",
+      "note": "Calon target 'edit lanjutan oleh manusia'."
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "OpenShot/openshot-qt",
+      "url": "https://github.com/OpenShot/openshot-qt",
+      "description": "Editor video desktop open-source.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "mltframework/shotcut",
+      "url": "https://github.com/mltframework/shotcut",
+      "description": "Editor video desktop open-source berbasis MLT.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "olive-editor/olive",
+      "url": "https://github.com/olive-editor/olive",
+      "description": "Editor video non-linear open-source.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "yt-dlp/yt-dlp",
+      "url": "https://github.com/yt-dlp/yt-dlp",
+      "description": "Pengunduh video; hanya untuk materi yang hak pakainya Anda miliki.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "microsoft/playwright",
+      "url": "https://github.com/microsoft/playwright",
+      "description": "Otomasi browser untuk menangkap layar produk asli.",
+      "note": "Rung 2 tangga bahan nyata: capture halaman/produk asli."
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "browser-use/browser-use",
+      "url": "https://github.com/browser-use/browser-use",
+      "description": "Agent yang mengendalikan browser.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "greensock/GSAP",
+      "url": "https://github.com/greensock/GSAP",
+      "description": "Library animasi yang dipakai HyperFrames.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "airbnb/lottie-web",
+      "url": "https://github.com/airbnb/lottie-web",
+      "description": "Render animasi Lottie di web.",
+      "note": ""
+    },
+    {
+      "category": "Mesin render, editing & capture",
+      "repo": "vercel/satori",
+      "url": "https://github.com/vercel/satori",
+      "description": "HTML/JSX ke SVG (kartu teks, thumbnail).",
+      "note": ""
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "blader/humanizer",
+      "url": "https://github.com/blader/humanizer",
+      "description": "Skill yang menghapus pola tulisan AI berdasarkan 'Signs of AI writing' Wikipedia, dengan voice matching.",
+      "note": "Inspirasi kategori lexicon (bukan disalin)."
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "hardikpandya/stop-slop",
+      "url": "https://github.com/hardikpandya/stop-slop",
+      "description": "Skill untuk menghapus 'AI tells' dari prosa: frasa, struktur, ritme.",
+      "note": ""
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "chi-feng/humanizer",
+      "url": "https://github.com/chi-feng/humanizer",
+      "description": "Skill portable (MIT) yang mengganti pola tulisan AI dengan pilihan penulis yang cermat.",
+      "note": ""
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "jalaalrd/anti-ai-slop-writing",
+      "url": "https://github.com/jalaalrd/anti-ai-slop-writing",
+      "description": "Skill dengan 50+ kata dan 35+ frasa terlarang dari riset deteksi AI.",
+      "note": ""
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "haidrrrry/humanize-ai-writing",
+      "url": "https://github.com/haidrrrry/humanize-ai-writing",
+      "description": "System prompt + skill untuk berbagai chatbot dengan katalog 'tells'.",
+      "note": ""
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "sam-paech/antislop-sampler",
+      "url": "https://github.com/sam-paech/antislop-sampler",
+      "description": "Sampler yang mundur dan mengulang saat model menulis frasa terlarang.",
+      "note": "Ide: larangan frasa di level generasi, bukan hanya lint."
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "sam-paech/slop-forensics",
+      "url": "https://github.com/sam-paech/slop-forensics",
+      "description": "Toolkit mengukur kata/n-gram yang terlalu sering muncul di output LLM dan membangun slop list.",
+      "note": "Cara membangun lexicon slop per channel dari data."
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "pbakaus/impeccable",
+      "url": "https://github.com/pbakaus/impeccable",
+      "description": "Kosakata desain untuk agent: critique, audit, menangkap AI slop sebelum rilis.",
+      "note": ""
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "Leonxlnx/taste-skill",
+      "url": "https://github.com/Leonxlnx/taste-skill",
+      "description": "Skill 'taste' untuk UI agar tidak generik.",
+      "note": ""
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills",
+      "description": "Skill resmi Anthropic (termasuk frontend-design).",
+      "note": ""
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "vercel-labs/web-interface-guidelines",
+      "url": "https://github.com/vercel-labs/web-interface-guidelines",
+      "description": "Pedoman antarmuka web dari Vercel.",
+      "note": ""
+    },
+    {
+      "category": "Anti-slop untuk teks & desain",
+      "repo": "emilkowalski/skills",
+      "url": "https://github.com/emilkowalski/skills",
+      "description": "Skill desain/animasi dari Emil Kowalski.",
+      "note": "Easing dan gerak yang tidak robotik."
+    },
+    {
+      "category": "Mengukur kualitas video & audio",
+      "repo": "Netflix/vmaf",
+      "url": "https://github.com/Netflix/vmaf",
+      "description": "Metrik kualitas video perseptual berbasis referensi.",
+      "note": "Untuk membandingkan encode akhir dengan master."
+    },
+    {
+      "category": "Mengukur kualitas video & audio",
+      "repo": "VQAssessment/DOVER",
+      "url": "https://github.com/VQAssessment/DOVER",
+      "description": "Penilai kualitas video tanpa referensi (estetika + teknis), ICCV 2023.",
+      "note": "Kandidat skor kualitas otomatis tambahan."
+    },
+    {
+      "category": "Mengukur kualitas video & audio",
+      "repo": "VQAssessment/FAST-VQA-and-FasterVQA",
+      "url": "https://github.com/VQAssessment/FAST-VQA-and-FasterVQA",
+      "description": "VQA tanpa referensi yang efisien (ECCV 2022).",
+      "note": "Cek lisensi riset sebelum komersial."
+    },
+    {
+      "category": "Mengukur kualitas video & audio",
+      "repo": "Vchitect/VBench",
+      "url": "https://github.com/Vchitect/VBench",
+      "description": "Benchmark kualitas model video generatif (16 dimensi).",
+      "note": "Dimensi berguna: konsistensi subjek, flicker, kualitas estetika."
+    },
+    {
+      "category": "Mengukur kualitas video & audio",
+      "repo": "EvalCrafter/EvalCrafter",
+      "url": "https://github.com/EvalCrafter/EvalCrafter",
+      "description": "Toolkit evaluasi video AI dengan 17 metrik objektif (CVPR 2024).",
+      "note": ""
+    },
+    {
+      "category": "Mengukur kualitas video & audio",
+      "repo": "chaofengc/IQA-PyTorch",
+      "url": "https://github.com/chaofengc/IQA-PyTorch",
+      "description": "Kumpulan metrik kualitas gambar (pyiqa) untuk menyaring frame/gambar generatif.",
+      "note": ""
+    },
+    {
+      "category": "Mengukur kualitas video & audio",
+      "repo": "slhck/ffmpeg-normalize",
+      "url": "https://github.com/slhck/ffmpeg-normalize",
+      "description": "Normalisasi loudness EBU R128 dengan ffmpeg.",
+      "note": "Alternatif loudnorm dua pass."
+    },
+    {
+      "category": "Mengukur kualitas video & audio",
+      "repo": "csteinmetz1/pyloudnorm",
+      "url": "https://github.com/csteinmetz1/pyloudnorm",
+      "description": "Pengukuran loudness ITU-R BS.1770 di Python.",
+      "note": ""
+    },
+    {
+      "category": "Mengukur kualitas video & audio",
+      "repo": "librosa/librosa",
+      "url": "https://github.com/librosa/librosa",
+      "description": "Analisis audio: tempo, beat, onset untuk memotong di ketukan.",
+      "note": ""
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "m-bain/whisperX",
+      "url": "https://github.com/m-bain/whisperX",
+      "description": "Whisper + forced alignment untuk timestamp per kata dan diarization.",
+      "note": "Alternatif lokal untuk transkrip word-level."
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "jianfch/stable-ts",
+      "url": "https://github.com/jianfch/stable-ts",
+      "description": "Timestamp kata Whisper yang distabilkan; ekspor SRT/ASS.",
+      "note": ""
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "SYSTRAN/faster-whisper",
+      "url": "https://github.com/SYSTRAN/faster-whisper",
+      "description": "Whisper cepat dengan CTranslate2.",
+      "note": ""
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "openai/whisper",
+      "url": "https://github.com/openai/whisper",
+      "description": "Model ASR Whisper asli.",
+      "note": ""
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "ggml-org/whisper.cpp",
+      "url": "https://github.com/ggml-org/whisper.cpp",
+      "description": "Whisper di C/C++ untuk CPU.",
+      "note": ""
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "linto-ai/whisper-timestamped",
+      "url": "https://github.com/linto-ai/whisper-timestamped",
+      "description": "Timestamp dan confidence per kata untuk Whisper.",
+      "note": ""
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "nyrahealth/CrisperWhisper",
+      "url": "https://github.com/nyrahealth/CrisperWhisper",
+      "description": "ASR verbatim dengan timestamp kata akurat (mempertahankan filler).",
+      "note": "Filler yang tidak dinormalisasi = sinyal editing (video-use)."
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "pyannote/pyannote-audio",
+      "url": "https://github.com/pyannote/pyannote-audio",
+      "description": "Diarization pembicara.",
+      "note": ""
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "facebookresearch/demucs",
+      "url": "https://github.com/facebookresearch/demucs",
+      "description": "Pemisahan sumber audio (vokal vs musik).",
+      "note": "Membersihkan suara dari musik bawaan footage."
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "tkarabela/pysubs2",
+      "url": "https://github.com/tkarabela/pysubs2",
+      "description": "Membaca/menulis SRT, ASS, VTT di Python.",
+      "note": ""
+    },
+    {
+      "category": "Transkrip word-level & caption",
+      "repo": "libass/libass",
+      "url": "https://github.com/libass/libass",
+      "description": "Renderer subtitle ASS yang dipakai ffmpeg untuk burn-in.",
+      "note": ""
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "contentauth/c2pa-rs",
+      "url": "https://github.com/contentauth/c2pa-rs",
+      "description": "SDK C2PA (Content Credentials) Rust, termasuk c2patool.",
+      "note": "Untuk menandai asal-usul dan bagian AI di file akhir."
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "contentauth/c2pa-python",
+      "url": "https://github.com/contentauth/c2pa-python",
+      "description": "Library Python untuk membaca, memvalidasi, dan menandatangani manifest C2PA.",
+      "note": ""
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "contentauth/c2patool",
+      "url": "https://github.com/contentauth/c2patool",
+      "description": "CLI C2PA (repo lama; pengembangan pindah ke c2pa-rs).",
+      "note": ""
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "facebookresearch/videoseal",
+      "url": "https://github.com/facebookresearch/videoseal",
+      "description": "Watermark tak terlihat untuk gambar dan video.",
+      "note": ""
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "facebookresearch/audioseal",
+      "url": "https://github.com/facebookresearch/audioseal",
+      "description": "Watermark audio untuk suara sintetis.",
+      "note": ""
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "google-deepmind/synthid-text",
+      "url": "https://github.com/google-deepmind/synthid-text",
+      "description": "Watermark teks SynthID.",
+      "note": ""
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "LongMa-2025/AIGVDBench",
+      "url": "https://github.com/LongMa-2025/AIGVDBench",
+      "description": "Benchmark deteksi video AI: 440K+ video dari 31 model, 33 detektor.",
+      "note": ""
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "MusapYildiz/ai_video_detection_benchmark",
+      "url": "https://github.com/MusapYildiz/ai_video_detection_benchmark",
+      "description": "AEGIS: detektor video yang sepenuhnya dibuat AI (bukan deepfake wajah).",
+      "note": "Klaim akurasi dari pembuat; verifikasi sendiri."
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "dxhou/AI-Generated-Video-Detection",
+      "url": "https://github.com/dxhou/AI-Generated-Video-Detection",
+      "description": "Kumpulan paper dan benchmark deteksi video AI (survei vision-language).",
+      "note": ""
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "ant-research/Awesome-AIGC-Image-Video-Detection",
+      "url": "https://github.com/ant-research/Awesome-AIGC-Image-Video-Detection",
+      "description": "Daftar kurasi deteksi gambar/video AI.",
+      "note": ""
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "lydonator/slopblock",
+      "url": "https://github.com/lydonator/slopblock",
+      "description": "Ekstensi browser: pelaporan video AI slop di YouTube secara crowdsourced.",
+      "note": "Cara penonton melihat slop: hindari ciri yang mereka laporkan."
+    },
+    {
+      "category": "Deteksi konten AI, provenance & watermark",
+      "repo": "fluryjanis/Content-Chef",
+      "url": "https://github.com/fluryjanis/Content-Chef",
+      "description": "Ekstensi lokal penyaring video AI, clickbait, dan konten berkualitas rendah di YouTube.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "Lightricks/LTX-Video",
+      "url": "https://github.com/Lightricks/LTX-Video",
+      "description": "Model video DiT cepat.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "Wan-Video/Wan2.2",
+      "url": "https://github.com/Wan-Video/Wan2.2",
+      "description": "Model video Wan 2.2 (teks/gambar ke video).",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "Wan-Video/Wan2.1",
+      "url": "https://github.com/Wan-Video/Wan2.1",
+      "description": "Model video Wan 2.1.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "Tencent-Hunyuan/HunyuanVideo",
+      "url": "https://github.com/Tencent-Hunyuan/HunyuanVideo",
+      "description": "Model video HunyuanVideo.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "zai-org/CogVideo",
+      "url": "https://github.com/zai-org/CogVideo",
+      "description": "CogVideoX.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "genmoai/mochi",
+      "url": "https://github.com/genmoai/mochi",
+      "description": "Model video Mochi.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "Comfy-Org/ComfyUI",
+      "url": "https://github.com/Comfy-Org/ComfyUI",
+      "description": "Antarmuka node untuk pipeline difusi lokal.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "kijai/ComfyUI-WanVideoWrapper",
+      "url": "https://github.com/kijai/ComfyUI-WanVideoWrapper",
+      "description": "Node ComfyUI untuk model Wan.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "guoyww/AnimateDiff",
+      "url": "https://github.com/guoyww/AnimateDiff",
+      "description": "Animasi dari model gambar difusi.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "KwaiVGI/LivePortrait",
+      "url": "https://github.com/KwaiVGI/LivePortrait",
+      "description": "Animasi potret dari video penggerak.",
+      "note": "Hanya dengan izin orang di potret."
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "bytedance/LatentSync",
+      "url": "https://github.com/bytedance/LatentSync",
+      "description": "Lip-sync berbasis difusi laten.",
+      "note": "Hanya dengan izin."
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "TMElyralab/MuseTalk",
+      "url": "https://github.com/TMElyralab/MuseTalk",
+      "description": "Lip-sync real-time.",
+      "note": "Hanya dengan izin."
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "OpenTalker/SadTalker",
+      "url": "https://github.com/OpenTalker/SadTalker",
+      "description": "Kepala bicara dari satu gambar + audio.",
+      "note": "Hanya dengan izin."
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "fudan-generative-vision/hallo",
+      "url": "https://github.com/fudan-generative-vision/hallo",
+      "description": "Animasi potret didorong audio.",
+      "note": "Hanya dengan izin."
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "xinntao/Real-ESRGAN",
+      "url": "https://github.com/xinntao/Real-ESRGAN",
+      "description": "Upscale gambar/video.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "hzwer/Practical-RIFE",
+      "url": "https://github.com/hzwer/Practical-RIFE",
+      "description": "Interpolasi frame (RIFE).",
+      "note": "Jangan dipakai untuk menutupi footage yang memang patah-patah."
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "k4yt3x/video2x",
+      "url": "https://github.com/k4yt3x/video2x",
+      "description": "Upscale dan interpolasi video.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "danielgatis/rembg",
+      "url": "https://github.com/danielgatis/rembg",
+      "description": "Hapus latar gambar.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "ZhengPeng7/BiRefNet",
+      "url": "https://github.com/ZhengPeng7/BiRefNet",
+      "description": "Segmentasi latar presisi tinggi.",
+      "note": ""
+    },
+    {
+      "category": "Model gambar/video open-source (opsional, lokal)",
+      "repo": "facebookresearch/sam2",
+      "url": "https://github.com/facebookresearch/sam2",
+      "description": "Segment Anything 2 untuk gambar dan video.",
+      "note": "Masking objek nyata untuk overlay."
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "hexgrad/kokoro",
+      "url": "https://github.com/hexgrad/kokoro",
+      "description": "TTS ringan berkualitas tinggi.",
+      "note": ""
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "resemble-ai/chatterbox",
+      "url": "https://github.com/resemble-ai/chatterbox",
+      "description": "TTS open-source dengan kontrol emosi.",
+      "note": "Juga tersedia di fal (chatterbox multilingual)."
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "SWivid/F5-TTS",
+      "url": "https://github.com/SWivid/F5-TTS",
+      "description": "TTS flow-matching dengan cloning suara.",
+      "note": "Cloning hanya dengan izin pemilik suara."
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "coqui-ai/TTS",
+      "url": "https://github.com/coqui-ai/TTS",
+      "description": "Toolkit TTS (XTTS).",
+      "note": ""
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "myshell-ai/OpenVoice",
+      "url": "https://github.com/myshell-ai/OpenVoice",
+      "description": "Cloning suara instan.",
+      "note": "Hanya dengan izin."
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "OHF-Voice/piper1-gpl",
+      "url": "https://github.com/OHF-Voice/piper1-gpl",
+      "description": "TTS lokal cepat Piper (penerus rhasspy/piper).",
+      "note": ""
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "fishaudio/fish-speech",
+      "url": "https://github.com/fishaudio/fish-speech",
+      "description": "TTS multibahasa.",
+      "note": ""
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "2noise/ChatTTS",
+      "url": "https://github.com/2noise/ChatTTS",
+      "description": "TTS untuk dialog.",
+      "note": ""
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "FunAudioLLM/CosyVoice",
+      "url": "https://github.com/FunAudioLLM/CosyVoice",
+      "description": "TTS multibahasa.",
+      "note": ""
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "nari-labs/dia",
+      "url": "https://github.com/nari-labs/dia",
+      "description": "TTS dialog dengan non-verbal.",
+      "note": ""
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "index-tts/index-tts",
+      "url": "https://github.com/index-tts/index-tts",
+      "description": "TTS zero-shot dengan kontrol durasi.",
+      "note": ""
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "facebookresearch/audiocraft",
+      "url": "https://github.com/facebookresearch/audiocraft",
+      "description": "MusicGen/AudioGen.",
+      "note": ""
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "hkchengrex/MMAudio",
+      "url": "https://github.com/hkchengrex/MMAudio",
+      "description": "Audio/efek suara dari video.",
+      "note": "Juga di fal (mmaudio-v2): SFX yang terikat pada gambar."
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "ace-step/ACE-Step",
+      "url": "https://github.com/ace-step/ACE-Step",
+      "description": "Model generasi musik.",
+      "note": ""
+    },
+    {
+      "category": "Suara, musik & efek suara",
+      "repo": "MTG/freesound-python",
+      "url": "https://github.com/MTG/freesound-python",
+      "description": "Klien API Freesound untuk efek suara berlisensi CC.",
+      "note": "Catat lisensi CC di ledger."
+    },
+    {
+      "category": "Pemahaman video (VLM untuk QA tambahan)",
+      "repo": "QwenLM/Qwen3-VL",
+      "url": "https://github.com/QwenLM/Qwen3-VL",
+      "description": "Model vision-language yang bisa membaca video.",
+      "note": "Kandidat 'mata' otomatis untuk menjelaskan frame contact sheet."
+    },
+    {
+      "category": "Pemahaman video (VLM untuk QA tambahan)",
+      "repo": "DAMO-NLP-SG/VideoLLaMA3",
+      "url": "https://github.com/DAMO-NLP-SG/VideoLLaMA3",
+      "description": "LLM multimodal untuk pemahaman video.",
+      "note": ""
+    },
+    {
+      "category": "Pemahaman video (VLM untuk QA tambahan)",
+      "repo": "OpenGVLab/InternVL",
+      "url": "https://github.com/OpenGVLab/InternVL",
+      "description": "Model multimodal open-source.",
+      "note": ""
+    },
+    {
+      "category": "Pabrik video faceless (pelajari, jangan ditiru mentah-mentah)",
+      "repo": "harry0703/MoneyPrinterTurbo",
+      "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "description": "Satu klik: topik → naskah LLM → stok footage → TTS → subtitle → video.",
+      "note": "Contoh pipeline yang menghasilkan slop bila tanpa brief, sumber, dan QA."
+    },
+    {
+      "category": "Pabrik video faceless (pelajari, jangan ditiru mentah-mentah)",
+      "repo": "FujiwaraChoki/MoneyPrinter",
+      "url": "https://github.com/FujiwaraChoki/MoneyPrinter",
+      "description": "Otomasi YouTube Shorts dari topik.",
+      "note": "Anti-contoh: stok b-roll generik + TTS."
+    },
+    {
+      "category": "Pabrik video faceless (pelajari, jangan ditiru mentah-mentah)",
+      "repo": "RayVentura/ShortGPT",
+      "url": "https://github.com/RayVentura/ShortGPT",
+      "description": "Framework otomasi konten video pendek.",
+      "note": ""
+    },
+    {
+      "category": "Pabrik video faceless (pelajari, jangan ditiru mentah-mentah)",
+      "repo": "gyoridavid/short-video-maker",
+      "url": "https://github.com/gyoridavid/short-video-maker",
+      "description": "TTS + caption otomatis + video latar + musik, dengan MCP/REST.",
+      "note": ""
+    },
+    {
+      "category": "Pabrik video faceless (pelajari, jangan ditiru mentah-mentah)",
+      "repo": "SamurAIGPT/AI-Youtube-Shorts-Generator",
+      "url": "https://github.com/SamurAIGPT/AI-Youtube-Shorts-Generator",
+      "description": "Memotong video panjang menjadi Shorts dengan AI.",
+      "note": ""
+    },
+    {
+      "category": "Pabrik video faceless (pelajari, jangan ditiru mentah-mentah)",
+      "repo": "SamurAIGPT/Text-To-Video-AI",
+      "url": "https://github.com/SamurAIGPT/Text-To-Video-AI",
+      "description": "Teks ke video dengan stok footage.",
+      "note": ""
+    },
+    {
+      "category": "Pabrik video faceless (pelajari, jangan ditiru mentah-mentah)",
+      "repo": "elebumm/RedditVideoMakerBot",
+      "url": "https://github.com/elebumm/RedditVideoMakerBot",
+      "description": "Video dari thread Reddit + TTS.",
+      "note": "Contoh klasik konten repetitif yang disasar kebijakan 'inauthentic content'."
+    },
+    {
+      "category": "Pabrik video faceless (pelajari, jangan ditiru mentah-mentah)",
+      "repo": "ClipsAI/clipsai",
+      "url": "https://github.com/ClipsAI/clipsai",
+      "description": "Mengubah video panjang menjadi klip pendek (transkrip + segmentasi).",
+      "note": "Berguna bila klip dipilih karena maknanya."
+    },
+    {
+      "category": "Daftar kurasi",
+      "repo": "showlab/Awesome-Video-Diffusion",
+      "url": "https://github.com/showlab/Awesome-Video-Diffusion",
+      "description": "Daftar kurasi model difusi video.",
+      "note": ""
+    },
+    {
+      "category": "Daftar kurasi",
+      "repo": "ChenHsing/Awesome-Video-Diffusion-Models",
+      "url": "https://github.com/ChenHsing/Awesome-Video-Diffusion-Models",
+      "description": "Survei model difusi video.",
+      "note": ""
+    },
+    {
+      "category": "Daftar kurasi",
+      "repo": "ComposioHQ/awesome-claude-skills",
+      "url": "https://github.com/ComposioHQ/awesome-claude-skills",
+      "description": "Daftar kurasi Claude skills.",
+      "note": ""
+    },
+    {
+      "category": "Daftar kurasi",
+      "repo": "travisvn/awesome-claude-skills",
+      "url": "https://github.com/travisvn/awesome-claude-skills",
+      "description": "Daftar kurasi Claude skills.",
+      "note": ""
+    }
+  ]
+}

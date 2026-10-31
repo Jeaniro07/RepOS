@@ -1,0 +1,18 @@
+[project]
+name = "slopguard"
+version = "0.1.0"
+description = "Anti-slop quality gates for AI-assisted video: script lint, caption checks, shot ledger, rendered-video QA, and a guarded fal.ai client."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = []
+
+[project.scripts]
+slopguard = "slopguard.cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["slopguard"]

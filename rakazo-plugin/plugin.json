@@ -1,0 +1,11 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.1.0/plugin.schema.json",
+  "name": "antislop-video",
+  "version": "0.1.0",
+  "description": "Anti-slop video director for Rakazo bots: brief-first workflow, sourced scripts, shot ledger, fal.ai generation with a spending guard, measured QA and a fresh-context critic.",
+  "author": { "name": "Jeaniro07", "url": "https://github.com/Jeaniro07" },
+  "homepage": "https://github.com/Jeaniro07/RepOS",
+  "repository": "https://github.com/Jeaniro07/RepOS",
+  "license": "MIT",
+  "keywords": ["video", "anti-slop", "fal", "remotion", "hyperframes", "ffmpeg", "captions", "qa"]
+}

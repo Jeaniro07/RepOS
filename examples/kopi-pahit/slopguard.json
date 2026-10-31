@@ -1,0 +1,15 @@
+{
+  "title": "Kenapa kopi saya pahit",
+  "format": "vertical",
+  "target": "1080x1920",
+  "fps": 30,
+  "duration": 16,
+  "lang": "id",
+  "lufs": -14,
+  "fal": {
+    "max_calls": 4
+  },
+  "lexicon": {
+    "extra": []
+  }
+}

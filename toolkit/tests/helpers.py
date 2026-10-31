@@ -10,7 +10,7 @@ FFMPEG = shutil.which("ffmpeg")
 
 
 def _run(args):
-    subprocess.run([FFMPEG, "-hide_banner", "-loglevel", "error", "-y"] + args, check=True)
+    subprocess.run([FFMPEG, "-nostdin", "-hide_banner", "-loglevel", "error", "-y"] + args, check=True, stdin=subprocess.DEVNULL)
 
 
 def make_sloppy(path: str, size: str = "540x960") -> str:

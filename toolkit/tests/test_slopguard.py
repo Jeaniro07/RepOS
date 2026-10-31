@@ -414,7 +414,8 @@ class Build(unittest.TestCase):
                 json.dump(long, fh)
             out = os.path.join(d, "edit", "master.srt")
             cli.main(["captions", words, "--out", out])
-            lines = [l for l in open(out).read().splitlines() if l and "-->" not in l and not l.isdigit()]
+            with open(out, encoding="utf-8") as fh:
+                lines = [l for l in fh.read().splitlines() if l and "-->" not in l and not l.isdigit()]
             self.assertTrue(lines and max(len(l) for l in lines) <= 28, lines)
 
     def test_balanced_split_has_no_orphans_and_keeps_numbers(self):

@@ -147,8 +147,9 @@ def data_uri(path: str) -> str:
         return f"data:{ctype};base64,{base64.b64encode(fh.read()).decode()}"
 
 
-def resolve_local_inputs(payload: Any, base_dir: str, inline_max_bytes: int = 0) -> Any:
-    """Replace values of *_url / *_urls keys that point at local files with uploaded URLs."""
+def resolve_local_inputs(payload: Any, base_dir, inline_max_bytes: int = 0) -> Any:
+    """Replace values of *_url / *_urls keys that point at local files with uploaded URLs.
+    base_dir may be one folder or a list tried in order (input file's folder, then cwd)."""
     if isinstance(payload, dict):
         out = {}
         for k, v in payload.items():
@@ -166,12 +167,29 @@ def _resolve_value(v: Any, base_dir: str, inline_max_bytes: int) -> Any:
     if isinstance(v, list):
         return [_resolve_value(x, base_dir, inline_max_bytes) for x in v]
     if isinstance(v, str) and not re.match(r"^(https?:|data:)", v):
-        p = v if os.path.isabs(v) else os.path.join(base_dir, v)
-        if os.path.exists(p):
+        bases = base_dir if isinstance(base_dir, (list, tuple)) else [base_dir]
+        candidates = [v] if os.path.isabs(v) else [os.path.join(b, v) for b in bases]
+        p = next((c for c in candidates if os.path.exists(c)), None)
+        if p:
             if inline_max_bytes and os.path.getsize(p) <= inline_max_bytes:
                 return data_uri(p)
             return upload_file(p)
     return v
+
+
+def payload_has_no_local_paths(payload: Any, bases) -> bool:
+    """After resolution, every *_url value must be a URL (or data URI)."""
+    if isinstance(payload, dict):
+        for k, v in payload.items():
+            if (k.endswith("_url") or k.endswith("_urls")) and v:
+                vals = v if isinstance(v, list) else [v]
+                if any(isinstance(x, str) and not re.match(r"^(https?:|data:)", x) for x in vals):
+                    return False
+            elif not payload_has_no_local_paths(v, bases):
+                return False
+    elif isinstance(payload, list):
+        return all(payload_has_no_local_paths(x, bases) for x in payload)
+    return True
 
 
 # ------------------------------------------------------------- run
@@ -244,7 +262,7 @@ def run(
     max_wait: int = 900,
     label: str = "",
     on_status=None,
-    base_dir: Optional[str] = None,
+    base_dir=None,
 ) -> dict:
     used, max_calls, log = budget(project_dir)
     if not confirm:
@@ -257,7 +275,10 @@ def run(
             f"Call budget reached ({used}/{max_calls}). Ask the user before raising fal.max_calls in slopguard.json."
         )
     _key()
-    payload = resolve_local_inputs(payload, base_dir or os.getcwd())
+    bases = [b for b in ([base_dir] if isinstance(base_dir, str) else list(base_dir or [])) if b] + [os.getcwd()]
+    payload = resolve_local_inputs(payload, bases)
+    if not payload_has_no_local_paths(payload, bases):
+        raise FalError("An input *_url points at a local path that does not exist. Use a path relative to the project folder, or a URL.")
     handle = submit(endpoint, payload)
     _log(log, {"event": "submit", "endpoint": endpoint, "request_id": handle.get("request_id"), "label": label})
     result = wait(handle, max_wait=max_wait, on_status=on_status)

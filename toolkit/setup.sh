@@ -6,7 +6,8 @@
 #   1. finds ffmpeg/ffprobe, or downloads a static build (BtbN/FFmpeg-Builds,
 #      GPL, linux64 / linuxarm64) into ~/.local/share/slopguard/bin;
 #   2. falls back to the imageio-ffmpeg wheel (ffmpeg only) through uv;
-#   3. installs a `slopguard` command into ~/.local/bin;
+#   3. installs a `slopguard` command into ~/.local/bin (and links ffmpeg/ffprobe
+#      there when they are not already on PATH);
 #   4. runs `slopguard doctor`.
 # Safe to re-run. Never touches FAL_KEY or any other secret.
 set -euo pipefail
@@ -73,6 +74,12 @@ if [ "${SLOPGUARD_FORCE_STATIC:-0}" = "1" ] || ! ffmpeg_ok; then
     exit 1
   }
 fi
+
+# Make the binaries callable as plain `ffmpeg` / `ffprobe` too: the assembly skill
+# runs ffmpeg directly, not only through slopguard.
+for b in ffmpeg ffprobe; do
+  if ! have "${b}" && [ -x "${BIN}/${b}" ]; then ln -sf "${BIN}/${b}" "${HOME}/.local/bin/${b}"; fi
+done
 
 cat > "${HOME}/.local/bin/slopguard" <<EOF
 #!/usr/bin/env bash

@@ -11,11 +11,14 @@ and `uv`. Everything installs into the home folder.
 ## Install or update
 
 ```bash
+REF="${ANTISLOP_REF:-main}"
 if [ -d ~/antislop/RepOS/.git ]; then git -C ~/antislop/RepOS pull --ff-only; \
-else mkdir -p ~/antislop && git clone --depth 1 https://github.com/Jeaniro07/RepOS ~/antislop/RepOS; fi
+else mkdir -p ~/antislop && git clone --depth 1 --branch "$REF" https://github.com/Jeaniro07/RepOS ~/antislop/RepOS; fi
 bash ~/antislop/RepOS/toolkit/setup.sh
 slopguard doctor
 ```
+
+`ANTISLOP_REF` is only for testing an unmerged branch; leave it unset to use `main`.
 
 `setup.sh` downloads a static ffmpeg + ffprobe build (about 150 MB, BtbN/FFmpeg-Builds) into
 `~/.local/share/slopguard/bin` when none is installed, falls back to the imageio-ffmpeg wheel through `uv`,

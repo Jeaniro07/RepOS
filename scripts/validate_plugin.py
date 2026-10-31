@@ -7,7 +7,9 @@ packages/core/src/agent-skill.ts) as of 2026-10:
   - mcp.json: same schema version, only $schema + mcpServers, entries type/url/headers,
     type streamable-http|sse, https URL, no ${VAR} placeholders
   - skills/<name>/SKILL.md: frontmatter with simple 'key: value' lines, name <= 80, description <= 2000
-  - companion files: text only (.md .mdx .txt .json .yaml .yml .csv), <= 40 per skill, <= 400,000 bytes per skill
+  - companion files: text only (.md .mdx .txt .json .yaml .yml .csv); any other file makes Rakazo
+    refuse the whole skill; <= 40 per skill, <= 400,000 bytes per skill
+  For the real parser, see simulation/rakazo-preview/ (runs Rakazo's parsePluginDirectory).
   - commands/<name>.md, agents/<name>.md: agents need name+description frontmatter
   - <= 200 files, <= 100,000 bytes per file, <= 4,000,000 bytes total, no symlinks
 Usage: python3 scripts/validate_plugin.py rakazo-plugin
@@ -123,7 +125,8 @@ def main(root: str) -> int:
         companions = [(r, p) for r, p in files if r.startswith(f"skills/{skill}/") and r != f"skills/{skill}/SKILL.md"]
         nontext = [r for r, _ in companions if not TEXT_RE.search(r)]
         if nontext:
-            warnings.append(f"skills/{skill}: non-text companions are skipped: {nontext}")
+            # Rakazo refuses the whole skill ("Skills with scripts or other non-text files are not supported").
+            errors.append(f"skills/{skill}: non-text files make Rakazo refuse this skill: {nontext}")
         if len(companions) > 40:
             errors.append(f"skills/{skill}: {len(companions)} companion files (max 40)")
         size = sum(os.path.getsize(p) for _, p in companions) + os.path.getsize(smd)

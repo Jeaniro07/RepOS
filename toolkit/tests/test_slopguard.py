@@ -300,9 +300,61 @@ class Fal(unittest.TestCase):
             with self.assertRaises(fal.FalError):
                 fal.run("fal-ai/nano-banana-pro", {"prompt": "y"}, out_dir=d, project_dir=d, confirm=True)
 
+    def test_missing_local_file_is_an_error_not_a_paid_call(self):
+        with tempfile.TemporaryDirectory() as d:
+            project.init_project(d, "t")
+            with self.assertRaises(fal.FalError):
+                fal.run("fal-ai/x/edit", {"image_url": "assets/missing.png"}, out_dir=d, project_dir=d, confirm=True, base_dir=d)
+            self.assertFalse([c for c in _FakeFal.calls if c[1].startswith("/fal-ai/")])
+
     def test_rejects_bad_endpoint(self):
         with self.assertRaises(fal.FalError):
             fal.submit("https://evil.example/x", {})
+
+
+class Build(unittest.TestCase):
+    SCRIBE = {"words": [
+        {"text": "Kopi", "start": 0.2, "end": 0.5, "type": "word"}, {"text": " ", "start": 0.5, "end": 0.55, "type": "spacing"},
+        {"text": "saya", "start": 0.55, "end": 0.9, "type": "word"}, {"text": "pahit.", "start": 0.95, "end": 1.4, "type": "word"},
+        {"text": "Turunkan", "start": 2.2, "end": 2.8, "type": "word"}, {"text": "ke", "start": 2.85, "end": 2.95, "type": "word"},
+        {"text": "92", "start": 3.0, "end": 3.4, "type": "word"}, {"text": "derajat.", "start": 3.45, "end": 4.0, "type": "word"},
+    ]}
+
+    def test_extract_formats(self):
+        from slopguard import build
+        self.assertEqual(len(build.extract_words(self.SCRIBE)), 7)  # spacing dropped
+        whisper = {"segments": [{"words": [{"word": "a", "start": 0, "end": 0.2}, {"word": "b", "start": 0.3, "end": 0.5}]}]}
+        self.assertEqual([w[0] for w in build.extract_words(whisper)], ["a", "b"])
+        chunks = {"chunks": [{"text": "satu dua", "timestamp": [0.0, 1.0]}]}
+        self.assertEqual(len(build.extract_words(chunks)), 2)
+
+    def test_captions_break_on_sentences_and_keep_numbers(self):
+        from slopguard import build
+        cues = build.captions_from_words(build.extract_words(self.SCRIBE), lang="id")
+        texts = [" ".join(c[2]) for c in cues]
+        self.assertEqual(texts, ["Kopi saya pahit.", "Turunkan ke 92 derajat."])
+        for (s, e, _), nxt in zip(cues, cues[1:] + [None]):
+            self.assertGreaterEqual(e - s, 0.8 - 1e-6)
+            if nxt:
+                self.assertLessEqual(e, nxt[0])
+        srt = build.to_srt(cues)
+        self.assertEqual(captions.check_captions(srt).exit_code(), EXIT_CLEAN)
+
+    def test_edl_mapping(self):
+        from slopguard import build
+        words = build.extract_words(self.SCRIBE)
+        out = build.map_to_output(words, [{"start": 2.0, "end": 4.2}])
+        self.assertEqual(out[0][0], "Turunkan")
+        self.assertAlmostEqual(out[0][1], 0.2, places=3)
+
+    @unittest.skipUnless(helpers.have_ffmpeg(), "ffmpeg not installed")
+    def test_master_hits_target(self):
+        from slopguard import build
+        with tempfile.TemporaryDirectory() as d:
+            src = helpers.make_sloppy(os.path.join(d, "loud.mp4"))
+            res = build.master_loudness(src, os.path.join(d, "out.mp4"))
+            self.assertAlmostEqual(res["after_lufs"], -14.0, delta=1.0)
+            self.assertLessEqual(res["after_true_peak"], -1.0)
 
 
 if __name__ == "__main__":

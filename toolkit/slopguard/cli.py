@@ -10,7 +10,7 @@ import json
 import os
 import sys
 
-from slopguard import __version__, captions, fal, ledger, media, project, sheet, textlint, videoqa
+from slopguard import __version__, build, captions, fal, ledger, media, project, sheet, textlint, videoqa
 from slopguard.report import EXIT_USAGE, Report, apply_waivers, load_waivers, write_outputs
 
 
@@ -165,6 +165,34 @@ def cmd_fal(a) -> int:
     return EXIT_USAGE
 
 
+def cmd_build_captions(a) -> int:
+    words = build.extract_words(json.loads(_read(a.words)))
+    if not words:
+        print("error: no word timings found in the transcript JSON", file=sys.stderr)
+        return EXIT_USAGE
+    if a.edl:
+        edl = json.loads(_read(a.edl))
+        words = build.map_to_output(words, edl.get("ranges", edl if isinstance(edl, list) else []))
+    cfg = project.load_config(a.out)
+    lang = a.lang or cfg.get("lang", "id")
+    video_end = media.probe(a.video).duration if a.video else None
+    cues = build.captions_from_words(words, lang=lang, max_chars=a.max_chars, max_cps=a.max_cps, video_end=video_end)
+    with open(a.out, "w", encoding="utf-8") as fh:
+        fh.write(build.to_srt(cues))
+    report = captions.check_captions(_read(a.out), subject=a.out, video_duration=video_end)
+    print(f"wrote {a.out}: {len(cues)} cues from {len(words)} words; {report.verdict()}")
+    return report.exit_code()
+
+
+def cmd_master(a) -> int:
+    cfg = project.load_config(a.input)
+    lufs = a.lufs if a.lufs is not None else cfg.get("lufs", -14.0)
+    res = build.master_loudness(a.input, a.out, lufs=float(lufs), tp=a.tp)
+    print(json.dumps(res, indent=2))
+    ok = res["after_lufs"] is not None and abs(res["after_lufs"] - float(lufs)) <= 1.0 and (res["after_true_peak"] or 0) <= -1.0
+    return 0 if ok else 2
+
+
 def cmd_doctor(a) -> int:
     ok = True
     ff = media._find("ffmpeg")
@@ -266,6 +294,23 @@ def build_parser() -> argparse.ArgumentParser:
     b = fs.add_parser("budget", help="show calls used / allowed")
     b.add_argument("--project", default=".")
     s.set_defaults(func=cmd_fal)
+
+    s = sub.add_parser("captions", help="build a readable SRT from word timestamps (Scribe/Whisper/fal JSON)")
+    s.add_argument("words", help="transcript JSON with word-level timings")
+    s.add_argument("--out", required=True, help="output .srt")
+    s.add_argument("--edl", help="EDL JSON with ranges[{start,end}] to map source time to output time")
+    s.add_argument("--video", help="rendered video, to clamp cues to its end")
+    s.add_argument("--lang", choices=["id", "en"])
+    s.add_argument("--max-chars", type=int, default=42)
+    s.add_argument("--max-cps", type=float, default=17.0)
+    s.set_defaults(func=cmd_build_captions)
+
+    s = sub.add_parser("master", help="two-pass loudness master (video stream copied)")
+    s.add_argument("input")
+    s.add_argument("--out", required=True)
+    s.add_argument("--lufs", type=float)
+    s.add_argument("--tp", type=float, default=-1.5)
+    s.set_defaults(func=cmd_master)
 
     s = sub.add_parser("doctor", help="check ffmpeg, filters and FAL_KEY presence")
     s.set_defaults(func=cmd_doctor)

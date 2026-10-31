@@ -18,22 +18,22 @@
 - loudness range (LU): 1.70
 - dead-air gaps: 0
 - frozen share of runtime: 0%
-- first frame luma / range: 116 / 48
+- first frame luma / range: 109 / 83
 - cuts detected: 4
 - mean shot length (s): 3.96
 - cut times (s): 4.70, 7.17, 12.30, 16.97
-- captions: cues: 5
-- captions: mean reading speed (chars/s): 11.30
+- captions: cues: 7
+- captions: mean reading speed (chars/s): 11.50
 - ledger: shots: 5
 - ledger: runtime in ledger (s): 19.75
 - ledger: runtime by source: footage 50%, code 26%, generated 24%
-- contact sheets: /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/cuts.jpg
+- contact sheets: /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/edit/qa/cuts.jpg
 
 ## Findings
 
 | | Gate | Where | Problem | Fix |
 |---|---|---|---|---|
-| NOTE | `encode.bitrate` | - | 1.8 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode. | Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p). |
+| NOTE | `encode.bitrate` | - | 1.9 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode. | Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p). |
 
 ## Not measurable here: check by eye/ear and say so
 

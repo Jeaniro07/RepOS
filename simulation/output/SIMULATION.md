@@ -1,8 +1,8 @@
 # Simulasi: bot Rakazo memakai plugin antislop-video
 
-- Tanggal: 2026-10-31 13:48 UTC
+- Tanggal: 2026-10-31 13:52 UTC
 - Repo yang di-clone bot: `https://github.com/Jeaniro07/RepOS` ref `claude/keen-einstein-1e7dc9`
-- Hasil: **36/37 langkah sesuai harapan**
+- Hasil: **37/37 langkah sesuai harapan**
 - Skill terpasang menurut parser Rakazo: antislop-script, antislop-video-director, cek-slop, fal-media, slop-critic, video, video-assembly, video-qa, video-toolkit-setup
 
 Nyata: parser plugin Rakazo, clone dari GitHub, setup.sh + ffmpeg statis, semua perintah slopguard, semua render ffmpeg.
@@ -49,7 +49,7 @@ footage pengguna (klip placeholder berlabel), dan tulisan agent (brief/naskah da
 | 34 | bot | video-qa | QA pass 2 | 0 (0) | ✅ |
 | 35 | bot | video-qa | Bahan untuk helper slop-critic tersedia (run_subagent dijalankan oleh Rakazo) | 0 (0) | ✅ |
 | 36 | bot | antislop-video-director | Serahkan: final.mp4 + SRT + REVIEW + ledger (tanpa mengunggah) | 0 (0) | ✅ |
-| 37 | sim | Floor #4 | Audit keamanan: anggaran, kunci, publikasi | 1 (0) | ❌ |
+| 37 | sim | Floor #4 | Audit keamanan: anggaran, kunci, publikasi | 0 (0) | ✅ |
 
 ## Audit
 
@@ -64,9 +64,7 @@ footage pengguna (klip placeholder berlabel), dan tulisan agent (brief/naskah da
     "bytedance/seedance-2.0/image-to-video"
   ],
   "requests_without_key": 0,
-  "files_or_outputs_containing_key": [
-    "/tmp/antislop-sim-1o6zgogw/home/antislop/RepOS/simulation/run_simulation.py"
-  ],
+  "files_or_outputs_containing_key": [],
   "upload_or_publish_commands": "none (no YouTube/TikTok/IG tools exist or were called)"
 }
 ```
@@ -81,17 +79,17 @@ Verdict: **CLEAR: no open FLOOR or REFLEX findings. Still review it with fresh e
 - video codec: h264
 - audio: aac 48000 Hz
 - target duration (s): 20
-- bits per pixel: 0.029
+- bits per pixel: 0.031
 - integrated loudness (LUFS): -14.0
 - true peak (dBTP): -1.5
 - loudness range (LU): 1.7
 - dead-air gaps: 0
 - frozen share of runtime: 0%
-- first frame luma / range: 116 / 48
+- first frame luma / range: 109 / 83
 - cuts detected: 4
 - mean shot length (s): 3.96
-- captions: cues: 5
-- captions: mean reading speed (chars/s): 11.3
+- captions: cues: 7
+- captions: mean reading speed (chars/s): 11.5
 - ledger: shots: 5
 - ledger: runtime in ledger (s): 19.75
 - ledger: runtime by source: footage 50%, code 26%, generated 24%
@@ -167,7 +165,7 @@ node … preview.mjs rakazo-plugin
 python3 scripts/validate_plugin.py rakazo-plugin
 ```
 ```text
-/home/user/RepOS/rakazo-plugin: 17 files, 48134 bytes, 7 skills/agents
+/home/user/RepOS/rakazo-plugin: 17 files, 48359 bytes, 7 skills/agents
 OK
 ```
 
@@ -196,20 +194,20 @@ slopguard doctor
 ```
 ```text
 downloading https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n8.1-latest-linux64-gpl-8.1.tar.xz (about 150 MB)...
-installed /tmp/antislop-sim-1o6zgogw/home/.local/share/slopguard/bin/ffmpeg
-installed /tmp/antislop-sim-1o6zgogw/home/.local/share/slopguard/bin/ffprobe
+installed /tmp/antislop-sim-66x04nf1/home/.local/share/slopguard/bin/ffmpeg
+installed /tmp/antislop-sim-66x04nf1/home/.local/share/slopguard/bin/ffprobe
 slopguard 0.1.0  python 3.11.18
-ffmpeg : /tmp/antislop-sim-1o6zgogw/home/.local/bin/ffmpeg  (version n8.1.3-27-g8dca1586f4-20261031)
-ffprobe: /tmp/antislop-sim-1o6zgogw/home/.local/bin/ffprobe
+ffmpeg : /tmp/antislop-sim-66x04nf1/home/.local/bin/ffmpeg  (version n8.1.3-27-g8dca1586f4-20261031)
+ffprobe: /tmp/antislop-sim-66x04nf1/home/.local/bin/ffprobe
 FAL_KEY: not set (needed only for fal generation)
 filters: all present
 slopguard 0.1.0  python 3.11.18
-ffmpeg : /tmp/antislop-sim-1o6zgogw/home/.local/bin/ffmpeg  (version n8.1.3-27-g8dca1586f4-20261031)
-ffprobe: /tmp/antislop-sim-1o6zgogw/home/.local/bin/ffprobe
+ffmpeg : /tmp/antislop-sim-66x04nf1/home/.local/bin/ffmpeg  (version n8.1.3-27-g8dca1586f4-20261031)
+ffprobe: /tmp/antislop-sim-66x04nf1/home/.local/bin/ffprobe
 FAL_KEY: not set (needed only for fal generation)
 filters: all present
 
-Cloning into '/tmp/antislop-sim-1o6zgogw/home/antislop/RepOS'...
+Cloning into '/tmp/antislop-sim-66x04nf1/home/antislop/RepOS'...
 ```
 
 ### 6. ffmpeg kini bisa dipanggil langsung (untuk video-assembly)
@@ -218,9 +216,9 @@ Cloning into '/tmp/antislop-sim-1o6zgogw/home/antislop/RepOS'...
 command -v ffmpeg ffprobe slopguard && ffmpeg -version | head -1
 ```
 ```text
-/tmp/antislop-sim-1o6zgogw/home/.local/bin/ffmpeg
-/tmp/antislop-sim-1o6zgogw/home/.local/bin/ffprobe
-/tmp/antislop-sim-1o6zgogw/home/.local/bin/slopguard
+/tmp/antislop-sim-66x04nf1/home/.local/bin/ffmpeg
+/tmp/antislop-sim-66x04nf1/home/.local/bin/ffprobe
+/tmp/antislop-sim-66x04nf1/home/.local/bin/slopguard
 ffmpeg version n8.1.3-27-g8dca1586f4-20261031 Copyright (c) 2000-2026 the FFmpeg developers
 ```
 
@@ -230,9 +228,8 @@ ffmpeg version n8.1.3-27-g8dca1586f4-20261031 Copyright (c) 2000-2026 the FFmpeg
 cd ~/antislop/RepOS/toolkit && python3 -m unittest discover -s tests 2>&1 | tail -3
 ```
 ```text
-Ran 24 tests in 12.000s
-
 OK
+wrote /tmp/tmpaktcnv3a/edit/master.srt: 2 cues from 9 words, <= 28 chars/line; CLEAR: no open FLOOR or REFLEX findings. Still review it with fresh eyes.
 ```
 
 ### 8. request_secret {name: fal-key, auth: command} → pengguna menyimpan kunci di kartu terlindung
@@ -256,13 +253,13 @@ FAL_KEY: set
 slopguard init ~/videos/kopi-pahit --title 'Kenapa kopi saya pahit' --format vertical --duration 20 --lang id --max-calls 4
 ```
 ```text
-created /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/slopguard.json
-created /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/BRIEF.md
-created /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/SPEC.md
-created /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/script.md
-created /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/ledger.csv
-created /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/waivers.json
-created /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/project.md
+created /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/slopguard.json
+created /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/BRIEF.md
+created /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/SPEC.md
+created /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/script.md
+created /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/ledger.csv
+created /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/waivers.json
+created /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/project.md
 ```
 
 ### 12. Brief diisi, 3 alur cerita diusulkan, pengguna memilih alur 1; SPEC.md ditulis
@@ -330,9 +327,9 @@ cd ~/videos/kopi-pahit && slopguard fal run fal-ai/elevenlabs/tts/eleven-v3 --in
 ```
 ```text
 {
-  "request_id": "6922e3ddb72d4f8e84b397a4539628fe",
+  "request_id": "7def00ab278643cd9ee962407380267f",
   "files": [
-    "/tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/gen/voice/voice-6922e3dd-0.wav"
+    "/tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/gen/voice/voice-7def00ab-0.wav"
   ]
 }
 
@@ -347,7 +344,7 @@ cd ~/videos/kopi-pahit && slopguard fal run fal-ai/elevenlabs/speech-to-text/scr
 ```
 ```text
 {
-  "request_id": "1beb531a10474155b53d08deb67e7a29",
+  "request_id": "f6d0909b7b174dc4a7ca74b417a66933",
   "files": []
 }
 
@@ -362,9 +359,9 @@ cd ~/videos/kopi-pahit && slopguard fal run fal-ai/nano-banana-pro --input gen/s
 ```
 ```text
 {
-  "request_id": "7c27a0a9af5f41fcb98731d3b2ae67a8",
+  "request_id": "f0db545ffe5e43ac92fac1633c891276",
   "files": [
-    "/tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/gen/shot4/shot4-still-7c27a0a9-0.png"
+    "/tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/gen/shot4/shot4-still-f0db545f-0.png"
   ]
 }
 
@@ -379,9 +376,9 @@ cd ~/videos/kopi-pahit && slopguard fal run bytedance/seedance-2.0/image-to-vide
 ```
 ```text
 {
-  "request_id": "5bfac8bb89b9478fbb74cf73f54d81b5",
+  "request_id": "dda77a3d41354fe18f76c47faeac42af",
   "files": [
-    "/tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/gen/shot4/shot4-motion-5bfac8bb-0.mp4"
+    "/tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/gen/shot4/shot4-motion-dda77a3d-0.mp4"
   ]
 }
 
@@ -401,7 +398,7 @@ fal error: Call budget reached (4/4). Ask the user before raising fal.max_calls 
 ### 24. Lihat hasil generatif di contact sheet sebelum dipakai
 
 ```bash
-cd ~/videos/kopi-pahit && slopguard sheet /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/gen/shot4/shot4-motion-5bfac8bb-0.mp4 --out gen/shot4/sheet --count 6
+cd ~/videos/kopi-pahit && slopguard sheet /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/gen/shot4/shot4-motion-dda77a3d-0.mp4 --out gen/shot4/sheet --count 6
 ```
 ```text
 gen/shot4/sheet/overview.jpg
@@ -431,10 +428,10 @@ cd ~/videos/kopi-pahit && ffmpeg -nostdin -hide_banner -loglevel error -y -f lav
 ### 29. Caption dari timestamp kata (slopguard captions)
 
 ```bash
-cd ~/videos/kopi-pahit && slopguard captions gen/transcript/stt-1beb531a.json --out edit/master.srt --lang id
+cd ~/videos/kopi-pahit && slopguard captions gen/transcript/stt-f6d0909b.json --out edit/master.srt --lang id
 ```
 ```text
-wrote edit/master.srt: 5 cues from 30 words; CLEAR: no open FLOOR or REFLEX findings. Still review it with fresh eyes.
+wrote edit/master.srt: 7 cues from 30 words, <= 28 chars/line; CLEAR: no open FLOOR or REFLEX findings. Still review it with fresh eyes.
 ```
 
 ### 30. Render v1: shot per segmen → concat -c copy → caption TERAKHIR (pass sendiri) → mux audio → master -14 LUFS
@@ -458,8 +455,8 @@ cd ~/videos/kopi-pahit && slopguard qa edit/preview.mp4 --captions edit/master.s
 ```
 ```text
 NOT YET: fix or waive (with a reason) every open REFLEX finding.
-REFLEX picture.frozen 7.47s Principal picture does not change for 4.6s (max 2.5s).
-FINISH encode.bitrate None 1.8 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode.
+REFLEX picture.frozen 7.47s Principal picture does not change for 3.5s (max 2.5s).
+FINISH encode.bitrate None 1.9 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode.
 ```
 
 ### 32. Perbaikan: shot 3 diubah dari kartu diam menjadi diagram yang bergerak sesuai narasi (batang 'senyawa pahit' terisi)
@@ -488,18 +485,18 @@ cd ~/videos/kopi-pahit && slopguard qa edit/preview.mp4 --captions edit/master.s
 4
 - mean shot length (s): 3.96
 - cut times (s): 4.70, 7.17, 12.30, 16.97
-- captions: cues: 5
-- captions: mean reading speed (chars/s): 11.30
+- captions: cues: 7
+- captions: mean reading speed (chars/s): 11.50
 - ledger: shots: 5
 - ledger: runtime in ledger (s): 19.75
 - ledger: runtime by source: footage 50%, code 26%, generated 24%
-- contact sheets: /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/cuts.jpg
+- contact sheets: /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/edit/qa/cuts.jpg
 
 ## Findings
 
 | | Gate | Where | Problem | Fix |
 |---|---|---|---|---|
-| NOTE | `encode.bitrate` | - | 1.8 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode. | Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p). |
+| NOTE | `encode.bitrate` | - | 1.9 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode. | Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p). |
 
 ## Not measurable here: check by eye/ear and say so
 
@@ -514,7 +511,7 @@ cd ~/videos/kopi-pahit && slopguard qa edit/preview.mp4 --captions edit/master.s
 
 _A measured pass is not a good video. Numbers catch what is broken; a fresh-context critic catches what is weak. Report what was measured and what nobody checked._
 
-wrote /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/qa-report.md, /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/qa-report.json
+wrote /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/edit/qa/qa-report.md, /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/edit/qa/qa-report.json
 ```
 
 ### 35. Bahan untuk helper slop-critic tersedia (run_subagent dijalankan oleh Rakazo)
@@ -523,13 +520,13 @@ wrote /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/qa-report.md, /t
 cd ~/videos/kopi-pahit && ls -la BRIEF.md SPEC.md script.md ledger.csv edit/qa/qa-report.md edit/qa/overview.jpg edit/qa/cuts.jpg
 ```
 ```text
--rw-r--r-- 1 rakazo-sim rakazo-sim   1046 Oct 31 13:46 BRIEF.md
--rw-r--r-- 1 rakazo-sim rakazo-sim   1098 Oct 31 13:46 SPEC.md
--rw-r--r-- 1 rakazo-sim rakazo-sim  68236 Oct 31 13:48 edit/qa/cuts.jpg
--rw-r--r-- 1 rakazo-sim rakazo-sim 225411 Oct 31 13:48 edit/qa/overview.jpg
--rw-r--r-- 1 rakazo-sim rakazo-sim   2207 Oct 31 13:48 edit/qa/qa-report.md
--rw-r--r-- 1 rakazo-sim rakazo-sim    787 Oct 31 13:47 ledger.csv
--rw-r--r-- 1 rakazo-sim rakazo-sim    496 Oct 31 13:46 script.md
+-rw-r--r-- 1 rakazo-sim rakazo-sim   1046 Oct 31 13:51 BRIEF.md
+-rw-r--r-- 1 rakazo-sim rakazo-sim   1098 Oct 31 13:51 SPEC.md
+-rw-r--r-- 1 rakazo-sim rakazo-sim  68444 Oct 31 13:52 edit/qa/cuts.jpg
+-rw-r--r-- 1 rakazo-sim rakazo-sim 206969 Oct 31 13:52 edit/qa/overview.jpg
+-rw-r--r-- 1 rakazo-sim rakazo-sim   2207 Oct 31 13:52 edit/qa/qa-report.md
+-rw-r--r-- 1 rakazo-sim rakazo-sim    787 Oct 31 13:51 ledger.csv
+-rw-r--r-- 1 rakazo-sim rakazo-sim    496 Oct 31 13:51 script.md
 ```
 
 ### 36. Serahkan: final.mp4 + SRT + REVIEW + ledger (tanpa mengunggah)
@@ -538,13 +535,13 @@ cd ~/videos/kopi-pahit && ls -la BRIEF.md SPEC.md script.md ledger.csv edit/qa/q
 cd ~/videos/kopi-pahit && mkdir -p deliver && cp edit/preview.mp4 deliver/final.mp4 && cp edit/master.srt deliver/final.srt && cp REVIEW.md ledger.csv deliver/ && printf '\n## Sesi 1 — simulasi\n**Strategi:** alur 1.\n**Keputusan:** 4 panggilan fal sesuai rencana; shot 3 dianimasikan setelah QA.\n**Tertunda:** footage uap asli.\n' >> project.md && ls -la deliver
 ```
 ```text
-total 4456
-drwxr-xr-x 2 rakazo-sim rakazo-sim    4096 Oct 31 13:48 .
-drwxr-xr-x 7 rakazo-sim rakazo-sim    4096 Oct 31 13:48 ..
--rw-r--r-- 1 rakazo-sim rakazo-sim     877 Oct 31 13:48 REVIEW.md
--rw-r--r-- 1 rakazo-sim rakazo-sim 4541623 Oct 31 13:48 final.mp4
--rw-r--r-- 1 rakazo-sim rakazo-sim     382 Oct 31 13:48 final.srt
--rw-r--r-- 1 rakazo-sim rakazo-sim     787 Oct 31 13:48 ledger.csv
+total 4724
+drwxr-xr-x 2 rakazo-sim rakazo-sim    4096 Oct 31 13:52 .
+drwxr-xr-x 7 rakazo-sim rakazo-sim    4096 Oct 31 13:52 ..
+-rw-r--r-- 1 rakazo-sim rakazo-sim     877 Oct 31 13:52 REVIEW.md
+-rw-r--r-- 1 rakazo-sim rakazo-sim 4814383 Oct 31 13:52 final.mp4
+-rw-r--r-- 1 rakazo-sim rakazo-sim     448 Oct 31 13:52 final.srt
+-rw-r--r-- 1 rakazo-sim rakazo-sim     787 Oct 31 13:52 ledger.csv
 ```
 
 ### 37. Audit keamanan: anggaran, kunci, publikasi
@@ -560,9 +557,7 @@ drwxr-xr-x 7 rakazo-sim rakazo-sim    4096 Oct 31 13:48 ..
     "bytedance/seedance-2.0/image-to-video"
   ],
   "requests_without_key": 0,
-  "files_or_outputs_containing_key": [
-    "/tmp/antislop-sim-1o6zgogw/home/antislop/RepOS/simulation/run_simulation.py"
-  ],
+  "files_or_outputs_containing_key": [],
   "upload_or_publish_commands": "none (no YouTube/TikTok/IG tools exist or were called)"
 }
 ```

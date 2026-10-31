@@ -16,13 +16,13 @@
     "video codec": "h264",
     "audio": "aac 48000 Hz",
     "target duration (s)": 20,
-    "bits per pixel": 0.029,
+    "bits per pixel": 0.031,
     "integrated loudness (LUFS)": -14.0,
     "true peak (dBTP)": -1.5,
     "loudness range (LU)": 1.7,
     "dead-air gaps": 0,
-    "frozen share of runtime": "23%",
-    "first frame luma / range": "116 / 48",
+    "frozen share of runtime": "18%",
+    "first frame luma / range": "109 / 83",
     "cuts detected": 4,
     "mean shot length (s)": 3.96,
     "cut times (s)": [
@@ -31,18 +31,18 @@
       12.3,
       16.97
     ],
-    "captions: cues": 5,
-    "captions: mean reading speed (chars/s)": 11.3,
+    "captions: cues": 7,
+    "captions: mean reading speed (chars/s)": 11.5,
     "ledger: shots": 5,
     "ledger: runtime in ledger (s)": 19.75,
     "ledger: runtime by source": "footage 50%, code 26%, generated 24%",
-    "contact sheets": "/tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-1o6zgogw/home/videos/kopi-pahit/edit/qa/cuts.jpg"
+    "contact sheets": "/tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/edit/qa/cuts.jpg"
   },
   "findings": [
     {
       "gate": "picture.frozen",
       "tier": "REFLEX",
-      "message": "Principal picture does not change for 4.6s (max 2.5s).",
+      "message": "Principal picture does not change for 3.5s (max 2.5s).",
       "at": "7.47s",
       "fix": "Give the frame a meaningful event (a reveal, an action, a new shot). Subtitle turnover or a slow zoom does not count.",
       "evidence": null,
@@ -52,7 +52,7 @@
     {
       "gate": "encode.bitrate",
       "tier": "FINISH",
-      "message": "1.8 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode.",
+      "message": "1.9 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode.",
       "at": null,
       "fix": "Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p).",
       "evidence": null,

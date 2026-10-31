@@ -251,6 +251,25 @@ def captions_from_words(
     return out
 
 
+def snap_to_cuts(cues, cuts: List[float], fps: float = 30.0):
+    """Netflix shot-change timing: a cue ending within 12 frames before a cut ends 2 frames
+    before it; a cue starting within 12 frames after a cut starts on it. Only moves times
+    outward (never shortens a cue) and keeps the 2-frame gap to neighbours."""
+    if not cuts:
+        return cues
+    f2, f12 = 2.0 / fps, 12.0 / fps
+    out = [list(c) for c in cues]
+    for i, c in enumerate(out):
+        for cut in cuts:
+            if 0 < cut - c[1] <= f12:
+                limit = out[i + 1][0] - f2 if i + 1 < len(out) else cut
+                c[1] = min(max(c[1], cut - f2), limit)
+            if 0 < c[0] - cut <= f12:
+                floor = out[i - 1][1] + f2 if i > 0 else 0.0
+                c[0] = max(cut, floor)
+    return [tuple(c) for c in out]
+
+
 def _ts(t: float) -> str:
     ms = int(round(t * 1000))
     h, ms = divmod(ms, 3600000)

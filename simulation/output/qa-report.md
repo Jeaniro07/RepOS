@@ -2,7 +2,7 @@
 
 - Subject: `edit/preview.mp4`
 - Verdict: **CLEAR: no open FLOOR or REFLEX findings. Still review it with fresh eyes.**
-- Floor 0 FAIL · Reflex 0 open (0 waived) · Finish 1 notes
+- Floor 0 FAIL · Reflex 0 open (0 waived) · Finish 7 notes
 
 ## Measured
 
@@ -18,22 +18,30 @@
 - loudness range (LU): 1.70
 - dead-air gaps: 0
 - frozen share of runtime: 0%
-- first frame luma / range: 109 / 83
-- cuts detected: 4
-- mean shot length (s): 3.96
-- cut times (s): 4.70, 7.17, 12.30, 16.97
-- captions: cues: 7
-- captions: mean reading speed (chars/s): 11.50
+- flicker stretches: 0
+- first frame luma / range: 114 / 57
+- cuts detected: 3
+- mean shot length (s): 4.95
+- cut times (s): 7.17, 12.30, 16.97
+- captions: reading-speed limit (chars/s): 17.00
+- captions: cues: 6
+- captions: mean reading speed (chars/s): 11.80
 - ledger: shots: 5
 - ledger: runtime in ledger (s): 19.75
 - ledger: runtime by source: footage 50%, code 26%, generated 24%
-- contact sheets: /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-66x04nf1/home/videos/kopi-pahit/edit/qa/cuts.jpg
+- contact sheets: /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/overview.jpg, /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/cuts.jpg, /tmp/antislop-sim-8o39fzua/home/videos/kopi-pahit/edit/qa/safezones.jpg
 
 ## Findings
 
 | | Gate | Where | Problem | Fix |
 |---|---|---|---|---|
-| NOTE | `encode.bitrate` | - | 1.9 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode. | Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p). |
+| NOTE | `captions.near-cut` | 12.04s | Cue 4 ends 255 ms from the shot change at 12.30s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
+| NOTE | `captions.near-cut` | 12.60s | Cue 5 starts 295 ms from the shot change at 12.30s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
+| NOTE | `captions.near-cut` | 16.70s | Cue 5 ends 263 ms from the shot change at 16.97s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
+| NOTE | `captions.near-cut` | 17.25s | Cue 6 starts 287 ms from the shot change at 16.97s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
+| NOTE | `captions.near-cut` | 6.91s | Cue 2 ends 262 ms from the shot change at 7.17s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
+| NOTE | `captions.near-cut` | 7.46s | Cue 3 starts 288 ms from the shot change at 7.17s. | Snap the cue to the cut (out-time 2 frames before it) or keep it 12+ frames away. |
+| NOTE | `encode.bitrate` | - | 2.0 Mb/s is thin for 1080x1920@30; expect banding/blocks after platform re-encode. | Encode H.264 CRF 18-20 (or 12+ Mb/s at 1080p). |
 
 ## Not measurable here: check by eye/ear and say so
 
@@ -45,5 +53,6 @@
 - [ ] Every cue matches the spoken words exactly (names, numbers, units kept together).
 - [ ] Line breaks fall on natural phrase boundaries, not mid-phrase.
 - [ ] Captions sit inside the title-safe area and never sit under platform UI or overlays.
+- [ ] safezones.jpg: no caption, face, product or key text inside the red platform-UI bands (approximate; check in each app).
 
 _A measured pass is not a good video. Numbers catch what is broken; a fresh-context critic catches what is weak. Report what was measured and what nobody checked._

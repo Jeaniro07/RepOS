@@ -346,7 +346,7 @@ def run(sim: Sim):
     sim.write(f"{proj}/ledger.csv", "\n".join(new_ledger) + "\n")
     sim.note(f"Potongan diambil dari jeda antar-kalimat di transkrip: {bounds}", "video-assembly", "", actor="bot")
     srt = "edit/master.srt"
-    sim.sh("Caption dari timestamp kata (slopguard captions)", "video-assembly", f"cd ~/{proj} && slopguard captions {os.path.relpath(transcript_json, os.path.join(sim.home, proj))} --out {srt} --lang id", expect=0)
+    sim.sh("Caption dari timestamp kata, ditempel ke titik potong (slopguard captions --cuts)", "video-assembly", f"cd ~/{proj} && slopguard captions {os.path.relpath(transcript_json, os.path.join(sim.home, proj))} --out {srt} --lang id --cuts {','.join(str(b) for b in bounds[1:-1])}", expect=0)
 
     def render(version):
         lines = ["set -e", "mkdir -p edit/clips"]

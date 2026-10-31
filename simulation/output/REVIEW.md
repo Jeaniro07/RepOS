@@ -2,7 +2,7 @@
 
 - Verdict QA: CLEAR: no open FLOOR or REFLEX findings. Still review it with fresh eyes.
 - Diukur: 1080x1920 @ 30.0 fps, 19.8 s, -14.0 LUFS, true peak -1.5 dBTP,
-  4 potongan, gambar beku 0%, caption 11.5 karakter/detik.
+  3 potongan, gambar beku 0%, caption 11.8 karakter/detik.
 - Dilihat: overview.jpg dan cuts.jpg. Tidak didengar: saya tidak bisa mendengar; mix hanya diukur.
 - Keputusan kreatif: alur 1 (masalah → penyebab → angka → hasil); alur 2 dan 3 tidak dibuat.
 - Perbaikan dari QA pass 1: kartu judul diam di shot 3 diganti diagram bergerak.

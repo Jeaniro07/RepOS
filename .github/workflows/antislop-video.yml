@@ -1,0 +1,49 @@
+name: antislop-video
+
+on:
+  pull_request:
+    paths:
+      - "toolkit/**"
+      - "rakazo-plugin/**"
+      - "scripts/validate_plugin.py"
+      - "research/build_catalog.py"
+      - ".github/workflows/antislop-video.yml"
+  push:
+    branches: [main]
+    paths:
+      - "toolkit/**"
+      - "rakazo-plugin/**"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - name: slopguard doctor
+        working-directory: toolkit
+        run: python -m slopguard doctor
+      - name: slopguard tests
+        working-directory: toolkit
+        run: python -m unittest discover -s tests -v
+      - name: Rakazo plugin rules
+        run: python scripts/validate_plugin.py rakazo-plugin
+      - name: Repo catalog builds
+        run: python research/build_catalog.py
+      - name: Example scripts behave
+        working-directory: toolkit
+        run: |
+          python -m slopguard lint-script ../examples/kopi-pahit/script.md
+          set +e
+          python -m slopguard lint-script ../examples/kopi-pahit/script-slop.md > /dev/null
+          test $? -eq 1

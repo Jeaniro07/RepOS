@@ -226,6 +226,12 @@ def cmd_build_captions(a) -> int:
     fps = vprobe.fps if vprobe and vprobe.fps else float(cfg.get("fps", 30) or 30)
     max_chars = a.max_chars or (VERTICAL_CHARS if _is_vertical(a.video, cfg) else LANDSCAPE_CHARS)
     cues = build.captions_from_words(words, lang=lang, max_chars=max_chars, max_cps=a.max_cps, fps=fps, video_end=video_end)
+    cuts = []
+    if a.cuts:
+        cuts = [float(x) for x in a.cuts.split(",") if x.strip()]
+    elif vprobe:
+        cuts = [c for c in media.picture_stats(a.video, vprobe.duration).cuts if 0.2 < c < vprobe.duration - 0.2]
+    cues = build.snap_to_cuts(cues, cuts, fps)
     with open(a.out, "w", encoding="utf-8") as fh:
         fh.write(build.to_srt(cues))
     check_chars = VERTICAL_CHECK if max_chars <= VERTICAL_CHARS else LANDSCAPE_CHECK
@@ -358,7 +364,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("words", help="transcript JSON with word-level timings")
     s.add_argument("--out", required=True, help="output .srt")
     s.add_argument("--edl", help="EDL JSON with ranges[{start,end}] to map source time to output time")
-    s.add_argument("--video", help="rendered video, to clamp cues to its end")
+    s.add_argument("--video", help="rendered video: clamps cues to its end and snaps them to its detected cuts")
+    s.add_argument("--cuts", help="shot-change times in seconds, comma separated (e.g. from the EDL), to snap cues to")
     s.add_argument("--lang", choices=["id", "en"])
     s.add_argument("--max-chars", type=int, help="default: 28 (build) / 32 (check) for vertical video, 42 otherwise")
     s.add_argument("--max-cps", type=float, help="default by language: 17 (id) / 20 (en)")

@@ -247,7 +247,7 @@ def near_cut_findings(cues: List[Cue], cuts: List[float], fps: float = 30.0) -> 
     out: List[Finding] = []
     if not cuts:
         return out
-    snap, keep_away = 2.0 / fps, 12.0 / fps
+    snap, keep_away = 2.5 / fps, 12.0 / fps  # half a frame of slack for SRT millisecond rounding
     for cue in cues:
         for label, t in (("starts", cue.start), ("ends", cue.end)):
             nearest = min(cuts, key=lambda c: abs(c - t))

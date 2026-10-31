@@ -431,6 +431,17 @@ class Build(unittest.TestCase):
         for (s1, e1, _), (s2, _, _) in zip(cues, cues[1:]):
             self.assertGreaterEqual(round(s2 - e1, 3), round(2 / 30, 3))
 
+    def test_snap_to_cuts(self):
+        from slopguard import build
+        cues = [(0.2, 4.43, ["a"]), (4.98, 6.9, ["b"]), (7.45, 10.0, ["c"])]
+        snapped = build.snap_to_cuts(cues, [4.7, 7.17], fps=30)
+        self.assertAlmostEqual(snapped[0][1], 4.7 - 2 / 30, places=3)   # ends 2 frames before the cut
+        self.assertAlmostEqual(snapped[1][0], 4.7, places=3)            # starts on the cut
+        self.assertAlmostEqual(snapped[1][1], 7.17 - 2 / 30, places=3)
+        self.assertAlmostEqual(snapped[2][0], 7.17, places=3)
+        found = captions.near_cut_findings(captions.parse_captions(build.to_srt(snapped)), [4.7, 7.17], fps=30)
+        self.assertEqual(found, [])
+
     def test_edl_mapping(self):
         from slopguard import build
         words = build.extract_words(self.SCRIBE)

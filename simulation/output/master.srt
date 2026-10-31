@@ -1,29 +1,27 @@
 1
-00:00:00,250 --> 00:00:02,195
+00:00:00,250 --> 00:00:04,433
 Kopi saya selalu pahit,
-
-2
-00:00:02,445 --> 00:00:04,433
 padahal bijinya mahal.
 
-3
+2
 00:00:04,983 --> 00:00:06,905
 Ternyata masalahnya air.
 
-4
-00:00:07,455 --> 00:00:10,948
-Air mendidih seratus derajat
-mengekstrak terlalu banyak
+3
+00:00:07,455 --> 00:00:10,159
+Air mendidih
+seratus derajat mengekstrak
 
-5
-00:00:11,018 --> 00:00:12,045
+4
+00:00:10,229 --> 00:00:12,045
+terlalu banyak
 senyawa pahit.
 
-6
+5
 00:00:12,595 --> 00:00:16,704
 Saya turunkan ke sekitar
 sembilan puluh dua derajat.
 
-7
+6
 00:00:17,254 --> 00:00:18,952
 Hasilnya lebih manis.

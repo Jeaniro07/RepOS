@@ -38,7 +38,8 @@ if Node is missing, install it in your home folder (for example a Node 22 tarbal
    appears at the window start.
 5. **Captions are built on the output timeline** (`output_time = word.start - segment.start + segment.offset`)
    and **applied last**, after every overlay. Build them with `slopguard captions <transcript.json> --out edit/master.srt`
-   (add `--edl edit/edl.json` when the transcript is of the source footage, not of the final narration).
+   (add `--edl edit/edl.json` when the transcript is of the source footage, not of the final narration, and
+   `--cuts <t1,t2,...>` with your shot changes so cues snap to them instead of flashing beside a cut).
    Burn them in their own pass on the picture (`-vf subtitles=...:fontsdir=/usr/share/fonts/truetype/dejavu -an`),
    then mux the audio in a separate pass with `-c:v copy -af apad -t <duration>`. Keeping captions and audio in
    one filtergraph has hung some ffmpeg builds.
